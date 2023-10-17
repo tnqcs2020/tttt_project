@@ -65,6 +65,7 @@ class _MenuLeftState extends State<MenuLeft> {
         // height: screenHeight * 0.35,
         width: screenWidth * 0.16,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.only(left: 5),
