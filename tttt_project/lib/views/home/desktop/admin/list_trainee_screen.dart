@@ -134,7 +134,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                   Expanded(
                     child: Container(
                       constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.74),
+                          BoxConstraints(minHeight: screenHeight * 0.7),
                       decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           border: Border.all(

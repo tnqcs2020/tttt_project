@@ -29,14 +29,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
-    print(sharedPref
-        .getString(
-          'userId',
-        )
-        .toString());
     if (isLoggedIn == true) {
-      // sharedPref.getString('email').toString();
-      // sharedPref.getString('password').toString();
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
@@ -59,10 +52,8 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
           setMenuSelected: sharedPref.getInt('menuSelected'),
           setIsRegistered: isExistUser.data()!['isRegistered'],
         );
-        print(isExistUser.data()?['group']);
       }
     }
-    // pagesSinhVien[currentUser.menuSelected.value];
   }
 
   @override
@@ -171,10 +162,143 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                 children: [
                   MenuLeft(),
                   SizedBox(width: screenWidth * 0.03),
-                  // pages[currentUser.group.value]
-                  //         ?[currentUser.menuSelected.value] ??
-                  //     // pages[currentUser.group.value]!
-                  //     const SizedBox(),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Container(
+                          constraints:
+                              BoxConstraints(minHeight: screenHeight * 0.3),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade600,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(5.0),
+                                          topRight: Radius.circular(5.0),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Thông báo",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          constraints:
+                              BoxConstraints(minHeight: screenHeight * 0.3),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade600,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(5.0),
+                                          topRight: Radius.circular(5.0),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Tin mới",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          constraints:
+                              BoxConstraints(minHeight: screenHeight * 0.3),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade600,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(5.0),
+                                          topRight: Radius.circular(5.0),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Nghiên cứu",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

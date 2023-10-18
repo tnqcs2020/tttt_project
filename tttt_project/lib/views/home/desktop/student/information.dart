@@ -30,14 +30,7 @@ class _InfoScreenState extends State<InfoScreen> {
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
-    print(sharedPref
-        .getString(
-          'userId',
-        )
-        .toString());
     if (isLoggedIn == true) {
-      // sharedPref.getString('email').toString();
-      // sharedPref.getString('password').toString();
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
@@ -60,10 +53,8 @@ class _InfoScreenState extends State<InfoScreen> {
           setMenuSelected: sharedPref.getInt('menuSelected'),
           setIsRegistered: isExistUser.data()!['isRegistered'],
         );
-        print(isExistUser.data()?['group']);
       }
     }
-    // pagesSinhVien[currentUser.menuSelected.value];
   }
 
   @override
@@ -169,14 +160,10 @@ class _InfoScreenState extends State<InfoScreen> {
                   children: [
                     MenuLeft(),
                     SizedBox(width: screenWidth * 0.03),
-                    // pages[currentUser.group.value]
-                    //         ?[currentUser.menuSelected.value] ??
-                    //     // pages[currentUser.group.value]!
-                    //     const SizedBox(),
                     Expanded(
                       child: Container(
                         constraints:
-                            BoxConstraints(minHeight: screenHeight * 0.74),
+                            BoxConstraints(minHeight: screenHeight * 0.7),
                         decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             border: Border.all(

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, dead_code
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_stepper/easy_stepper.dart';
@@ -77,7 +77,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await GV.traineesCol.doc(userId).get();
-        if (isExitTrainee.data() != null && loadUser.isRegistered == true) {
+        if (isExitTrainee.data() != null) {
           final loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
           currentUser.setCurrentUser(
@@ -146,7 +146,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         Expanded(
                           child: Container(
                             constraints:
-                                BoxConstraints(minHeight: screenHeight * 0.74),
+                                BoxConstraints(minHeight: screenHeight * 0.70),
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 border: Border.all(
@@ -177,357 +177,185 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                     ],
                                   ),
                                 ),
-                                StreamBuilder(
-                                  stream:
-                                      GV.traineesCol.doc(userId).snapshots(),
-                                  builder: (context, snapshotTrainee) {
-                                    if (snapshotTrainee.hasData &&
-                                        snapshotTrainee.connectionState ==
-                                            ConnectionState.active) {
-                                      final loadTrainee =
-                                          RegisterTraineeModel.fromMap(
-                                              snapshotTrainee.data!.data()!);
-                                      // currentUser.activeStep.value =
-                                      //     loadTrainee.reachedStep;
-                                      // currentUser.reachedStep.value =
-                                      //     loadTrainee.reachedStep;
-                                      return Column(
-                                        children: [
-                                          EasyStepper(
-                                            activeStep:
-                                                currentUser.activeStep.value,
-                                            maxReachedStep:
-                                                currentUser.reachedStep.value,
-                                            lineStyle: const LineStyle(
-                                              lineLength: 100,
-                                              lineThickness: 1,
-                                              lineSpace: 5,
+                                Column(
+                                  children: [
+                                    Obx(
+                                      () => EasyStepper(
+                                        activeStep:
+                                            currentUser.activeStep.value,
+                                        maxReachedStep:
+                                            currentUser.reachedStep.value,
+                                        lineStyle: const LineStyle(
+                                          lineLength: 100,
+                                          lineThickness: 1,
+                                          lineSpace: 5,
+                                        ),
+                                        stepRadius: 20,
+                                        unreachedStepIconColor: Colors.black87,
+                                        unreachedStepBorderColor:
+                                            Colors.black54,
+                                        unreachedStepTextColor: Colors.black,
+                                        showLoadingAnimation: false,
+                                        steps: [
+                                          EasyStep(
+                                            icon: const Icon(Icons.edit_square),
+                                            customTitle: Text(
+                                              'Đăng ký',
+                                              style: TextStyle(
+                                                  color: currentUser.activeStep
+                                                              .value ==
+                                                          0
+                                                      ? Colors.black
+                                                      : Colors.blue.shade900,
+                                                  fontWeight: currentUser
+                                                              .activeStep
+                                                              .value ==
+                                                          0
+                                                      ? FontWeight.bold
+                                                      : null),
+                                              textAlign: TextAlign.center,
                                             ),
-                                            stepRadius: 20,
-                                            unreachedStepIconColor:
-                                                Colors.black87,
-                                            unreachedStepBorderColor:
-                                                Colors.black54,
-                                            unreachedStepTextColor:
-                                                Colors.black,
-                                            showLoadingAnimation: false,
-                                            steps: [
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    Icons.edit_square),
-                                                customTitle: Text(
-                                                  'Đăng ký thực tập',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              0
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              0
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    0, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    CupertinoIcons.house_fill),
-                                                customTitle: Text(
-                                                  'Đăng ký công ty',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              1
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              1
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    1, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(CupertinoIcons
-                                                    .desktopcomputer),
-                                                customTitle: Text(
-                                                  'Thực tập',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              2
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              2
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    2, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    CupertinoIcons.doc_fill),
-                                                customTitle: Text(
-                                                  'Nộp tài liệu',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              3
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              3
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    3, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  grade: 5,
-                                                ),
-                                                customTitle: Text(
-                                                  'Kết quả',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              4
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              4
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    4, StepEnabling.sequential),
-                                              ),
-                                            ],
-                                            onStepReached: (index) {
-                                              setState(() => currentUser
-                                                  .activeStep.value = index);
-                                              GV.traineesCol
-                                                  .doc(userId)
-                                                  .update({
-                                                'reachedStep': currentUser
-                                                    .reachedStep.value
-                                              });
-                                            },
+                                            enabled: _allowTabStepping(
+                                                0, StepEnabling.sequential),
                                           ),
-                                          const Divider(
-                                            thickness: 0.1,
-                                            height: 0,
-                                            color: Colors.black,
-                                          ),
-                                          switch (
-                                              currentUser.activeStep.value) {
-                                            1 => _regisFirm(),
-                                            2 => _trainee(),
-                                            3 => _submit(),
-                                            4 => _completed(),
-                                            _ => loadUser != null &&
-                                                    loadUser.isRegistered ==
-                                                        true
-                                                ? _infoRegis(loadTrainee)
-                                                : _regisCredit(),
-                                          },
-                                          const SizedBox(height: 35),
-                                          _nextStep(StepEnabling.sequential),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          EasyStepper(
-                                            activeStep:
-                                                currentUser.activeStep.value,
-                                            maxReachedStep:
-                                                currentUser.reachedStep.value,
-                                            lineStyle: const LineStyle(
-                                              lineLength: 100,
-                                              lineThickness: 1,
-                                              lineSpace: 5,
+                                          EasyStep(
+                                            icon: const Icon(
+                                                CupertinoIcons.house_fill),
+                                            customTitle: Text(
+                                              'Tìm công ty',
+                                              style: TextStyle(
+                                                  color: currentUser.activeStep
+                                                              .value ==
+                                                          1
+                                                      ? Colors.black
+                                                      : Colors.blue.shade900,
+                                                  fontWeight: currentUser
+                                                              .activeStep
+                                                              .value ==
+                                                          1
+                                                      ? FontWeight.bold
+                                                      : null),
+                                              textAlign: TextAlign.center,
                                             ),
-                                            stepRadius: 20,
-                                            unreachedStepIconColor:
-                                                Colors.black87,
-                                            unreachedStepBorderColor:
-                                                Colors.black54,
-                                            unreachedStepTextColor:
-                                                Colors.black,
-                                            showLoadingAnimation: false,
-                                            steps: [
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    Icons.edit_square),
-                                                customTitle: Text(
-                                                  'Đăng ký thực tập',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              0
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              0
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    0, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    CupertinoIcons.house_fill),
-                                                customTitle: Text(
-                                                  'Đăng ký công ty',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              1
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              1
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    1, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(CupertinoIcons
-                                                    .desktopcomputer),
-                                                customTitle: Text(
-                                                  'Thực tập',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              2
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              2
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    2, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                    CupertinoIcons.doc_fill),
-                                                customTitle: Text(
-                                                  'Nộp tài liệu',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              3
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              3
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    3, StepEnabling.sequential),
-                                              ),
-                                              EasyStep(
-                                                icon: const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  grade: 5,
-                                                ),
-                                                customTitle: Text(
-                                                  'Kết quả',
-                                                  style: TextStyle(
-                                                      color: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              4
-                                                          ? Colors.black
-                                                          : Colors
-                                                              .blue.shade900,
-                                                      fontWeight: currentUser
-                                                                  .activeStep
-                                                                  .value ==
-                                                              4
-                                                          ? FontWeight.bold
-                                                          : null),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                enabled: _allowTabStepping(
-                                                    4, StepEnabling.sequential),
-                                              ),
-                                            ],
-                                            onStepReached: (index) {
-                                              setState(() => currentUser
-                                                  .activeStep.value = index);
-                                              GV.traineesCol
-                                                  .doc(userId)
-                                                  .update({
-                                                'reachedStep': currentUser
-                                                    .reachedStep.value
-                                              });
-                                            },
+                                            enabled: _allowTabStepping(
+                                                1, StepEnabling.sequential),
                                           ),
-                                          const SizedBox.shrink(),
+                                          EasyStep(
+                                            icon: const Icon(
+                                                CupertinoIcons.desktopcomputer),
+                                            customTitle: Text(
+                                              'Thực tập',
+                                              style: TextStyle(
+                                                  color: currentUser.activeStep
+                                                              .value ==
+                                                          2
+                                                      ? Colors.black
+                                                      : Colors.blue.shade900,
+                                                  fontWeight: currentUser
+                                                              .activeStep
+                                                              .value ==
+                                                          2
+                                                      ? FontWeight.bold
+                                                      : null),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            enabled: _allowTabStepping(
+                                                2, StepEnabling.sequential),
+                                          ),
+                                          EasyStep(
+                                            icon: const Icon(
+                                                CupertinoIcons.doc_fill),
+                                            customTitle: Text(
+                                              'Nộp tài liệu',
+                                              style: TextStyle(
+                                                  color: currentUser.activeStep
+                                                              .value ==
+                                                          3
+                                                      ? Colors.black
+                                                      : Colors.blue.shade900,
+                                                  fontWeight: currentUser
+                                                              .activeStep
+                                                              .value ==
+                                                          3
+                                                      ? FontWeight.bold
+                                                      : null),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            enabled: _allowTabStepping(
+                                                3, StepEnabling.sequential),
+                                          ),
+                                          EasyStep(
+                                            icon: const Icon(
+                                              CupertinoIcons.checkmark_alt,
+                                              grade: 5,
+                                            ),
+                                            customTitle: Text(
+                                              'Kết quả',
+                                              style: TextStyle(
+                                                  color: currentUser.activeStep
+                                                              .value ==
+                                                          4
+                                                      ? Colors.black
+                                                      : Colors.blue.shade900,
+                                                  fontWeight: currentUser
+                                                              .activeStep
+                                                              .value ==
+                                                          4
+                                                      ? FontWeight.bold
+                                                      : null),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            enabled: _allowTabStepping(
+                                                4, StepEnabling.sequential),
+                                          ),
                                         ],
-                                      );
-                                    }
-                                  },
+                                        onStepReached: (index) {
+                                          setState(() => currentUser
+                                              .activeStep.value = index);
+                                          GV.traineesCol.doc(userId).update({
+                                            'reachedStep':
+                                                currentUser.reachedStep.value
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const Divider(
+                                      thickness: 0.1,
+                                      height: 0,
+                                      color: Colors.black,
+                                    ),
+                                    StreamBuilder(
+                                      stream: GV.traineesCol
+                                          .doc(userId)
+                                          .snapshots(),
+                                      builder: (context, snapshotTrainee) {
+                                        if (snapshotTrainee.hasData &&
+                                            snapshotTrainee.connectionState ==
+                                                ConnectionState.active) {
+                                          final loadTrainee =
+                                              RegisterTraineeModel.fromMap(
+                                                  snapshotTrainee.data!
+                                                      .data()!);
+                                          return Obx(
+                                            () => switch (
+                                                currentUser.activeStep.value) {
+                                              1 => _regisFirm(),
+                                              2 => _trainee(),
+                                              3 => _submit(),
+                                              4 => _completed(),
+                                              _ => loadUser != null &&
+                                                      loadUser.isRegistered ==
+                                                          true
+                                                  ? _infoCredit(loadTrainee)
+                                                  : _regisCredit(),
+                                            },
+                                          );
+                                        } else {
+                                          return const Loading();
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -558,7 +386,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         Expanded(
                           child: Container(
                             constraints:
-                                BoxConstraints(minHeight: screenHeight * 0.74),
+                                BoxConstraints(minHeight: screenHeight * 0.7),
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 border: Border.all(
@@ -589,7 +417,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                     ],
                                   ),
                                 ),
-                                const Loading(),
+                                const SizedBox.shrink(),
                               ],
                             ),
                           ),
@@ -815,6 +643,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     }
                   },
                 ),
+                const SizedBox(height: 35),
+                _nextStep(StepEnabling.sequential),
               ],
             ),
           );
@@ -825,7 +655,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     );
   }
 
-  Widget _infoRegis(RegisterTraineeModel loadTrainee) {
+  Widget _infoCredit(RegisterTraineeModel loadTrainee) {
     // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
@@ -835,7 +665,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           Container(
             color: Colors.amber,
             child: const Text(
-              'Học phần đã đăng ký',
+              'Thông tin học phần',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -844,19 +674,77 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(loadTrainee.creditId),
-                Text(loadTrainee.creditName),
-                Text(loadTrainee.term),
-                Text('${loadTrainee.yearStart} - ${loadTrainee.yearEnd}'),
+                Text('Mã HP: ${loadTrainee.creditId}'),
+                Text('Tên HP: ${loadTrainee.creditName}'),
+                Text('Học kỳ: ${loadTrainee.term}'),
+                Text(
+                    'Năm học: ${loadTrainee.yearStart} - ${loadTrainee.yearEnd}'),
               ],
             ),
-          )
+          ),
+          const SizedBox(height: 35),
+          _nextStep(StepEnabling.sequential),
         ],
       ),
     );
   }
 
   Widget _regisFirm() {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isRegisFirm = false;
+    return isRegisFirm
+        ? Padding(
+            padding: const EdgeInsets.only(top: 15),
+            child: Column(
+              children: [
+                Container(
+                  color: Colors.amber,
+                  child: const Text(
+                    'Công ty đã đăng ký',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  width: screenWidth * 0.25,
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tên công ty : Abc'),
+                      Text('Người đại diện: Nguyễn Văn A'),
+                      Text(
+                          'Địa chỉ: Ninh Kiều, Cần Thơ Địa chỉ: Ninh Kiều, Cần Thơ Địa chỉ: Ninh Kiều, Cần Thơ'),
+                      Text('Điện thoại: 0987654321'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 35),
+                _nextStep(StepEnabling.sequential),
+              ],
+            ),
+          )
+        : Padding(
+            padding: const EdgeInsets.only(top: 35),
+            child: Column(
+              children: [
+                CustomButton(
+                  text: "Các công ty ",
+                  width: screenWidth * 0.1,
+                  height: screenHeight * 0.07,
+                  onTap: () async {
+                    currentUser.menuSelected.value = 4;
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setInt('menuSelected', 4);
+                    Navigator.pushNamed(context, pageSinhVien[4]);
+                  },
+                ),
+              ],
+            ),
+          );
+  }
+
+  Widget _trainee() {
     // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
@@ -866,51 +754,121 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           Container(
             color: Colors.amber,
             child: const Text(
-              'Đăng ký công ty',
+              'Phân công thực tập',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(
-            width: screenWidth * 0.25,
-            child: const Column(
+            width: screenWidth * 0.35,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Các công ty đã đăng ký'),
-                Text('Tên cty : Abc'),
-                Text('Người đại diện: Nguyễn Văn A'),
-                Text(
-                    'Địa chỉ: Ninh Kiều, Cần Thơ Địa chỉ: Ninh Kiều, Cần Thơ Địa chỉ: Ninh Kiều, Cần Thơ'),
-                Text('Sdt: 0987654321'),
+                const Text('Cán bộ hướng dẫn: Trần Văn B'),
+                const Text('Thời gian thực tập: 15/05/2023 - 08/07/2023'),
+                const Text('Ngày phân công: 15/05/2023'),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Table(
+                    border: TableBorder.all(),
+                    columnWidths: Map.from({
+                      0: const FlexColumnWidth(1),
+                      1: const FlexColumnWidth(3),
+                      2: const FlexColumnWidth(1),
+                    }),
+                    children: [
+                      TableRow(
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(10),
+                              child: const Text(
+                                'Tuan',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
+                          Container(
+                              padding: const EdgeInsets.all(10),
+                              child: const Text(
+                                'Noi dung',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            child: const Text(
+                              'So buoi',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      TableRow(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            child: const Column(
+                              children: [
+                                Text(
+                                  '1',
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  '15/05/2023 - 21/06/2023',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                      'Tìm hiểu tài liệu về FVM, Get Cli.'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                      'Tìm hiểu về quản lý trạng thái - BloC.'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Text('Tìm hiểu về dio, retrofit.'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            child: const Column(
+                              children: [
+                                Text(
+                                  '10',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _trainee() {
-    // double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: EdgeInsets.only(top: 15),
-      child: Column(
-        children: [
-          Container(
-            color: Colors.amber,
-            child: Text(
-              'Thực tập',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(
-              width: screenWidth * 0.25,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Bảng phân công'),
-                ],
-              )),
+          const SizedBox(height: 35),
+          _nextStep(StepEnabling.sequential),
         ],
       ),
     );
@@ -920,20 +878,22 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
-      padding: EdgeInsets.only(top: 15),
+      padding: const EdgeInsets.only(top: 15),
       child: Column(
         children: [
           Container(
             color: Colors.amber,
-            child: Text(
+            child: const Text(
               'Nộp tài liệu',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(
             width: screenWidth * 0.25,
-            child: Column(children: []),
-          )
+            child: const Column(children: []),
+          ),
+          const SizedBox(height: 35),
+          _nextStep(StepEnabling.sequential),
         ],
       ),
     );
@@ -943,24 +903,27 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
-      padding: EdgeInsets.only(top: 15),
+      padding: const EdgeInsets.only(top: 15),
       child: Column(
         children: [
           Container(
             color: Colors.amber,
-            child: Text(
+            child: const Text(
               'Hoàn thành',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(
-              width: screenWidth * 0.25,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Kết quả thực tập'),
-                ],
-              )),
+            width: screenWidth * 0.25,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Kết quả thực tập'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 35),
+          _nextStep(StepEnabling.sequential),
         ],
       ),
     );

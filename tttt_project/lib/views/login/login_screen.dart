@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/views/login/form_sign_in.dart';
 import 'package:tttt_project/widgets/announcement.dart';
-import 'package:tttt_project/widgets/custom_devider.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
@@ -106,7 +105,6 @@ class LogInScreen extends StatelessWidget {
                                 userIdCtrl: _userIdCtrl,
                                 passwordCtrl: _pwdCtrl,
                               ),
-                              
                               const SizedBox(height: 10),
                               TextButton(
                                 onPressed: () {},
@@ -123,17 +121,7 @@ class LogInScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const CustomDivider(
-              color: Colors.grey,
-              dashHeight: 0.5,
-              dashWidth: 2,
-            ),
             const Footer(),
-            const CustomDivider(
-              color: Colors.grey,
-              dashHeight: 0.5,
-              dashWidth: 2,
-            ),
           ],
         ),
       ),
