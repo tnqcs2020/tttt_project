@@ -76,25 +76,13 @@ class FormSignIn extends StatelessWidget {
                     } else {
                       EasyLoading.showError('Tài khoản không tồn tại!');
                     }
-
-                    // final SharedPreferences sharedPref =
-                    //     await SharedPreferences.getInstance();
-                    // sharedPref.setString(
-                    //   'userId',
-                    //   _userIdCtrl.text.toUpperCase(),
-                    // );
-                    // sharedPref.setString(
-                    //   'password',
-                    //   _pwdCtrl.text,
-                    // );
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
-                    prefs.setString('email', str);
                     prefs.setString(
                       'userId',
                       _userIdCtrl.text,
                     );
-                    prefs.setString('password', _pwdCtrl.text);
+                    prefs.setInt('menuSelected', 0);
                     prefs.setBool("isLoggedIn", true);
                     currentUser.setCurrentUser(
                       setUid: isExistUser.data()!['uid'],
@@ -106,9 +94,9 @@ class FormSignIn extends StatelessWidget {
                       setMajor: isExistUser.data()!['major'],
                       setEmail: isExistUser.data()!['email'],
                       setIsRegistered: isExistUser.data()!['isRegistered'],
+                      setMenuSelected: 0,
                     );
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, RouteGenerator.home, (route) => false);
+                    Navigator.pushNamed(context, RouteGenerator.home);
                   } else {
                     EasyLoading.showError('Mật khẩu không đúng!');
                   }

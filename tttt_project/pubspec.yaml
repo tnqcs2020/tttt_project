@@ -24,6 +24,8 @@ dependencies:
   shared_preferences: ^2.2.1
   loading_animation_widget: ^1.2.0+4
   easy_stepper: ^0.8.1
+  searchable_listview: ^2.7.1
+  motion_toast: ^2.7.9
 
 dev_dependencies:
   flutter_test:

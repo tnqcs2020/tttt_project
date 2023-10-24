@@ -40,7 +40,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   List<String> dsnd = [
     NguoiDung.giaovu,
     NguoiDung.covan,
-    NguoiDung.congty,
+    // NguoiDung.congty,
     NguoiDung.cbhd,
     NguoiDung.sinhvien,
   ];
@@ -66,14 +66,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
-    print(sharedPref
-        .getString(
-          'userId',
-        )
-        .toString());
     if (isLoggedIn == true) {
-      // sharedPref.getString('email').toString();
-      // sharedPref.getString('password').toString();
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
@@ -96,10 +89,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
           setMenuSelected: sharedPref.getInt('menuSelected'),
           setIsRegistered: isExistUser.data()!['isRegistered'],
         );
-        print(isExistUser.data()?['group']);
       }
     }
-    // pagesSinhVien[currentUser.menuSelected.value];
   }
 
   @override
@@ -159,257 +150,311 @@ class _AddUserScreenState extends State<AddUserScreen> {
                               ],
                             ),
                           ),
-                          Form(
-                            key: _signUpFormKey,
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: screenWidth * 0.07,
-                                      child: const Text(
-                                        "Nhóm người dùng:",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w900,
-                                          color: Colors.black,
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Form(
+                              key: _signUpFormKey,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: screenWidth * 0.07,
+                                        child: const Text(
+                                          "Nhóm người dùng:",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.black,
+                                          ),
+                                          // overflow: TextOverflow.ellipsis,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                    DropdownButtonHideUnderline(
-                                      child: DropdownButton2<String>(
-                                        isExpanded: true,
-                                        hint: Center(
-                                          child: Text(
-                                            'Chọn',
-                                            style: DropdownStyle.hintStyle,
-                                            overflow: TextOverflow.ellipsis,
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 30),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton2<String>(
+                                            isExpanded: true,
+                                            hint: Center(
+                                              child: Text(
+                                                'Chọn',
+                                                style: DropdownStyle.hintStyle,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            items: dsnd
+                                                .map((String nd) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: nd,
+                                                      child: Text(
+                                                        nd,
+                                                        style: DropdownStyle
+                                                            .itemStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            value: selectedND,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedND = value;
+                                              });
+                                            },
+                                            buttonStyleData:
+                                                DropdownStyle.buttonStyleLong,
+                                            iconStyleData:
+                                                DropdownStyle.iconStyleData,
+                                            dropdownStyleData:
+                                                DropdownStyle.dropdownStyleLong,
+                                            menuItemStyleData:
+                                                DropdownStyle.menuItemStyleData,
                                           ),
                                         ),
-                                        items: dsnd
-                                            .map((String nd) =>
-                                                DropdownMenuItem<String>(
-                                                  value: nd,
-                                                  child: Text(
-                                                    nd,
-                                                    style:
-                                                        DropdownStyle.itemStyle,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ))
-                                            .toList(),
-                                        value: selectedND,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedND = value;
-                                          });
-                                        },
-                                        buttonStyleData:
-                                            DropdownStyle.buttonStyleLong,
-                                        iconStyleData:
-                                            DropdownStyle.iconStyleData,
-                                        dropdownStyleData:
-                                            DropdownStyle.dropdownStyleLong,
-                                        menuItemStyleData:
-                                            DropdownStyle.menuItemStyleData,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Tài khoản:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            CustomTextField(
-                                              hintText: "Mã sinh viên",
-                                              controller: _userIdCtrl,
-                                            ),
-                                          ],
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: screenWidth * 0.07,
+                                                child: const Text(
+                                                  "Tài khoản:",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              CustomTextField(
+                                                hintText: "Mã số",
+                                                controller: _userIdCtrl,
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: screenWidth * 0.07,
+                                                child: const Text(
+                                                  "Mật khẩu:",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              CustomTextField(
+                                                hintText: "Mật khẩu",
+                                                controller: _pwdCtrl,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: screenWidth * 0.07,
+                                        child: const Text(
+                                          "Họ tên:",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Mật khẩu:",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            CustomTextField(
-                                              hintText: "Mật khẩu",
-                                              controller: _pwdCtrl,
-                                            ),
-                                          ],
+                                      ),
+                                      CustomTextField(
+                                        hintText: "Họ tên",
+                                        controller: _nameCtrl,
+                                      ),
+                                    ],
+                                  ),
+                                  if (selectedND == NguoiDung.sinhvien)
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: screenWidth * 0.07,
+                                          child: const Text(
+                                            "Mã lớp:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        CustomTextField(
+                                          hintText: "Mã lớp",
+                                          controller: _classIdCtrl,
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Họ tên:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                  if (selectedND == NguoiDung.sinhvien)
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: screenWidth * 0.07,
+                                          child: const Text(
+                                            "Tên lớp:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        CustomTextField(
+                                          hintText: "Tên lớp",
+                                          controller: _classNameCtrl,
+                                        ),
+                                      ],
                                     ),
-                                    CustomTextField(
-                                      hintText: "Họ tên",
-                                      controller: _nameCtrl,
+                                  if (selectedND == NguoiDung.sinhvien)
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: screenWidth * 0.07,
+                                          child: const Text(
+                                            "Ngành:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        CustomTextField(
+                                          hintText: "Ngành",
+                                          controller: _majorCtrl,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Email:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                  if (selectedND == NguoiDung.sinhvien)
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: screenWidth * 0.07,
+                                          child: const Text(
+                                            "Khóa:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        CustomTextField(
+                                          hintText: "Khóa",
+                                          controller: _courseCtrl,
+                                        ),
+                                      ],
                                     ),
-                                    CustomTextField(
-                                      hintText: "Email",
-                                      controller: _emailCtrl,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Mã lớp:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    CustomTextField(
-                                      hintText: "Mã lớp",
-                                      controller: _classIdCtrl,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Tên lớp:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    CustomTextField(
-                                      hintText: "Tên lớp",
-                                      controller: _classNameCtrl,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Ngành:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    CustomTextField(
-                                      hintText: "Ngành",
-                                      controller: _majorCtrl,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "Khóa:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    CustomTextField(
-                                      hintText: "Khóa",
-                                      controller: _courseCtrl,
-                                    ),
-                                  ],
-                                ),
-                                CustomButton(
-                                  text: 'Tạo',
-                                  width: Get.width * 0.5,
-                                  onTap: () async {
-                                    if (_signUpFormKey.currentState!
-                                        .validate()) {
-                                      DocumentSnapshot<Map<String, dynamic>>
-                                          isExistUser = await GV.usersCol
-                                              .doc(_userIdCtrl.text
-                                                  .toLowerCase())
-                                              .get();
-                                      if (isExistUser.data() == null) {
-                                        String str = "";
-                                        if (selectedND == NguoiDung.giaovu ||
-                                            selectedND == NguoiDung.covan ||
-                                            selectedND == NguoiDung.congty ||
-                                            selectedND == NguoiDung.cbhd) {
-                                          str =
-                                              "${_userIdCtrl.text.toLowerCase()}@cict.ctu.vn";
-                                        } else if (selectedND ==
-                                            NguoiDung.sinhvien) {
-                                          str =
-                                              "${_userIdCtrl.text.toLowerCase()}@student.cict.ctu.vn";
+                                  CustomButton(
+                                    text: 'Tạo',
+                                    width: Get.width * 0.1,
+                                    onTap: () async {
+                                      if (_signUpFormKey.currentState!
+                                          .validate()) {
+                                        DocumentSnapshot<Map<String, dynamic>>
+                                            isExistUser = await GV.usersCol
+                                                .doc(_userIdCtrl.text
+                                                    .toLowerCase())
+                                                .get();
+                                        if (isExistUser.data() == null) {
+                                          String str = "";
+                                          if (selectedND == NguoiDung.giaovu ||
+                                              selectedND == NguoiDung.covan ||
+                                              selectedND == NguoiDung.cbhd) {
+                                            str =
+                                                "${_userIdCtrl.text.toLowerCase()}@cict.ctu.vn";
+                                          } else if (selectedND ==
+                                              NguoiDung.sinhvien) {
+                                            str =
+                                                "${_userIdCtrl.text.toLowerCase()}@student.cict.ctu.vn";
+                                          }
+                                          FirebaseApp secondaryApp =
+                                              await Firebase.initializeApp(
+                                                  name: 'secondaryApp',
+                                                  options:
+                                                      Firebase.app().options);
+                                          final UserCredential newUser =
+                                              await FirebaseAuth.instanceFor(
+                                                      app: secondaryApp)
+                                                  .createUserWithEmailAndPassword(
+                                            email: str,
+                                            password: _pwdCtrl.text,
+                                          );
+                                          await secondaryApp.delete();
+                                          UserModel userModel;
+                                          if (selectedND ==
+                                              NguoiDung.sinhvien) {
+                                            userModel = UserModel(
+                                              uid: newUser.user!.uid,
+                                              userId: _userIdCtrl.text
+                                                  .toLowerCase(),
+                                              name: _nameCtrl.text,
+                                              password: _pwdCtrl.text.isEmpty
+                                                  ? "Abc@123456"
+                                                  : _pwdCtrl.text,
+                                              classId: _classIdCtrl.text,
+                                              className: _classNameCtrl.text,
+                                              course: _courseCtrl.text,
+                                              major: _majorCtrl.text,
+                                              group: selectedND,
+                                            );
+                                          } else {
+                                            userModel = UserModel(
+                                              uid: newUser.user!.uid,
+                                              userId: _userIdCtrl.text
+                                                  .toLowerCase(),
+                                              name: _nameCtrl.text,
+                                              password: _pwdCtrl.text.isEmpty
+                                                  ? "Abc@123456"
+                                                  : _pwdCtrl.text,
+                                              group: selectedND,
+                                            );
+                                          }
+                                          final docUser =
+                                              GV.usersCol.doc(userModel.userId);
+                                          final json = userModel.toMap();
+                                          await docUser.set(json);
+                                          if (selectedND ==
+                                              NguoiDung.sinhvien) {
+                                            currentUser.setCurrentUser(
+                                                setUid: userModel.uid,
+                                                setUserId: userModel.userId,
+                                                setName: userModel.name,
+                                                setClassId: userModel.classId,
+                                                setCourse: userModel.course,
+                                                setGroup: userModel.group!,
+                                                setMajor: userModel.major,
+                                                setEmail: userModel.email,
+                                                setPhone: userModel.phone,
+                                                setClassName:
+                                                    userModel.className);
+                                          } else {
+                                            currentUser.setCurrentUser(
+                                              setUid: userModel.uid,
+                                              setUserId: userModel.userId,
+                                              setName: userModel.name,
+                                              setGroup: userModel.group!,
+                                              setEmail: userModel.email,
+                                              setPhone: userModel.phone,
+                                            );
+                                          }
+                                          currentUser.menuSelected.value = 1;
+                                          SharedPreferences prefs =
+                                              await SharedPreferences
+                                                  .getInstance();
+                                          prefs.setInt('menuSelected', 1);
+                                          Navigator.pushNamed(
+                                              context, pageQuanTri[1]);
+                                          EasyLoading.showError(
+                                              'Tạo thành công!');
+                                        } else {
+                                          EasyLoading.showError(
+                                              'Tài khoản email đã tồn tại!!');
                                         }
-                                        FirebaseApp secondaryApp =
-                                            await Firebase.initializeApp(
-                                                name: 'secondaryApp',
-                                                options:
-                                                    Firebase.app().options);
-                                        final UserCredential newUser =
-                                            await FirebaseAuth.instanceFor(
-                                                    app: secondaryApp)
-                                                .createUserWithEmailAndPassword(
-                                          email: str,
-                                          password: _pwdCtrl.text,
-                                        );
-                                        await secondaryApp.delete();
-                                        final userModel = UserModel(
-                                          uid: newUser.user!.uid,
-                                          userId:
-                                              _userIdCtrl.text.toLowerCase(),
-                                          name: _nameCtrl.text,
-                                          email: _emailCtrl.text.toLowerCase(),
-                                          password: _pwdCtrl.text.isEmpty
-                                              ? "Abc@123456"
-                                              : _pwdCtrl.text,
-                                          classId: _classIdCtrl.text,
-                                          className: _classNameCtrl.text,
-                                          course: _courseCtrl.text,
-                                          major: _majorCtrl.text,
-                                          group: selectedND,
-                                        );
-                                        final docUser = GV.usersCol
-                                            .doc(userModel.userId);
-                                        final json = userModel.toMap();
-                                        await docUser.set(json);
-                                        currentUser.setCurrentUser(
-                                            setUid: userModel.uid,
-                                            setUserId: userModel.userId,
-                                            setName: userModel.name,
-                                            setClassId: userModel.classId,
-                                            setCourse: userModel.course,
-                                            setGroup: userModel.group!,
-                                            setMajor: userModel.major,
-                                            setEmail: userModel.email,
-                                            setClassName: userModel.className);
-                                        EasyLoading.showError(
-                                            'Tạo thành công!');
-                                        // Get.toNamed(RouteGenerator.home);
                                       } else {
                                         EasyLoading.showError(
-                                            'Tài khoản email đã tồn tại!!');
+                                            'Điền đầy đủ thông tin!');
                                       }
-                                    } else {
-                                      EasyLoading.showError(
-                                          'Điền đầy đủ thông tin!');
-                                    }
-                                  },
-                                ),
-                              ],
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                         ],
@@ -426,318 +471,3 @@ class _AddUserScreenState extends State<AddUserScreen> {
     );
   }
 }
-
-
-// class AddUser extends StatefulWidget {
-//   const AddUser({Key? key}) : super(key: key);
-
-//   @override
-//   State<AddUser> createState() => _AddUserState();
-// }
-
-// class _AddUserState extends State<AddUser> {
-//   final currentUser = Get.put(UserController());
-//   final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
-//   final TextEditingController _nameCtrl = TextEditingController();
-//   final TextEditingController _emailCtrl = TextEditingController();
-//   final TextEditingController _userIdCtrl = TextEditingController();
-//   final TextEditingController _classIdCtrl = TextEditingController();
-//   final TextEditingController _classNameCtrl = TextEditingController();
-//   final TextEditingController _pwdCtrl =
-//       TextEditingController(text: "Abc@123456");
-//   final TextEditingController _courseCtrl = TextEditingController();
-//   final TextEditingController _majorCtrl = TextEditingController();
-//   // final TextEditingController _groupCtrl = TextEditingController();
-//   List<String> dsnd = [
-//     NguoiDung.giaovu,
-//     NguoiDung.covan,
-//     NguoiDung.congty,
-//     NguoiDung.cbhd,
-//     NguoiDung.sinhvien,
-//   ];
-//   String? selectedND;
-//   @override
-//   Widget build(BuildContext context) {
-//     double screenHeight = MediaQuery.of(context).size.height;
-//     double screenWidth = MediaQuery.of(context).size.width;
-//     return Expanded(
-//       child: Container(
-//         constraints: BoxConstraints(minHeight: screenHeight * 0.74),
-//         decoration: BoxDecoration(
-//             color: Colors.grey.shade100,
-//             border: Border.all(
-//               style: BorderStyle.solid,
-//               width: 0.1,
-//             ),
-//             borderRadius: BorderRadius.circular(5)),
-//         child: Column(
-//           children: [
-//             Container(
-//               height: 35,
-//               decoration: BoxDecoration(
-//                 color: Colors.blue.shade600,
-//                 borderRadius: const BorderRadius.only(
-//                   topLeft: Radius.circular(5.0),
-//                   topRight: Radius.circular(5.0),
-//                 ),
-//               ),
-//               child: const Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Text(
-//                     "Tạo tài khoản",
-//                     style: TextStyle(
-//                         color: Colors.white, fontWeight: FontWeight.bold),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             Form(
-//               key: _signUpFormKey,
-//               child: Column(
-//                 children: [
-//                   Row(
-//                     children: [
-//                       SizedBox(
-//                         width: screenWidth * 0.07,
-//                         child: const Text(
-//                           "Nhóm người dùng:",
-//                           style: TextStyle(
-//                             fontSize: 14,
-//                             fontWeight: FontWeight.w900,
-//                             color: Colors.black,
-//                           ),
-//                           overflow: TextOverflow.ellipsis,
-//                         ),
-//                       ),
-//                       DropdownButtonHideUnderline(
-//                         child: DropdownButton2<String>(
-//                           isExpanded: true,
-//                           hint: Center(
-//                             child: Text(
-//                               'Chọn',
-//                               style: DropdownStyle.hintStyle,
-//                               overflow: TextOverflow.ellipsis,
-//                             ),
-//                           ),
-//                           items: dsnd
-//                               .map((String nd) => DropdownMenuItem<String>(
-//                                     value: nd,
-//                                     child: Text(
-//                                       nd,
-//                                       style: DropdownStyle.itemStyle,
-//                                       overflow: TextOverflow.ellipsis,
-//                                     ),
-//                                   ))
-//                               .toList(),
-//                           value: selectedND,
-//                           onChanged: (value) {
-//                             setState(() {
-//                               selectedND = value;
-//                             });
-//                           },
-//                           buttonStyleData: DropdownStyle.buttonStyleLong,
-//                           iconStyleData: DropdownStyle.iconStyleData,
-//                           dropdownStyleData: DropdownStyle.dropdownStyleLong,
-//                           menuItemStyleData: DropdownStyle.menuItemStyleData,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       Column(
-//                         children: [
-//                           Row(
-//                             children: [
-//                               const Text(
-//                                 "Tài khoản:",
-//                                 style: TextStyle(fontWeight: FontWeight.bold),
-//                               ),
-//                               CustomTextField(
-//                                 hintText: "Mã sinh viên",
-//                                 controller: _userIdCtrl,
-//                               ),
-//                             ],
-//                           ),
-//                           Row(
-//                             children: [
-//                               const Text(
-//                                 "Mật khẩu:",
-//                                 style: TextStyle(fontWeight: FontWeight.bold),
-//                               ),
-//                               CustomTextField(
-//                                 hintText: "Mật khẩu",
-//                                 controller: _pwdCtrl,
-//                               ),
-//                             ],
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Họ tên:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Họ tên",
-//                         controller: _nameCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Email:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Email",
-//                         controller: _emailCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Mã lớp:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Mã lớp",
-//                         controller: _classIdCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Tên lớp:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Tên lớp",
-//                         controller: _classNameCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Ngành:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Ngành",
-//                         controller: _majorCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Text(
-//                         "Khóa:",
-//                         style: TextStyle(fontWeight: FontWeight.bold),
-//                       ),
-//                       CustomTextField(
-//                         hintText: "Khóa",
-//                         controller: _courseCtrl,
-//                       ),
-//                     ],
-//                   ),
-//                   // Row(
-//                   //   children: [
-//                   //     const Text(
-//                   //       "Nhóm người dùng:",
-//                   //       style: TextStyle(fontWeight: FontWeight.bold),
-//                   //     ),
-//                   //     CustomTextField(
-//                   //       hintText:
-//                   //           "0:firm, 1:student, 2:teacher, 3:supervisor, 4:admin",
-//                   //       controller: _groupCtrl,
-//                   //     ),
-//                   //   ],
-//                   // ),
-//                   CustomButton(
-//                     text: 'Tạo',
-//                     width: Get.width * 0.5,
-//                     onTap: () async {
-//                       if (_signUpFormKey.currentState!.validate()) {
-//                         DocumentSnapshot<Map<String, dynamic>> isExistUser =
-//                             await GV.usersCol
-//                                 .doc(_userIdCtrl.text.toLowerCase())
-//                                 .get();
-//                         if (isExistUser.data() == null) {
-//                           String str = "";
-//                           if (selectedND == NguoiDung.giaovu ||
-//                               selectedND == NguoiDung.covan ||
-//                               selectedND == NguoiDung.congty ||
-//                               selectedND == NguoiDung.cbhd) {
-//                             str =
-//                                 "${_userIdCtrl.text.toLowerCase()}@cict.ctu.vn";
-//                           } else if (selectedND == NguoiDung.sinhvien) {
-//                             str =
-//                                 "${_userIdCtrl.text.toLowerCase()}@student.cict.ctu.vn";
-//                           }
-//                           FirebaseApp secondaryApp =
-//                               await Firebase.initializeApp(
-//                                   name: 'secondaryApp',
-//                                   options: Firebase.app().options);
-//                           final UserCredential newUser =
-//                               await FirebaseAuth.instanceFor(app: secondaryApp)
-//                                   .createUserWithEmailAndPassword(
-//                             email: str,
-//                             password: _pwdCtrl.text,
-//                           );
-//                           await secondaryApp.delete();
-//                           final userModel = UserModel(
-//                             uid: newUser.user!.uid,
-//                             userId: _userIdCtrl.text.toLowerCase(),
-//                             name: _nameCtrl.text,
-//                             email: _emailCtrl.text.toLowerCase(),
-//                             password: _pwdCtrl.text.isEmpty
-//                                 ? "Abc@123456"
-//                                 : _pwdCtrl.text,
-//                             classId: _classIdCtrl.text,
-//                             className: _classNameCtrl.text,
-//                             course: _courseCtrl.text,
-//                             major: _majorCtrl.text,
-//                             group: selectedND,
-//                           );
-//                           final docUser = FirebaseFirestore.instance
-//                               .collection('users')
-//                               .doc(userModel.userId);
-//                           final json = userModel.toMap();
-//                           await docUser.set(json);
-//                           currentUser.setCurrentUser(
-//                               setUid: userModel.uid,
-//                               setUserId: userModel.userId,
-//                               setName: userModel.name,
-//                               setClassId: userModel.classId,
-//                               setCourse: userModel.course,
-//                               setGroup: userModel.group!,
-//                               setMajor: userModel.major,
-//                               setEmail: userModel.email,
-//                               setClassName: userModel.className);
-//                           EasyLoading.showError('Tạo thành công!');
-//                           // Get.toNamed(RouteGenerator.home);
-//                         } else {
-//                           EasyLoading.showError('Tài khoản email đã tồn tại!!');
-//                         }
-//                       } else {
-//                         EasyLoading.showError('Điền đầy đủ thông tin!');
-//                       }
-//                     },
-//                   ),
-//                 ],
-//               ),
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

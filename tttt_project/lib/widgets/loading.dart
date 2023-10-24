@@ -8,18 +8,20 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 100.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LoadingAnimationWidget.discreteCircle(
-              color: Colors.blue,
-              size: 35,
-              secondRingColor: Colors.teal,
-              thirdRingColor: Colors.orangeAccent),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LoadingAnimationWidget.discreteCircle(
+                color: Colors.blue,
+                size: 35,
+                secondRingColor: Colors.teal,
+                thirdRingColor: Colors.orangeAccent),
+          ],
+        ),
+      ],
     );
   }
 }

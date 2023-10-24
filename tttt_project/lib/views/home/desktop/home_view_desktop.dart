@@ -4,9 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
-import 'package:tttt_project/routes.dart';
 import 'package:tttt_project/widgets/footer.dart';
+import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
@@ -49,6 +48,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
           setGroup: isExistUser.data()?['group'],
           setMajor: isExistUser.data()?['major'],
           setEmail: isExistUser.data()?['email'],
+          setPhone: isExistUser.data()?['phone'],
           setMenuSelected: sharedPref.getInt('menuSelected'),
           setIsRegistered: isExistUser.data()!['isRegistered'],
         );
@@ -66,88 +66,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            Container(
-              color: Colors.blue.shade600,
-              height: screenHeight * 0.12,
-              padding: EdgeInsets.only(
-                left: screenWidth * 0.08,
-                right: screenWidth * 0.08,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Hệ thống quản lý thực tập thực tế",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        "Trường Công nghệ Thông tin và Truyền thông",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w900),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    constraints: const BoxConstraints(minWidth: 100),
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          children: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  final SharedPreferences sharedPref =
-                                      await SharedPreferences.getInstance();
-                                  await sharedPref.remove('email');
-                                  await sharedPref.remove('userId');
-                                  await sharedPref.remove('password');
-                                  await sharedPref.setBool("isLoggedIn", false);
-                                  await sharedPref.remove('menuSelected');
-                                  await GV.auth.signOut();
-                                  Navigator.restorablePushReplacementNamed(
-                                      context, RouteGenerator.login);
-                                  // Navigator.pushNamedAndRemoveUntil(context,
-                                  //     RouteGenerator.login, (route) => false);
-                                  // Get.toNamed(RouteGenerator.login);
-                                },
-                                child: const Text("Thoát"))
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            const Text(
-                              "Xin chào, ",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                            Obx(
-                              () => Text(
-                                currentUser.name.value,
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+            const Header(),
             // Obx(
             //   () =>
             Padding(

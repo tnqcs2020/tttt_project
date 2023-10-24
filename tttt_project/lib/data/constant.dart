@@ -1,18 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tttt_project/routes.dart';
+import 'dart:math';
 
 class GV {
   static final auth = FirebaseAuth.instance;
   static final usersCol = FirebaseFirestore.instance.collection('users');
   static final creditsCol = FirebaseFirestore.instance.collection('credits');
   static final traineesCol = FirebaseFirestore.instance.collection('trainees');
+  static final cvsCol = FirebaseFirestore.instance.collection('cvs');
+  static final firmsCol = FirebaseFirestore.instance.collection('firms');
+
+  static String generateRandomString(int len) {
+    var rd = Random();
+    const chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => chars[rd.nextInt(chars.length)])
+        .join();
+  }
 }
 
 List<String> menuSinhVien = [
   "Trang chủ",
   "Thông tin sinh viên",
-  "Hồ sơ xin việc",
   "Thực tập thực tế",
   "Công ty liên kết",
 ];
@@ -20,16 +30,15 @@ List<String> menuSinhVien = [
 List<String> pageSinhVien = [
   RouteGenerator.home,
   RouteGenerator.info,
-  RouteGenerator.cv,
   RouteGenerator.register,
   RouteGenerator.firm,
 ];
 
 List<String> menuQuanTri = [
-  "Trang chu",
+  "Trang chủ",
   "Tạo tài khoản",
   "Danh sách thực tập",
-  "Công ty liên kết",
+  // "Công ty liên kết",
   "Quản lý học phần",
 ];
 
@@ -37,64 +46,40 @@ List<String> pageQuanTri = [
   RouteGenerator.home,
   RouteGenerator.addUser,
   RouteGenerator.dstttt,
-  RouteGenerator.firm,
+  // RouteGenerator.firm,
   RouteGenerator.manageCredit,
 ];
 
 List<String> menuCanBo = [
-  "Thông tin sinh viên",
-  "Hồ sơ xin việc",
-  "Đăng ký thực tập",
-  "Quá trình thực tập",
-  "Công ty liên kết",
+  "Trang chủ",
+  "Quản lý thông tin",
+  "Quản lý thực tập",
 ];
 
 List<String> pageCanBo = [
   RouteGenerator.home,
-  RouteGenerator.info,
-  RouteGenerator.cv,
-  RouteGenerator.register,
-  RouteGenerator.firm,
+  RouteGenerator.manageInfoCB,
+  RouteGenerator.manageTraineeCB,
 ];
 List<String> menuGiaoVu = [
-  "Thông tin sinh viên",
-  "Hồ sơ xin việc",
-  "Đăng ký thực tập",
-  "Quá trình thực tập",
-  "Công ty liên kết",
+  "Trang chủ",
+  "Thêm thông báo",
+  "Quản lý học phần",
 ];
 List<String> pageGiaoVu = [
   RouteGenerator.home,
   RouteGenerator.info,
-  RouteGenerator.cv,
-  RouteGenerator.register,
-  RouteGenerator.firm,
-];
-List<String> menuCongTy = [
-  "Thông tin sinh viên",
-  "Hồ sơ xin việc",
-  "Đăng ký thực tập",
-  "Quá trình thực tập",
-  "Công ty liên kết",
-];
-List<String> pageCongTy = [
-  RouteGenerator.home,
-  RouteGenerator.info,
-  RouteGenerator.cv,
-  RouteGenerator.register,
   RouteGenerator.firm,
 ];
 List<String> menuCoVan = [
-  "Thông tin sinh viên",
-  "Hồ sơ xin việc",
-  "Đăng ký thực tập",
-  "Quá trình thực tập",
+  'Trang chu',
+  "Thông tin",
   "Công ty liên kết",
+  "Đánh giá",
 ];
 List<String> pageCoVan = [
   RouteGenerator.home,
   RouteGenerator.info,
-  RouteGenerator.cv,
   RouteGenerator.register,
   RouteGenerator.firm,
 ];

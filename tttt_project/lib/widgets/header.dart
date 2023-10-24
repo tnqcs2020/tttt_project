@@ -8,9 +8,8 @@ import 'package:tttt_project/routes.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
 class Header extends StatelessWidget {
-  const Header({
-    super.key,
-  });
+  const Header({super.key, this.userName});
+  final String? userName;
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -33,13 +32,11 @@ class Header extends StatelessWidget {
             children: [
               Text(
                 "Hệ thống quản lý thực tập thực tế",
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
               Text(
                 "Trường Công nghệ Thông tin và Truyền thông",
-                style: TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w900),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -55,14 +52,12 @@ class Header extends StatelessWidget {
                         onPressed: () async {
                           final SharedPreferences sharedPref =
                               await SharedPreferences.getInstance();
-                          await sharedPref.remove('email');
                           await sharedPref.remove('userId');
-                          await sharedPref.remove('password');
                           await sharedPref.setBool("isLoggedIn", false);
                           await sharedPref.remove('menuSelected');
                           await GV.auth.signOut();
-                          Navigator.pushNamedAndRemoveUntil(context,
-                              RouteGenerator.login, (route) => false);
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, RouteGenerator.login, (route) => false);
                           // Get.toNamed(RouteGenerator.login);
                         },
                         child: const Text("Thoát"))
@@ -79,15 +74,24 @@ class Header extends StatelessWidget {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    Obx(
-                      () => Text(
-                        currentUser.name.value,
+                    if (userName != null)
+                      Text(
+                        userName!,
                         style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
                             fontWeight: FontWeight.bold),
+                      )
+                    else
+                      Obx(
+                        () => Text(
+                          currentUser.name.value,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],

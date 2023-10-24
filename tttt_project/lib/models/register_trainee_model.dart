@@ -1,26 +1,28 @@
 import 'dart:convert';
 
 class RegisterTraineeModel {
-  String creditId,
+  String? creditId,
       term,
       creditName,
       yearStart,
       yearEnd,
-      uid,
+      userId,
       course,
       studentName;
-  int reachedStep;
+  int? reachedStep;
+  List<UserRegisterModel>? listRegis;
 
   RegisterTraineeModel({
-    required this.creditId,
-    required this.term,
-    required this.creditName,
-    required this.yearStart,
-    required this.uid,
-    required this.yearEnd,
-    required this.course,
-    required this.studentName,
+    this.creditId,
+    this.term,
+    this.creditName,
+    this.yearStart,
+    this.userId,
+    this.yearEnd,
+    this.course,
+    this.studentName,
     this.reachedStep = 0,
+    this.listRegis,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,11 +31,12 @@ class RegisterTraineeModel {
       'term': term,
       'creditName': creditName,
       'yearStart': yearStart,
-      'uid': uid,
+      'userId': userId,
       'yearEnd': yearEnd,
       'course': course,
       'studentName': studentName,
       'reachedStep': reachedStep,
+      'listRegis': listRegis!.map((i) => i.toMap()).toList(),
     };
   }
 
@@ -43,11 +46,14 @@ class RegisterTraineeModel {
       term: map['term'] ?? '',
       creditName: map['creditName'] ?? '',
       yearStart: map['yearStart'] ?? '',
-      uid: map['uid'] ?? '',
+      userId: map['userId'] ?? '',
       yearEnd: map['yearEnd'] ?? '',
       course: map['course'] ?? '',
       studentName: map['studentName'] ?? '',
       reachedStep: map['reachedStep'] ?? 0,
+      listRegis: map['listRegis']
+          .map<UserRegisterModel>((i) => UserRegisterModel.fromMap(i))
+          .toList(),
     );
   }
 
@@ -55,28 +61,39 @@ class RegisterTraineeModel {
 
   factory RegisterTraineeModel.fromJson(String source) =>
       RegisterTraineeModel.fromMap(json.decode(source));
+}
 
-  RegisterTraineeModel copyWith({
-    String? creditId,
-    String? term,
-    String? creditName,
-    String? yearStart,
-    String? uid,
-    String? yearEnd,
-    String? course,
-    String? studentName,
-    int? reachedStep,
-  }) {
-    return RegisterTraineeModel(
-      creditId: creditId ?? this.creditId,
-      term: term ?? this.term,
-      creditName: creditName ?? this.creditName,
-      yearStart: yearStart ?? this.yearStart,
-      uid: uid ?? this.uid,
-      yearEnd: yearEnd ?? this.yearEnd,
-      course: course ?? this.course,
-      studentName: studentName ?? this.studentName,
-      reachedStep: reachedStep ?? this.reachedStep,
+class UserRegisterModel {
+  String? firmId, name, jobId;
+  bool? isAccepted;
+
+  UserRegisterModel({
+    this.firmId,
+    this.jobId,
+    this.name,
+    this.isAccepted,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'firmId': firmId,
+      'jobId': jobId,
+      'name': name,
+      'isAccepted': isAccepted,
+    };
+  }
+
+  factory UserRegisterModel.fromMap(Map<String, dynamic> map) {
+    return UserRegisterModel(
+      firmId: map['firmId'] ?? '',
+      jobId: map['jobId'] ?? '',
+      name: map['name'] ?? '',
+      isAccepted: map['isAccepted'] ?? false,
     );
   }
+
+  String toJson() => json.encode(toMap());
+
+  factory UserRegisterModel.fromJson(String source) =>
+      UserRegisterModel.fromMap(json.decode(source));
 }

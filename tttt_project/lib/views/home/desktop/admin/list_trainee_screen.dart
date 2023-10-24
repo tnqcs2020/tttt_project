@@ -402,11 +402,6 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       builder: (context, snapshot) {
                                         final List<RegisterTraineeModel>
                                             dstttt = [];
-                                        snapshot.data?.docs.forEach((element) {
-                                          dstttt.add(
-                                              RegisterTraineeModel.fromMap(
-                                                  element.data()));
-                                        });
                                         if (snapshot.hasData &&
                                             isLook.value &&
                                             selectedHK.value.isNotEmpty &&
@@ -414,6 +409,12 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                             selectedNH.value.end.isNotEmpty &&
                                             snapshot.connectionState ==
                                                 ConnectionState.active) {
+                                          snapshot.data?.docs
+                                              .forEach((element) {
+                                            dstttt.add(
+                                                RegisterTraineeModel.fromMap(
+                                                    element.data()));
+                                          });
                                           return ListView.builder(
                                             itemCount: dstttt.length,
                                             shrinkWrap: true,
@@ -435,7 +436,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                       flex: 2,
                                                       child: Text(
                                                           dstttt[index]
-                                                              .uid
+                                                              .userId!
                                                               .toUpperCase(),
                                                           textAlign:
                                                               TextAlign.center),
@@ -444,7 +445,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                       flex: 4,
                                                       child: Text(
                                                           dstttt[index]
-                                                              .studentName,
+                                                              .studentName!,
                                                           textAlign:
                                                               TextAlign.center),
                                                     ),
@@ -458,7 +459,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                     Expanded(
                                                       flex: 1,
                                                       child: Text(
-                                                          dstttt[index].course,
+                                                          dstttt[index].course!,
                                                           textAlign:
                                                               TextAlign.center),
                                                     ),

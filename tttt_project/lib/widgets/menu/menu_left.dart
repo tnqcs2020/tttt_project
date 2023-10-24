@@ -29,6 +29,10 @@ class _MenuLeftState extends State<MenuLeft> {
         titles = menuSinhVien;
       case NguoiDung.quantri:
         titles = menuQuanTri;
+      case NguoiDung.cbhd:
+        titles = menuCanBo;
+      case NguoiDung.covan:
+        titles = menuCoVan;
       default:
         titles = menuSinhVien;
     }
@@ -43,6 +47,10 @@ class _MenuLeftState extends State<MenuLeft> {
         pages = pageSinhVien;
       case NguoiDung.quantri:
         pages = pageQuanTri;
+      case NguoiDung.cbhd:
+        pages = pageCanBo;
+      case NguoiDung.covan:
+        pages = pageCoVan;
       default:
         pages = pageSinhVien;
     }

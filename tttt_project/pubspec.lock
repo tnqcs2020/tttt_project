@@ -336,6 +336,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  motion_toast:
+    dependency: "direct main"
+    description:
+      name: motion_toast
+      sha256: "5742e33ec2f11210f5269294304fb9bd0f30eace78ad23925eb9306dce7763c9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.9"
   nested:
     dependency: transitive
     description:
@@ -416,6 +424,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0"
+  searchable_listview:
+    dependency: "direct main"
+    description:
+      name: searchable_listview
+      sha256: e1ba75eda1460c24648e54c543843a7142811ea4966c2106e0cc6792128b7127
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.1"
   shared_preferences:
     dependency: "direct main"
     description:

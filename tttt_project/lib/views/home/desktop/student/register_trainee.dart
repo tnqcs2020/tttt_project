@@ -127,6 +127,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
               UserModel? loadUser;
               if (snapshotUser.data!.data() != null) {
                 loadUser = UserModel.fromMap(snapshotUser.data!.data()!);
+                print(loadUser.name);
               }
               return Column(
                 children: [
@@ -329,13 +330,16 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                           .doc(userId)
                                           .snapshots(),
                                       builder: (context, snapshotTrainee) {
-                                        if (snapshotTrainee.hasData &&
-                                            snapshotTrainee.connectionState ==
-                                                ConnectionState.active) {
-                                          final loadTrainee =
-                                              RegisterTraineeModel.fromMap(
-                                                  snapshotTrainee.data!
-                                                      .data()!);
+                                        if (snapshotTrainee.connectionState ==
+                                            ConnectionState.active) {
+                                          RegisterTraineeModel? loadTrainee;
+                                          if (snapshotTrainee.data!.data() !=
+                                              null) {
+                                            loadTrainee =
+                                                RegisterTraineeModel.fromMap(
+                                                    snapshotTrainee.data!
+                                                        .data()!);
+                                          }
                                           return Obx(
                                             () => switch (
                                                 currentUser.activeStep.value) {
@@ -346,7 +350,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                               _ => loadUser != null &&
                                                       loadUser.isRegistered ==
                                                           true
-                                                  ? _infoCredit(loadTrainee)
+                                                  ? _infoCredit(loadTrainee!)
                                                   : _regisCredit(),
                                             },
                                           );
@@ -622,7 +626,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                           term: selectedHK,
                           creditName: selectedHP.name,
                           yearStart: selectedNH.start,
-                          uid: userId!,
+                          userId: userId!,
                           yearEnd: selectedNH.end,
                           course: currentUser.course.value,
                           studentName: currentUser.name.value,
@@ -630,11 +634,11 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                       currentUser.reachedStep.value = 0;
                       currentUser.activeStep.value = 1;
                       final docRegister =
-                          GV.traineesCol.doc(registerTraineeModel.uid);
+                          GV.traineesCol.doc(registerTraineeModel.userId);
                       final json = registerTraineeModel.toMap();
                       await docRegister.set(json);
                       GV.usersCol
-                          .doc(registerTraineeModel.uid)
+                          .doc(registerTraineeModel.userId)
                           .update({'isRegistered': true});
                       currentUser.setCurrentUser(setIsRegistered: true);
                       EasyLoading.showError('Đã đăng ký!');
@@ -692,7 +696,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   Widget _regisFirm() {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    bool isRegisFirm = false;
+    bool isRegisFirm = true;
     return isRegisFirm
         ? Padding(
             padding: const EdgeInsets.only(top: 15),

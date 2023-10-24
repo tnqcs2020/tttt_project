@@ -19,7 +19,7 @@ class UserController extends GetxController {
   RxBool isRegistered = false.obs;
   RxInt activeStep = 0.obs;
   RxInt reachedStep = 0.obs;
-  // RxBool loadIn = false.obs;
+  RxInt firmSelected = 0.obs;
 
   setCurrentUser({
     String? setUid,
