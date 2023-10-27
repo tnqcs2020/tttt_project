@@ -1,6 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
@@ -129,7 +130,10 @@ class _MyCVState extends State<MyCV> {
                               wish: wishCtrl.text);
                           final json = myCV.toMap();
                           GV.cvsCol.doc(myCV.uid).update(json);
-                          EasyLoading.showSuccess('Cập nhật thành công!');
+                          // EasyLoading.showSuccess();
+                          GV.success(
+                              context: context,
+                              message: 'Thông tin đã được cập nhật.');
                         } else if (skillCtrl.text != '' ||
                             achieveCtrl.text != '' ||
                             hobbyCtrl.text != '' ||
@@ -142,7 +146,9 @@ class _MyCVState extends State<MyCV> {
                               wish: wishCtrl.text);
                           final json = myCV.toMap();
                           GV.cvsCol.doc(myCV.uid).set(json);
-                          EasyLoading.showSuccess('Thêm thành công!');
+                          GV.success(
+                              context: context,
+                              message: 'Đã thêm các thông tin.');
                         }
                       },
                     ),
@@ -152,13 +158,8 @@ class _MyCVState extends State<MyCV> {
             );
           } else {
             return const Padding(
-              padding: EdgeInsets.only(top: 20, bottom: 50),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Loading(),
-                ],
-              ),
+              padding: EdgeInsets.only(top: 150),
+              child: Loading(),
             );
           }
         });

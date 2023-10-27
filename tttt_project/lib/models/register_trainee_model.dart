@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class RegisterTraineeModel {
   String? creditId,
       term,
@@ -64,22 +66,33 @@ class RegisterTraineeModel {
 }
 
 class UserRegisterModel {
-  String? firmId, name, jobId;
-  bool? isAccepted;
+  String? firmId, jobName, jobId, status;
+  Timestamp? createdAt, repliedAt, traineeStart, traineeEnd;
+  bool? isConfirmed;
 
   UserRegisterModel({
     this.firmId,
     this.jobId,
-    this.name,
-    this.isAccepted,
+    this.jobName,
+    this.status,
+    this.createdAt,
+    this.repliedAt,
+    this.isConfirmed = false,
+    this.traineeStart,
+    this.traineeEnd,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'firmId': firmId,
       'jobId': jobId,
-      'name': name,
-      'isAccepted': isAccepted,
+      'jobName': jobName,
+      'status': status,
+      'createdAt': createdAt,
+      'repliedAt': repliedAt,
+      'isConfirmed': isConfirmed,
+      'traineeStart': traineeStart,
+      'traineeEnd': traineeEnd,
     };
   }
 
@@ -87,8 +100,13 @@ class UserRegisterModel {
     return UserRegisterModel(
       firmId: map['firmId'] ?? '',
       jobId: map['jobId'] ?? '',
-      name: map['name'] ?? '',
-      isAccepted: map['isAccepted'] ?? false,
+      jobName: map['jobName'] ?? '',
+      status: map['status'] ?? '',
+      createdAt: map['createdAt'],
+      repliedAt: map['repliedAt'],
+      isConfirmed: map['isConfirmed'] ?? false,
+      traineeStart: map['traineeStart'],
+      traineeEnd: map['traineeEnd'],
     );
   }
 

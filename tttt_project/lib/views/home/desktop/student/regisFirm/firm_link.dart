@@ -22,7 +22,7 @@ class FirmLink extends StatefulWidget {
 
 class _FirmLinkState extends State<FirmLink> {
   final currentUser = Get.put(UserController());
-  ValueNotifier selectedMenu = ValueNotifier(2);
+  ValueNotifier selectedMenu = ValueNotifier(0);
 
   @override
   void initState() {

@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tttt_project/models/firm_model.dart';
 
 class UserController extends GetxController {
   RxString uid = "".obs;
@@ -17,9 +19,12 @@ class UserController extends GetxController {
   RxString gender = "".obs; //true: male, false: female
   RxInt menuSelected = 0.obs;
   RxBool isRegistered = false.obs;
-  RxInt activeStep = 0.obs;
+  RxInt selectedStep = 0.obs;
   RxInt reachedStep = 0.obs;
-  RxInt firmSelected = 0.obs;
+  RxBool loadIn = false.obs;
+  Rx<JobPositionModel> selectedJob = JobPositionModel().obs;
+  Rx<DateTimeRange> traineeTime =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now()).obs;
 
   setCurrentUser({
     String? setUid,
@@ -37,9 +42,9 @@ class UserController extends GetxController {
     String? setGender,
     int? setMenuSelected,
     bool? setIsRegistered,
-    int? setActiveStep,
     int? setReachedStep,
-    // bool? setLoadIn,
+    int? setSelectedStep,
+    bool? setLoadIn,
   }) {
     uid.value = setUid ?? uid.value;
     name.value = setName ?? name.value;
@@ -56,8 +61,29 @@ class UserController extends GetxController {
     address.value = setAddress ?? address.value;
     menuSelected.value = setMenuSelected ?? menuSelected.value;
     isRegistered.value = setIsRegistered ?? isRegistered.value;
-    activeStep.value = setActiveStep ?? activeStep.value;
     reachedStep.value = setReachedStep ?? reachedStep.value;
-    // loadIn.value = setLoadIn ?? false;
+    selectedStep.value = setSelectedStep ?? selectedStep.value;
+    loadIn.value = setLoadIn ?? false;
+  }
+
+  resetUser() {
+    uid.value = "";
+    name.value = "";
+    userId.value = "";
+    email.value = "";
+    birthday.value = "";
+    classId.value = "";
+    className.value = "";
+    course.value = "";
+    major.value = "";
+    phone.value = "";
+    group.value = "";
+    gender.value = "";
+    address.value = "";
+    menuSelected.value = 0;
+    isRegistered.value = false;
+    reachedStep.value = 0;
+    selectedStep.value = 0;
+    loadIn.value = false;
   }
 }

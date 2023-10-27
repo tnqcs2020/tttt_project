@@ -54,7 +54,7 @@ class _InfoFirmState extends State<InfoFirm> {
         await FirebaseFirestore.instance.collection('firms').doc(userId).get();
     if (isExistFirm.data() != null) {
       loadFirm = FirmModel.fromMap(isExistFirm.data()!);
-      nameFirmCtrl.text = loadFirm.name ?? '';
+      nameFirmCtrl.text = loadFirm.firmName ?? '';
       ownerCtrl.text = loadFirm.owner ?? '';
       phoneCtrl.text = loadFirm.phone ?? '';
       emailCtrl.text = loadFirm.email ?? '';
@@ -67,7 +67,7 @@ class _InfoFirmState extends State<InfoFirm> {
           describes = [];
           temp = 0;
           loadFirm.listJob!.forEach((element) {
-            positions.add(TextEditingController(text: element.name));
+            positions.add(TextEditingController(text: element.jobName));
             quantities.add(TextEditingController(text: element.quantity));
             describes.add(TextEditingController(text: element.describeJob));
             temp++;
@@ -302,7 +302,7 @@ class _InfoFirmState extends State<InfoFirm> {
                                   quantities[i].text != '' ||
                                   describes[i].text != '') {
                                 jobs.add(JobPositionModel(
-                                    name: positions[i].text,
+                                    jobName: positions[i].text,
                                     quantity: quantities[i].text,
                                     describeJob: describes[i].text,
                                     jobId: GV.generateRandomString(10)));
@@ -312,7 +312,7 @@ class _InfoFirmState extends State<InfoFirm> {
 
                           FirmModel firmModel = FirmModel(
                             firmId: currentUser.userId.value,
-                            name: nameFirmCtrl.text != ""
+                            firmName: nameFirmCtrl.text != ""
                                 ? nameFirmCtrl.text
                                 : null,
                             owner: ownerCtrl.text != "" ? ownerCtrl.text : null,

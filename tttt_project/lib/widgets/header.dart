@@ -56,6 +56,7 @@ class Header extends StatelessWidget {
                           await sharedPref.setBool("isLoggedIn", false);
                           await sharedPref.remove('menuSelected');
                           await GV.auth.signOut();
+                          currentUser.resetUser();
                           Navigator.pushNamedAndRemoveUntil(
                               context, RouteGenerator.login, (route) => false);
                           // Get.toNamed(RouteGenerator.login);

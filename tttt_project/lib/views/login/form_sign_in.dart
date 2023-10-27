@@ -58,7 +58,6 @@ class FormSignIn extends StatelessWidget {
                     if (isExistUser.data()!['group'] == NguoiDung.quantri ||
                         isExistUser.data()!['group'] == NguoiDung.giaovu ||
                         isExistUser.data()!['group'] == NguoiDung.covan ||
-                        isExistUser.data()!['group'] == NguoiDung.congty ||
                         isExistUser.data()!['group'] == NguoiDung.cbhd) {
                       str = "${_userIdCtrl.text.toLowerCase()}@cict.ctu.vn";
                       await GV.auth.signInWithEmailAndPassword(
@@ -94,6 +93,7 @@ class FormSignIn extends StatelessWidget {
                       setMajor: isExistUser.data()!['major'],
                       setEmail: isExistUser.data()!['email'],
                       setIsRegistered: isExistUser.data()!['isRegistered'],
+                      setPhone: isExistUser.data()!['phone'],
                       setMenuSelected: 0,
                     );
                     Navigator.pushNamed(context, RouteGenerator.home);

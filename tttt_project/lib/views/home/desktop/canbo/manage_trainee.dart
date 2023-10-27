@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tttt_project/views/home/desktop/canbo/list_student_regis.dart';
+import 'package:tttt_project/views/home/desktop/canbo/list_student_trainee.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -63,8 +65,8 @@ class _ManageTraineeState extends State<ManageTrainee> {
     'Đánh giá',
   ];
   List contentInfo = [
-    const Text('ds'),
-    const Text('tt'),
+    const ListStudentRegis(),
+    const ListStudentTrainee(),
     const Text('td'),
     const Text('dg')
   ];

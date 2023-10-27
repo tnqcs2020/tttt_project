@@ -1,13 +1,15 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FirmModel {
-  String? firmId, name, email, phone, owner, describe, address;
+  String? firmId, firmName, email, phone, owner, describe, address;
   List<JobPositionModel>? listJob;
   List<JobRegisterModel>? listRegis;
 
   FirmModel(
       {this.firmId,
-      this.name,
+      this.firmName,
       this.email,
       this.owner,
       this.phone,
@@ -19,7 +21,7 @@ class FirmModel {
   Map<String, dynamic> toMap() {
     return {
       'firmId': firmId,
-      'name': name,
+      'firmName': firmName,
       'email': email,
       'owner': owner,
       'phone': phone,
@@ -33,7 +35,7 @@ class FirmModel {
   factory FirmModel.fromMap(Map<String, dynamic> data) {
     return FirmModel(
       firmId: data['firmId'] ?? '',
-      name: data['name'] ?? '',
+      firmName: data['firmName'] ?? '',
       email: data['email'] ?? '',
       owner: data['owner'] ?? '',
       phone: data['phone'] ?? '',
@@ -55,12 +57,12 @@ class FirmModel {
 }
 
 class JobPositionModel {
-  String? jobId, describeJob, name, quantity;
+  String? jobId, describeJob, jobName, quantity;
 
   JobPositionModel({
     this.jobId,
     this.describeJob,
-    this.name,
+    this.jobName,
     this.quantity,
   });
 
@@ -68,7 +70,7 @@ class JobPositionModel {
     return {
       'jobId': jobId,
       'describeJob': describeJob,
-      'name': name,
+      'jobName': jobName,
       'quantity': quantity,
     };
   }
@@ -77,7 +79,7 @@ class JobPositionModel {
     return JobPositionModel(
       jobId: map['jobId'] ?? '',
       describeJob: map['describeJob'] ?? '',
-      name: map['name'] ?? '',
+      jobName: map['jobName'] ?? '',
       quantity: map['quantity'] ?? '',
     );
   }
@@ -89,22 +91,34 @@ class JobPositionModel {
 }
 
 class JobRegisterModel {
-  String? userId, name, jobId;
-  bool? isAccepted;
-
+  String? userId, userName, jobId, status, jobName;
+  Timestamp? createdAt, repliedAt, traineeStart, traineeEnd;
+  bool? isConfirmed;
   JobRegisterModel({
     this.userId,
     this.jobId,
-    this.name,
-    this.isAccepted,
+    this.userName,
+    this.status,
+    this.jobName,
+    this.createdAt,
+    this.repliedAt,
+    this.isConfirmed = false,
+    this.traineeStart,
+    this.traineeEnd,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'jobId': jobId,
-      'name': name,
-      'isAccepted': isAccepted,
+      'userName': userName,
+      'status': status,
+      'jobName': jobName,
+      'createdAt': createdAt,
+      'repliedAt': repliedAt,
+      'isConfirmed': isConfirmed,
+      'traineeStart': traineeStart,
+      'traineeEnd': traineeEnd,
     };
   }
 
@@ -112,8 +126,14 @@ class JobRegisterModel {
     return JobRegisterModel(
       userId: map['userId'] ?? '',
       jobId: map['jobId'] ?? '',
-      name: map['name'] ?? '',
-      isAccepted: map['isAccepted'] ?? false,
+      userName: map['userName'] ?? '',
+      status: map['status'] ?? '',
+      jobName: map['jobName'] ?? '',
+      createdAt: map['createdAt'],
+      repliedAt: map['repliedAt'],
+      isConfirmed: map['isConfirmed'] ?? false,
+      traineeStart: map['traineeStart'],
+      traineeEnd: map['traineeEnd'],
     );
   }
 

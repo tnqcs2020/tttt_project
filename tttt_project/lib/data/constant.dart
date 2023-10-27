@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:motion_toast/resources/arrays.dart';
 import 'package:tttt_project/routes.dart';
 import 'dart:math';
+import 'package:intl/intl.dart';
 
 class GV {
   static final auth = FirebaseAuth.instance;
@@ -17,6 +21,87 @@ class GV {
         'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
     return List.generate(len, (index) => chars[rd.nextInt(chars.length)])
         .join();
+  }
+
+  static String readTimestamp(Timestamp timestamp) {
+    var date = DateFormat('dd/MM/yyyy').format(
+        DateTime.fromMicrosecondsSinceEpoch(timestamp.microsecondsSinceEpoch));
+    return date.toString();
+  }
+
+  //toast
+  static warning(
+      {required BuildContext context, String? title, required String message}) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    return MotionToast.warning(
+      title: Text(
+        title ?? 'Chú ý',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      description: Text(
+        message,
+        style: const TextStyle(fontSize: 12),
+      ),
+      toastDuration: const Duration(milliseconds: 1500),
+      animationType: AnimationType.fromLeft,
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.6,
+        bottom: 20,
+      ),
+      width: screenWidth * 0.24,
+      height: screenHeight * 0.1,
+    ).show(context);
+  }
+
+  static success(
+      {required BuildContext context, String? title, required String message}) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    return MotionToast.success(
+      title: Text(
+        title ?? 'Thành công',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      description: Text(
+        message,
+        style: const TextStyle(fontSize: 12),
+      ),
+      toastDuration: const Duration(milliseconds: 1500),
+      animationType: AnimationType.fromLeft,
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.6,
+        bottom: 20,
+      ),
+      width: screenWidth * 0.24,
+      height: screenHeight * 0.1,
+    ).show(context);
+  }
+
+  static error(
+      {required BuildContext context, String? title, required String message}) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    return MotionToast(
+      icon: Icons.close,
+      title: Text(
+        title ?? "Từ chối",
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      description: Text(
+        message,
+        style: const TextStyle(fontSize: 12),
+      ),
+      toastDuration: const Duration(milliseconds: 1500),
+      animationType: AnimationType.fromLeft,
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.6,
+        bottom: 20,
+      ),
+      width: screenWidth * 0.24,
+      height: screenHeight * 0.1,
+      primaryColor: Colors.red,
+    ).show(context);
   }
 }
 
@@ -93,6 +178,12 @@ class NguoiDung {
   static const String congty = "Công ty";
 }
 
+class TrangThai {
+  static const String wait = "Chờ duyệt";
+  static const String accept = "Đã duyệt";
+  static const String reject = "Từ chối";
+}
+
 class NamHoc {
   final String start;
   final String end;
@@ -122,40 +213,40 @@ class HocPhan {
   });
 }
 
-class DSHocPhan45 {
-  static HocPhan ct215h =
-      HocPhan(maHP: "CT215H", tenHP: "Thực tập thực tế (CLC)");
-  static HocPhan ct471 =
-      HocPhan(maHP: "CT471", tenHP: "Thực tập thực tế - CNTT");
-  static HocPhan ct472 =
-      HocPhan(maHP: "CT472", tenHP: "Thực tập thực tế - HTTT");
-  static HocPhan ct473 =
-      HocPhan(maHP: "CT473", tenHP: "Thực tập thực tế - KHMT");
-  static HocPhan ct474 =
-      HocPhan(maHP: "CT474", tenHP: "Thực tập thực tế - KTPM");
-  static HocPhan ct475 =
-      HocPhan(maHP: "CT475", tenHP: "Thực tập thực tế - THUD");
-  static HocPhan ct476 =
-      HocPhan(maHP: "CT476", tenHP: "Thực tập thực tế - TT&MMT");
-}
+// class DSHocPhan45 {
+//   static HocPhan ct215h =
+//       HocPhan(maHP: "CT215H", tenHP: "Thực tập thực tế (CLC)");
+//   static HocPhan ct471 =
+//       HocPhan(maHP: "CT471", tenHP: "Thực tập thực tế - CNTT");
+//   static HocPhan ct472 =
+//       HocPhan(maHP: "CT472", tenHP: "Thực tập thực tế - HTTT");
+//   static HocPhan ct473 =
+//       HocPhan(maHP: "CT473", tenHP: "Thực tập thực tế - KHMT");
+//   static HocPhan ct474 =
+//       HocPhan(maHP: "CT474", tenHP: "Thực tập thực tế - KTPM");
+//   static HocPhan ct475 =
+//       HocPhan(maHP: "CT475", tenHP: "Thực tập thực tế - THUD");
+//   static HocPhan ct476 =
+//       HocPhan(maHP: "CT476", tenHP: "Thực tập thực tế - TT&MMT");
+// }
 
-class DSHocPhan49 {
-  static HocPhan ct215h =
-      HocPhan(maHP: "CT215H", tenHP: "Thực tập thực tế (CLC)");
-  static HocPhan ct458e =
-      HocPhan(maHP: "CT458E", tenHP: "Thực tập doanh nghiệp - KTPM");
-  static HocPhan ct474h =
-      HocPhan(maHP: "CT474H", tenHP: "Thực tập doanh nghiệp - KTPM (CLC)");
-  static HocPhan ct493e = HocPhan(
-      maHP: "CT493E", tenHP: "Thực tập doanh nghiệp - An toàn thông tin");
-  static HocPhan ct508e =
-      HocPhan(maHP: "CT508E", tenHP: "Thực tập doanh nghiệp - TTDPT");
-  static HocPhan ct511e =
-      HocPhan(maHP: "CT511E", tenHP: "Thực tập doanh nghiệp - HTTT");
-  static HocPhan ct516e =
-      HocPhan(maHP: "CT516E", tenHP: "Thực tập doanh nghiệp - KHMT");
-  static HocPhan ct517e =
-      HocPhan(maHP: "CT517E", tenHP: "Thực tập doanh nghiệp - MMT&TTDL");
-  static HocPhan ct518e =
-      HocPhan(maHP: "CT518E", tenHP: "Thực tập doanh nghiệp - CNTT");
-}
+// class DSHocPhan49 {
+//   static HocPhan ct215h =
+//       HocPhan(maHP: "CT215H", tenHP: "Thực tập thực tế (CLC)");
+//   static HocPhan ct458e =
+//       HocPhan(maHP: "CT458E", tenHP: "Thực tập doanh nghiệp - KTPM");
+//   static HocPhan ct474h =
+//       HocPhan(maHP: "CT474H", tenHP: "Thực tập doanh nghiệp - KTPM (CLC)");
+//   static HocPhan ct493e = HocPhan(
+//       maHP: "CT493E", tenHP: "Thực tập doanh nghiệp - An toàn thông tin");
+//   static HocPhan ct508e =
+//       HocPhan(maHP: "CT508E", tenHP: "Thực tập doanh nghiệp - TTDPT");
+//   static HocPhan ct511e =
+//       HocPhan(maHP: "CT511E", tenHP: "Thực tập doanh nghiệp - HTTT");
+//   static HocPhan ct516e =
+//       HocPhan(maHP: "CT516E", tenHP: "Thực tập doanh nghiệp - KHMT");
+//   static HocPhan ct517e =
+//       HocPhan(maHP: "CT517E", tenHP: "Thực tập doanh nghiệp - MMT&TTDL");
+//   static HocPhan ct518e =
+//       HocPhan(maHP: "CT518E", tenHP: "Thực tập doanh nghiệp - CNTT");
+// }

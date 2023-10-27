@@ -19,16 +19,16 @@ class UserModel {
   bool? isRegistered;
 
   UserModel({
-    required this.uid,
-    required this.userId,
-    required this.name,
+    this.uid,
+    this.userId,
+    this.name,
     this.classId,
     this.className,
     this.course,
     this.major,
     this.email,
-    required this.password,
-    required this.group,
+    this.password,
+    this.group,
     this.phone,
     this.birthday,
     this.gender,

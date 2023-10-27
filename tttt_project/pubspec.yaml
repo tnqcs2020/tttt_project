@@ -26,6 +26,7 @@ dependencies:
   easy_stepper: ^0.8.1
   searchable_listview: ^2.7.1
   motion_toast: ^2.7.9
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
