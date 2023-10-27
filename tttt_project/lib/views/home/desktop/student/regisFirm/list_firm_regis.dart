@@ -103,7 +103,8 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Obx(
       () => StreamBuilder(
-        stream: GV.traineesCol
+        stream: FirebaseFirestore.instance
+            .collection('trainees')
             .where('userId', isEqualTo: currentUser.userId.value)
             .snapshots(),
         builder: (context, snapshotTrainee) {
@@ -132,7 +133,8 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                             shrinkWrap: true,
                             itemBuilder: (context, indexRegis) {
                               return StreamBuilder(
-                                  stream: GV.firmsCol
+                                  stream: FirebaseFirestore.instance
+                                      .collection('firms')
                                       .doc(listRegis[indexRegis].firmId)
                                       .snapshots(),
                                   builder: (context, snapshot) {

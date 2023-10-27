@@ -52,17 +52,11 @@ class _ListFirmState extends State<ListFirm> {
           await GV.usersCol.doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
-        // setState(() {
-        //   user = loadUser;
-        // });
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await GV.traineesCol.doc(userId).get();
         if (isExitTrainee.data() != null) {
           final loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
-          // setState(() {
-          //   trainee = loadTrainee;
-          // });
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
@@ -91,21 +85,13 @@ class _ListFirmState extends State<ListFirm> {
         }
       }
     }
-    GV.firmsCol.snapshots().listen((querySnapshot) {
-      loadFirm.clear();
-      if (querySnapshot.docs.isNotEmpty) {
-        querySnapshot.docs.forEach((element) => setState(() {
-              // loadFirm.add(FirmModel.fromMap(element.data()));
-              firms.add(FirmModel.fromMap(element.data()));
-            }));
-      }
-    });
     currentUser.loadIn.value = true;
   }
 
   @override
   void dispose() {
     searchCtrl.dispose();
+    isSearch.dispose();
     super.dispose();
   }
 
@@ -114,7 +100,7 @@ class _ListFirmState extends State<ListFirm> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return StreamBuilder(
-      stream: GV.firmsCol.snapshots(),
+      stream: FirebaseFirestore.instance.collection('firms').snapshots(),
       builder: (context, snapshotFirm) {
         if (snapshotFirm.hasData) {
           firms = [];
@@ -581,152 +567,134 @@ class _ListFirmState extends State<ListFirm> {
                                                                 }
                                                               }
                                                             } else {
-                                                              for (var d in firmResult[
-                                                                      indexFirm]
-                                                                  .listRegis!) {
-                                                                if (d.userId ==
-                                                                    userId) {
-                                                                  if (d.jobId ==
-                                                                          currentUser
-                                                                              .selectedJob
-                                                                              .value
-                                                                              .jobId &&
-                                                                      d.traineeStart ==
-                                                                          Timestamp.fromDate(currentUser
-                                                                              .traineeTime
-                                                                              .value
-                                                                              .start) &&
-                                                                      d.traineeEnd ==
-                                                                          Timestamp.fromDate(currentUser
-                                                                              .traineeTime
-                                                                              .value
-                                                                              .end)) {
-                                                                    GV.warning(
-                                                                        context:
-                                                                            context,
-                                                                        message:
-                                                                            'Không có gì thay đổi.');
-                                                                  } else if (currentUser
-                                                                          .selectedJob
-                                                                          .value
-                                                                          .jobId ==
-                                                                      null) {
-                                                                    GV.error(
-                                                                        context:
-                                                                            context,
-                                                                        message:
-                                                                            'Vui lòng chọn vị trí ứng tuyển.');
-                                                                  } else if (currentUser
-                                                                          .traineeTime
-                                                                          .value
-                                                                          .start ==
+                                                              if (currentUser
+                                                                      .selectedJob
+                                                                      .value
+                                                                      .jobId ==
+                                                                  null) {
+                                                                GV.error(
+                                                                    context:
+                                                                        context,
+                                                                    message:
+                                                                        'Vui lòng chọn vị trí ứng tuyển.');
+                                                              } else if (currentUser
+                                                                      .traineeTime
+                                                                      .value
+                                                                      .start ==
+                                                                  currentUser
+                                                                      .traineeTime
+                                                                      .value
+                                                                      .end) {
+                                                                GV.error(
+                                                                    context:
+                                                                        context,
+                                                                    message:
+                                                                        'Vui lòng chọn thời gian phù hợp.');
+                                                              } else {
+                                                                final regis =
+                                                                    JobRegisterModel(
+                                                                  userId:
+                                                                      userId,
+                                                                  jobId: currentUser
+                                                                      .selectedJob
+                                                                      .value
+                                                                      .jobId,
+                                                                  userName:
+                                                                      currentUser
+                                                                          .name
+                                                                          .value,
+                                                                  jobName: currentUser
+                                                                      .selectedJob
+                                                                      .value
+                                                                      .jobName,
+                                                                  status:
+                                                                      TrangThai
+                                                                          .wait,
+                                                                  createdAt:
+                                                                      Timestamp
+                                                                          .now(),
+                                                                  traineeStart: Timestamp.fromDate(
                                                                       currentUser
                                                                           .traineeTime
                                                                           .value
-                                                                          .end) {
-                                                                    GV.error(
-                                                                        context:
-                                                                            context,
-                                                                        message:
-                                                                            'Vui lòng chọn thời gian phù hợp.');
-                                                                  } else {
-                                                                    final regis =
-                                                                        JobRegisterModel(
-                                                                      userId:
-                                                                          userId,
-                                                                      jobId: currentUser
-                                                                          .selectedJob
-                                                                          .value
-                                                                          .jobId,
-                                                                      userName: currentUser
-                                                                          .name
-                                                                          .value,
-                                                                      jobName: currentUser
-                                                                          .selectedJob
-                                                                          .value
-                                                                          .jobName,
-                                                                      status: TrangThai
-                                                                          .wait,
-                                                                      createdAt:
-                                                                          Timestamp
-                                                                              .now(),
-                                                                      traineeStart: Timestamp.fromDate(currentUser
-                                                                          .traineeTime
-                                                                          .value
                                                                           .start),
-                                                                      traineeEnd: Timestamp.fromDate(currentUser
+                                                                  traineeEnd: Timestamp.fromDate(
+                                                                      currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .end),
-                                                                    );
-                                                                    var listRegis =
-                                                                        firmResult[indexFirm]
-                                                                            .listRegis;
-                                                                    listRegis!.add(
-                                                                        regis);
-                                                                    GV.firmsCol
-                                                                        .doc(firmResult[indexFirm]
-                                                                            .firmId)
-                                                                        .update({
-                                                                      'listRegis': listRegis
-                                                                          .map((i) =>
-                                                                              i.toMap())
-                                                                          .toList()
-                                                                    });
-                                                                    final userRegis =
-                                                                        UserRegisterModel(
-                                                                      firmId: firmResult[
-                                                                              indexFirm]
-                                                                          .firmId,
-                                                                      jobId: regis
-                                                                          .jobId,
-                                                                      jobName: regis
-                                                                          .jobName,
-                                                                      status: TrangThai
+                                                                );
+                                                                var listRegis =
+                                                                    firmResult[
+                                                                            indexFirm]
+                                                                        .listRegis;
+                                                                listRegis!
+                                                                    .add(regis);
+                                                                GV.firmsCol
+                                                                    .doc(firmResult[
+                                                                            indexFirm]
+                                                                        .firmId)
+                                                                    .update({
+                                                                  'listRegis': listRegis
+                                                                      .map((i) =>
+                                                                          i.toMap())
+                                                                      .toList()
+                                                                });
+                                                                final userRegis =
+                                                                    UserRegisterModel(
+                                                                  firmId: firmResult[
+                                                                          indexFirm]
+                                                                      .firmId,
+                                                                  jobId: regis
+                                                                      .jobId,
+                                                                  jobName: regis
+                                                                      .jobName,
+                                                                  status:
+                                                                      TrangThai
                                                                           .wait,
-                                                                      createdAt:
-                                                                          Timestamp
-                                                                              .now(),
-                                                                      traineeStart: Timestamp.fromDate(currentUser
+                                                                  createdAt:
+                                                                      Timestamp
+                                                                          .now(),
+                                                                  traineeStart: Timestamp.fromDate(
+                                                                      currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .start),
-                                                                      traineeEnd: Timestamp.fromDate(currentUser
+                                                                  traineeEnd: Timestamp.fromDate(
+                                                                      currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .end),
-                                                                    );
+                                                                );
 
-                                                                    var loadListRegis = await GV
+                                                                var loadListRegis =
+                                                                    await GV
                                                                         .traineesCol
                                                                         .doc(
                                                                             userId)
                                                                         .get();
 
-                                                                    final listUserRegis =
-                                                                        RegisterTraineeModel.fromMap(loadListRegis.data()!)
-                                                                            .listRegis;
-                                                                    listUserRegis!
-                                                                        .add(
-                                                                            userRegis);
-                                                                    GV.traineesCol
-                                                                        .doc(
-                                                                            userId)
-                                                                        .update({
-                                                                      'listRegis': listUserRegis
-                                                                          .map((i) =>
-                                                                              i.toMap())
-                                                                          .toList(),
-                                                                    });
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    GV.success(
-                                                                        context:
-                                                                            context,
-                                                                        message:
-                                                                            'Đăng ký thành công.');
-                                                                  }
-                                                                }
+                                                                final listUserRegis =
+                                                                    RegisterTraineeModel.fromMap(
+                                                                            loadListRegis.data()!)
+                                                                        .listRegis;
+                                                                listUserRegis!.add(
+                                                                    userRegis);
+                                                                GV.traineesCol
+                                                                    .doc(userId)
+                                                                    .update({
+                                                                  'listRegis': listUserRegis
+                                                                      .map((i) =>
+                                                                          i.toMap())
+                                                                      .toList(),
+                                                                });
+                                                                Navigator.pop(
+                                                                    context);
+                                                                GV.success(
+                                                                    context:
+                                                                        context,
+                                                                    message:
+                                                                        'Đăng ký thành công.');
                                                               }
                                                             }
                                                           } else {
@@ -1164,158 +1132,133 @@ class _ListFirmState extends State<ListFirm> {
                                                             }
                                                           }
                                                         } else {
-                                                          for (var d in firms[
-                                                                  indexFirm]
-                                                              .listRegis!) {
-                                                            if (d.userId ==
-                                                                userId) {
-                                                              if (d.jobId ==
-                                                                      currentUser
-                                                                          .selectedJob
-                                                                          .value
-                                                                          .jobId &&
-                                                                  d.traineeStart ==
-                                                                      Timestamp.fromDate(currentUser
-                                                                          .traineeTime
-                                                                          .value
-                                                                          .start) &&
-                                                                  d.traineeEnd ==
-                                                                      Timestamp.fromDate(currentUser
-                                                                          .traineeTime
-                                                                          .value
-                                                                          .end)) {
-                                                                GV.warning(
-                                                                    context:
-                                                                        context,
-                                                                    message:
-                                                                        'Không có gì thay đổi.');
-                                                              } else if (currentUser
-                                                                      .selectedJob
-                                                                      .value
-                                                                      .jobId ==
-                                                                  null) {
-                                                                GV.error(
-                                                                    context:
-                                                                        context,
-                                                                    message:
-                                                                        'Vui lòng chọn vị trí ứng tuyển.');
-                                                              } else if (currentUser
-                                                                      .traineeTime
-                                                                      .value
-                                                                      .start ==
+                                                          if (currentUser
+                                                                  .selectedJob
+                                                                  .value
+                                                                  .jobId ==
+                                                              null) {
+                                                            GV.error(
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    'Vui lòng chọn vị trí ứng tuyển.');
+                                                          } else if (currentUser
+                                                                  .traineeTime
+                                                                  .value
+                                                                  .start ==
+                                                              currentUser
+                                                                  .traineeTime
+                                                                  .value
+                                                                  .end) {
+                                                            GV.error(
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    'Vui lòng chọn thời gian phù hợp.');
+                                                          } else {
+                                                            final regis =
+                                                                JobRegisterModel(
+                                                              userId: userId,
+                                                              jobId: currentUser
+                                                                  .selectedJob
+                                                                  .value
+                                                                  .jobId,
+                                                              userName:
                                                                   currentUser
-                                                                      .traineeTime
-                                                                      .value
-                                                                      .end) {
-                                                                GV.error(
-                                                                    context:
-                                                                        context,
-                                                                    message:
-                                                                        'Vui lòng chọn thời gian phù hợp.');
-                                                              } else {
-                                                                final regis =
-                                                                    JobRegisterModel(
-                                                                  userId:
-                                                                      userId,
-                                                                  jobId: currentUser
-                                                                      .selectedJob
-                                                                      .value
-                                                                      .jobId,
-                                                                  userName:
-                                                                      currentUser
-                                                                          .name
-                                                                          .value,
-                                                                  jobName: currentUser
-                                                                      .selectedJob
-                                                                      .value
-                                                                      .jobName,
-                                                                  status:
-                                                                      TrangThai
-                                                                          .wait,
-                                                                  createdAt:
-                                                                      Timestamp
-                                                                          .now(),
-                                                                  traineeStart: Timestamp.fromDate(
+                                                                      .name
+                                                                      .value,
+                                                              jobName: currentUser
+                                                                  .selectedJob
+                                                                  .value
+                                                                  .jobName,
+                                                              status: TrangThai
+                                                                  .wait,
+                                                              createdAt:
+                                                                  Timestamp
+                                                                      .now(),
+                                                              traineeStart:
+                                                                  Timestamp.fromDate(
                                                                       currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .start),
-                                                                  traineeEnd: Timestamp.fromDate(
+                                                              traineeEnd: Timestamp
+                                                                  .fromDate(
                                                                       currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .end),
-                                                                );
-                                                                var listRegis =
-                                                                    firms[indexFirm]
-                                                                        .listRegis;
-                                                                listRegis!
-                                                                    .add(regis);
-                                                                GV.firmsCol
-                                                                    .doc(firms[
-                                                                            indexFirm]
-                                                                        .firmId)
-                                                                    .update({
-                                                                  'listRegis': listRegis
-                                                                      .map((i) =>
-                                                                          i.toMap())
-                                                                      .toList()
-                                                                });
-                                                                final userRegis =
-                                                                    UserRegisterModel(
-                                                                  firmId: firms[
-                                                                          indexFirm]
-                                                                      .firmId,
-                                                                  jobId: regis
-                                                                      .jobId,
-                                                                  jobName: regis
-                                                                      .jobName,
-                                                                  status:
-                                                                      TrangThai
-                                                                          .wait,
-                                                                  createdAt:
-                                                                      Timestamp
-                                                                          .now(),
-                                                                  traineeStart: Timestamp.fromDate(
+                                                            );
+                                                            var listRegis =
+                                                                firms[indexFirm]
+                                                                    .listRegis;
+                                                            listRegis!
+                                                                .add(regis);
+                                                            GV.firmsCol
+                                                                .doc(firms[
+                                                                        indexFirm]
+                                                                    .firmId)
+                                                                .update({
+                                                              'listRegis': listRegis
+                                                                  .map((i) =>
+                                                                      i.toMap())
+                                                                  .toList()
+                                                            });
+                                                            final userRegis =
+                                                                UserRegisterModel(
+                                                              firmId: firms[
+                                                                      indexFirm]
+                                                                  .firmId,
+                                                              jobId:
+                                                                  regis.jobId,
+                                                              jobName:
+                                                                  regis.jobName,
+                                                              status: TrangThai
+                                                                  .wait,
+                                                              createdAt:
+                                                                  Timestamp
+                                                                      .now(),
+                                                              traineeStart:
+                                                                  Timestamp.fromDate(
                                                                       currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .start),
-                                                                  traineeEnd: Timestamp.fromDate(
+                                                              traineeEnd: Timestamp
+                                                                  .fromDate(
                                                                       currentUser
                                                                           .traineeTime
                                                                           .value
                                                                           .end),
-                                                                );
-                                                                var loadListRegis =
-                                                                    await GV
-                                                                        .traineesCol
-                                                                        .doc(
-                                                                            userId)
-                                                                        .get();
-                                                                final listUserRegis =
-                                                                    RegisterTraineeModel.fromMap(
-                                                                            loadListRegis.data()!)
-                                                                        .listRegis;
-                                                                listUserRegis!.add(
-                                                                    userRegis);
-                                                                GV.traineesCol
+                                                            );
+                                                            var loadListRegis =
+                                                                await GV
+                                                                    .traineesCol
                                                                     .doc(userId)
-                                                                    .update({
-                                                                  'listRegis': listUserRegis
+                                                                    .get();
+                                                            final listUserRegis =
+                                                                RegisterTraineeModel.fromMap(
+                                                                        loadListRegis
+                                                                            .data()!)
+                                                                    .listRegis;
+                                                            listUserRegis!
+                                                                .add(userRegis);
+                                                            GV.traineesCol
+                                                                .doc(userId)
+                                                                .update({
+                                                              'listRegis':
+                                                                  listUserRegis
                                                                       .map((i) =>
                                                                           i.toMap())
                                                                       .toList(),
-                                                                });
-                                                                Navigator.pop(
-                                                                    context);
-                                                                GV.success(
-                                                                    context:
-                                                                        context,
-                                                                    message:
-                                                                        'Đăng ký thành công.');
-                                                              }
-                                                            }
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                            GV.success(
+                                                                context:
+                                                                    context,
+                                                                message:
+                                                                    'Đăng ký thành công.');
                                                           }
                                                         }
                                                       } else {
