@@ -182,34 +182,34 @@ class _ListFirmState extends State<ListFirm> {
                                         firmResult[indexFirm].describe!,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      // trailing: firmResult[indexFirm]
-                                      //             .listRegis!
-                                      //             .firstWhere((element) =>
-                                      //                 element.userId == userId)
-                                      //             .status ==
-                                      //         TrangThai.accept
-                                      //     ? Column(
-                                      //         mainAxisAlignment:
-                                      //             MainAxisAlignment.center,
-                                      //         children: [
-                                      //           Text(firmResult[indexFirm]
-                                      //               .listRegis!
-                                      //               .firstWhere((element) =>
-                                      //                   element.userId ==
-                                      //                   userId)
-                                      //               .status!),
-                                      //           const Text(
-                                      //             'Chờ xác nhận',
-                                      //             style: TextStyle(
-                                      //                 color: Colors.red),
-                                      //           )
-                                      //         ],
-                                      //       )
-                                      //     : Text(firmResult[indexFirm]
-                                      //         .listRegis!
-                                      //         .firstWhere((element) =>
-                                      //             element.userId == userId)
-                                      //         .status!),
+                                      trailing: firmResult[indexFirm]
+                                                  .listRegis!
+                                                  .firstWhere((element) =>
+                                                      element.userId == userId)
+                                                  .status ==
+                                              TrangThai.accept
+                                          ? Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(firmResult[indexFirm]
+                                                    .listRegis!
+                                                    .firstWhere((element) =>
+                                                        element.userId ==
+                                                        userId)
+                                                    .status!),
+                                                const Text(
+                                                  'Chờ xác nhận',
+                                                  style: TextStyle(
+                                                      color: Colors.red),
+                                                )
+                                              ],
+                                            )
+                                          : Text(firmResult[indexFirm]
+                                              .listRegis!
+                                              .firstWhere((element) =>
+                                                  element.userId == userId)
+                                              .status!),
                                       onTap: () {
                                         JobRegisterModel loadRegis =
                                             JobRegisterModel();
@@ -735,33 +735,33 @@ class _ListFirmState extends State<ListFirm> {
                                     firms[indexFirm].describe!,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  // trailing: firms[indexFirm]
-                                  //             .listRegis!
-                                  //             .firstWhere((element) =>
-                                  //                 element.userId == userId)
-                                  //             .status ==
-                                  //         TrangThai.accept
-                                  //     ? Column(
-                                  //         mainAxisAlignment:
-                                  //             MainAxisAlignment.center,
-                                  //         children: [
-                                  //           Text(firms[indexFirm]
-                                  //               .listRegis!
-                                  //               .firstWhere((element) =>
-                                  //                   element.userId == userId)
-                                  //               .status!),
-                                  //           const Text(
-                                  //             'Chờ xác nhận',
-                                  //             style:
-                                  //                 TextStyle(color: Colors.red),
-                                  //           )
-                                  //         ],
-                                  //       )
-                                  //     : Text(firms[indexFirm]
-                                  //         .listRegis!
-                                  //         .firstWhere((element) =>
-                                  //             element.userId == userId)
-                                  //         .status!),
+                                  trailing: firms[indexFirm]
+                                              .listRegis!
+                                              .firstWhere((element) =>
+                                                  element.userId == userId)
+                                              .status ==
+                                          TrangThai.accept
+                                      ? Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(firms[indexFirm]
+                                                .listRegis!
+                                                .firstWhere((element) =>
+                                                    element.userId == userId)
+                                                .status!),
+                                            const Text(
+                                              'Chờ xác nhận',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            )
+                                          ],
+                                        )
+                                      : Text(firms[indexFirm]
+                                          .listRegis!
+                                          .firstWhere((element) =>
+                                              element.userId == userId)
+                                          .status!),
                                   onTap: () {
                                     JobRegisterModel loadRegis =
                                         JobRegisterModel();
