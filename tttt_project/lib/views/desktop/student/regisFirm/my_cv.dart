@@ -21,6 +21,7 @@ class MyCV extends StatefulWidget {
 }
 
 class _MyCVState extends State<MyCV> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final TextEditingController skillCtrl = TextEditingController();
   final TextEditingController achieveCtrl = TextEditingController();
   final TextEditingController hobbyCtrl = TextEditingController();
@@ -42,7 +43,7 @@ class _MyCVState extends State<MyCV> {
         )
         .toString();
     DocumentSnapshot<Map<String, dynamic>> isExistCV =
-        await FirebaseFirestore.instance.collection('cvs').doc(userId).get();
+        await firestore.collection('cvs').doc(userId).get();
     if (isExistCV.data() != null) {
       loadCV = CVModel.fromMap(isExistCV.data()!);
       skillCtrl.text = loadCV.skill ?? '';
@@ -66,7 +67,7 @@ class _MyCVState extends State<MyCV> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return StreamBuilder(
-        stream: GV.cvsCol.doc(userId).snapshots(),
+        stream: firestore.collection('cvs').doc(userId).snapshots(),
         builder: (context, snapshotCV) {
           if (snapshotCV.hasData &&
               snapshotCV.data != null &&
@@ -116,7 +117,7 @@ class _MyCVState extends State<MyCV> {
                       height: screenHeight * 0.07,
                       onTap: () async {
                         DocumentSnapshot<Map<String, dynamic>> isExistCV =
-                            await GV.cvsCol.doc(userId).get();
+                            await firestore.collection('cvs').doc(userId).get();
                         if (isExistCV.data() != null &&
                             (skillCtrl.text != '' ||
                                 achieveCtrl.text != '' ||
@@ -129,7 +130,10 @@ class _MyCVState extends State<MyCV> {
                               hobby: hobbyCtrl.text,
                               wish: wishCtrl.text);
                           final json = myCV.toMap();
-                          GV.cvsCol.doc(myCV.uid).update(json);
+                          firestore
+                              .collection('cvs')
+                              .doc(myCV.uid)
+                              .update(json);
                           // EasyLoading.showSuccess();
                           GV.success(
                               context: context,
@@ -145,7 +149,7 @@ class _MyCVState extends State<MyCV> {
                               hobby: hobbyCtrl.text,
                               wish: wishCtrl.text);
                           final json = myCV.toMap();
-                          GV.cvsCol.doc(myCV.uid).set(json);
+                          firestore.collection('cvs').doc(myCV.uid).set(json);
                           GV.success(
                               context: context,
                               message: 'Đã thêm các thông tin.');
@@ -158,7 +162,7 @@ class _MyCVState extends State<MyCV> {
             );
           } else {
             return const Padding(
-              padding: EdgeInsets.only(top: 150),
+              padding: EdgeInsets.only(top: 200),
               child: Loading(),
             );
           }

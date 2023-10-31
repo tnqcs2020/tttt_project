@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
 
 class CustomRadio extends StatelessWidget {
   const CustomRadio(

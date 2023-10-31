@@ -120,6 +120,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                               return SizedBox(
                                 width: screenWidth * 0.5,
                                 child: Card(
+                                  elevation: 5,
                                   child: ListTile(
                                     title:
                                         Text(listRegis[indexRegis].userName!),
@@ -134,7 +135,8 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                       });
                                       showDialog(
                                         context: context,
-                                        barrierColor: Colors.transparent,
+                                        barrierColor: Colors.black12,
+                                        barrierDismissible: false,
                                         builder: (context) {
                                           return StreamBuilder(
                                               stream: GV.traineesCol
@@ -256,7 +258,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                 'Số điện thoại: ${user.phone!}',
                                                               ),
                                                               Text(
-                                                                'Ngày đăng ký: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}',
+                                                                'Ngày ứng tuyển: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}',
                                                               ),
                                                               Text(
                                                                   'Từ ngày: ${GV.readTimestamp(listRegis[indexRegis].traineeStart!)} - Đến ngày: ${GV.readTimestamp(listRegis[indexRegis].traineeEnd!)}'),
@@ -375,7 +377,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                       },
                                                                     ),
                                                                   ]
-                                                                : [],
+                                                                : null,
                                                       ),
                                                     ],
                                                   ),

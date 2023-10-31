@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tttt_project/views/home/desktop/admin/add_user_screen.dart';
-import 'package:tttt_project/views/home/desktop/admin/list_trainee_screen.dart';
-import 'package:tttt_project/views/home/desktop/admin/manage_credit_screen.dart';
-import 'package:tttt_project/views/home/desktop/canbo/manage_info_canbo.dart';
-import 'package:tttt_project/views/home/desktop/canbo/manage_trainee.dart';
-import 'package:tttt_project/views/home/desktop/home_view_desktop.dart';
-import 'package:tttt_project/views/home/desktop/student/cv_screen.dart';
-import 'package:tttt_project/views/home/desktop/student/regisFirm/firm_link.dart';
-import 'package:tttt_project/views/home/desktop/student/information.dart';
-import 'package:tttt_project/views/home/desktop/student/register_trainee.dart';
+import 'package:tttt_project/views/desktop/admin/add_user_screen.dart';
+import 'package:tttt_project/views/desktop/admin/list_trainee_screen.dart';
+import 'package:tttt_project/views/desktop/admin/manage_credit_screen.dart';
+import 'package:tttt_project/views/desktop/canbo/manage_info_canbo.dart';
+import 'package:tttt_project/views/desktop/canbo/manage_trainee.dart';
+import 'package:tttt_project/views/desktop/home_view_desktop.dart';
+import 'package:tttt_project/views/desktop/student/cv_screen.dart';
+import 'package:tttt_project/views/desktop/student/regisFirm/firm_link.dart';
+import 'package:tttt_project/views/desktop/student/information.dart';
+import 'package:tttt_project/views/desktop/student/register_trainee.dart';
 import 'package:tttt_project/views/login/login_screen.dart';
 
 class RouteGenerator {

@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tttt_project/views/home/desktop/canbo/info_can_bo.dart';
-import 'package:tttt_project/views/home/desktop/canbo/info_firm.dart';
+import 'package:tttt_project/views/desktop/canbo/list_student_regis.dart';
+import 'package:tttt_project/views/desktop/canbo/list_student_trainee.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,22 +12,17 @@ import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
-class ManageInfoCB extends StatefulWidget {
-  const ManageInfoCB({Key? key}) : super(key: key);
+class ManageTrainee extends StatefulWidget {
+  const ManageTrainee({Key? key}) : super(key: key);
 
   @override
-  State<ManageInfoCB> createState() => _ManageInfoCBState();
+  State<ManageTrainee> createState() => _ManageTraineeState();
 }
 
-class _ManageInfoCBState extends State<ManageInfoCB> {
+class _ManageTraineeState extends State<ManageTrainee> {
   final currentUser = Get.put(UserController());
   String? userId;
-  List manageInfo = [
-    'Cá nhân',
-    'Công ty',
-  ];
-  List contentInfo = [const InfoCB(), const InfoFirm()];
-  ValueNotifier selectedMenu = ValueNotifier(0);
+  ValueNotifier selectedMenu = ValueNotifier(1);
   @override
   void initState() {
     getUserData();
@@ -61,6 +56,25 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
         );
       }
     }
+  }
+
+  List manageInfo = [
+    'Danh sách đăng ký',
+    'Danh sách thực tập',
+    'Phân công & theo dõi tiến độ',
+    'Đánh giá',
+  ];
+  List contentInfo = [
+    const ListStudentRegis(),
+    const ListStudentTrainee(),
+    const Text('td'),
+    const Text('dg')
+  ];
+
+  @override
+  void dispose() {
+    selectedMenu.dispose();
+    super.dispose();
   }
 
   @override
@@ -116,7 +130,7 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Quản lý",
+                                            "Quản lý thực tập",
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
@@ -132,7 +146,7 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(
-                                              height: screenHeight * 0.04,
+                                              height: screenHeight * 0.05,
                                               child: ListView.builder(
                                                 itemCount: manageInfo.length,
                                                 shrinkWrap: true,
@@ -140,7 +154,10 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                                     Axis.horizontal,
                                                 itemBuilder: (context, index) {
                                                   return Container(
-                                                    width: screenWidth * 0.1,
+                                                    width: screenWidth * 0.13,
+                                                    constraints: BoxConstraints(
+                                                        minWidth:
+                                                            screenWidth * 0.01),
                                                     padding:
                                                         const EdgeInsets.all(5),
                                                     decoration: BoxDecoration(

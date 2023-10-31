@@ -175,7 +175,7 @@ class NguoiDung {
   static const String sinhvien = "Sinh viên";
   static const String covan = "Cố vấn học tập";
   static const String cbhd = "Cán bộ hướng dẫn";
-  static const String congty = "Công ty";
+  // static const String congty = "Công ty";
 }
 
 class TrangThai {
@@ -191,14 +191,16 @@ class NamHoc {
     required this.start,
     required this.end,
   });
-  static NamHoc n1920 = NamHoc(start: "2019", end: "2020");
+  static NamHoc tatca = NamHoc(start: "Tất cả", end: "Tất cả");
   static NamHoc n2021 = NamHoc(start: "2020", end: "2021");
   static NamHoc n2122 = NamHoc(start: "2021", end: "2022");
   static NamHoc n2223 = NamHoc(start: "2022", end: "2023");
   static NamHoc n2324 = NamHoc(start: "2023", end: "2024");
+  static NamHoc n2425 = NamHoc(start: "2024", end: "2025");
 }
 
 class HocKy {
+  static const String tatca = "Tất cả";
   static const String hk1 = "1";
   static const String hk2 = "2";
   static const String hk3 = "Hè";
@@ -212,6 +214,30 @@ class HocPhan {
     required this.tenHP,
   });
 }
+
+List<String> contentAppreciate = [
+  'I.1. Thực hiện nội quy của cơ quan (nếu thực tập online thì không chẩm điểm)',
+  'I.2. Chấp hành giờ giấc làm việc (nếu thực tập online thì không chẩm điểm)',
+  'I.3. Thái độ giao tiếp với cán bộ trong đơn vị (nếu thực lập online thì không chấm điểm)',
+  'I.4. Tích cực trong công việc',
+  'II.1. Đáp ứng yêu cầu công việc',
+  'II.2. Tinh thần học hỏi, nâng cao trình độ chuyên môn, nghiệp vụ',
+  'II.3. Có đề xuất, sáng kiến, năng động trong công việc',
+  'III.1. Báo cáo tiến độ công việc cho cán bộ hướng dẫn mỗi tuần 1 lần',
+  'III.2. Hoàn thành công việc được giao',
+  'III.3. Kết quả công việc có đóng góp cho cơ quan nơi thực tập',
+  'I. Tinh thần kỷ luật',
+  'II. Khả năng chuyên môn, nghiệp vụ',
+  'III. Kết quả công tác',
+];
+
+List<String> appreciatesCTDT = [
+  'Phù hợp với thực tế',
+  'Tăng cường ngoại ngữ',
+  'Không phù hợp với thực tế',
+  'Tăng cường kỹ năng làm việc nhóm',
+  'Tăng cường kỹ năng mềm',
+];
 
 // class DSHocPhan45 {
 //   static HocPhan ct215h =

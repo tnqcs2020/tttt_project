@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tttt_project/views/home/desktop/canbo/list_student_regis.dart';
-import 'package:tttt_project/views/home/desktop/canbo/list_student_trainee.dart';
+import 'package:tttt_project/views/desktop/canbo/info_can_bo.dart';
+import 'package:tttt_project/views/desktop/canbo/info_firm.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,16 +12,21 @@ import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
-class ManageTrainee extends StatefulWidget {
-  const ManageTrainee({Key? key}) : super(key: key);
+class ManageInfoCB extends StatefulWidget {
+  const ManageInfoCB({Key? key}) : super(key: key);
 
   @override
-  State<ManageTrainee> createState() => _ManageTraineeState();
+  State<ManageInfoCB> createState() => _ManageInfoCBState();
 }
 
-class _ManageTraineeState extends State<ManageTrainee> {
+class _ManageInfoCBState extends State<ManageInfoCB> {
   final currentUser = Get.put(UserController());
   String? userId;
+  List manageInfo = [
+    'Cá nhân',
+    'Công ty',
+  ];
+  List contentInfo = [const InfoCB(), const InfoFirm()];
   ValueNotifier selectedMenu = ValueNotifier(0);
   @override
   void initState() {
@@ -56,25 +61,6 @@ class _ManageTraineeState extends State<ManageTrainee> {
         );
       }
     }
-  }
-
-  List manageInfo = [
-    'Danh sách đăng ký',
-    'Danh sách thực tập',
-    'Theo dõi tiến độ',
-    'Đánh giá',
-  ];
-  List contentInfo = [
-    const ListStudentRegis(),
-    const ListStudentTrainee(),
-    const Text('td'),
-    const Text('dg')
-  ];
-
-  @override
-  void dispose() {
-    selectedMenu.dispose();
-    super.dispose();
   }
 
   @override

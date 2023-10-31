@@ -25,6 +25,8 @@ class UserController extends GetxController {
   Rx<JobPositionModel> selectedJob = JobPositionModel().obs;
   Rx<DateTimeRange> traineeTime =
       DateTimeRange(start: DateTime.now(), end: DateTime.now()).obs;
+  RxBool isCompleted = false.obs;
+  // RxBool isActive = false.obs;
 
   setCurrentUser({
     String? setUid,

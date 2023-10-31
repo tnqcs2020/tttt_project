@@ -27,6 +27,8 @@ dependencies:
   searchable_listview: ^2.7.1
   motion_toast: ^2.7.9
   intl: ^0.18.1
+  date_field: ^3.0.5
+  syncfusion_flutter_datepicker: ^23.1.42
 
 dev_dependencies:
   flutter_test:

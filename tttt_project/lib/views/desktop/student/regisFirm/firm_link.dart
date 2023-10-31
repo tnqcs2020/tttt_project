@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tttt_project/views/home/desktop/student/regisFirm/list_firm.dart';
-import 'package:tttt_project/views/home/desktop/student/regisFirm/list_firm_regis.dart';
+import 'package:tttt_project/views/desktop/student/regisFirm/list_firm.dart';
+import 'package:tttt_project/views/desktop/student/regisFirm/list_firm_regis.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
-import 'package:tttt_project/views/home/desktop/student/regisFirm/my_cv.dart';
+import 'package:tttt_project/views/desktop/student/regisFirm/my_cv.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
