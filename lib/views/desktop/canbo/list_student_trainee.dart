@@ -1081,10 +1081,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                     )
                   : selectedHK == '' && selectedNH.start == ''
                       ? StreamBuilder(
-                          stream: firestore
-                              .collection('firms')
-                              .where('firmId', isEqualTo: userId)
-                              .snapshots(),
+                          stream: firestore.collection('firms').snapshots(),
                           builder: (context, snapshotFirm) {
                             if (snapshotFirm.hasData &&
                                 snapshotFirm.data != null &&
@@ -1096,9 +1093,17 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                 snapshotFirm.data!.docs.forEach((element) =>
                                     loadFirms.add(
                                         FirmModel.fromMap(element.data())));
-                                for (var e in loadFirms.first.listRegis!) {
-                                  if (e.isConfirmed == true) {
-                                    listRegis.add(e);
+                                FirmModel firm = FirmModel();
+                                loadFirms.forEach((element) {
+                                  if (element.firmId == userId) {
+                                    firm = element;
+                                  }
+                                });
+                                if (firm.listRegis != null) {
+                                  for (var e in firm.listRegis!) {
+                                    if (e.isConfirmed == true) {
+                                      listRegis.add(e);
+                                    }
                                   }
                                 }
                               }

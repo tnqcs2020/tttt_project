@@ -161,7 +161,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                           Row(
                                             children: [
                                               SizedBox(
-                                                width: screenWidth * 0.07,
+                                                width: screenWidth * 0.1,
                                                 child: const Text(
                                                   "Nhóm người dùng:",
                                                   style: TextStyle(
@@ -234,7 +234,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                     children: [
                                                       SizedBox(
                                                         width:
-                                                            screenWidth * 0.07,
+                                                            screenWidth * 0.1,
                                                         child: const Text(
                                                           "Tài khoản:",
                                                           style: TextStyle(
@@ -253,7 +253,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                     children: [
                                                       SizedBox(
                                                         width:
-                                                            screenWidth * 0.07,
+                                                            screenWidth * 0.1,
                                                         child: const Text(
                                                           "Mật khẩu:",
                                                           style: TextStyle(
@@ -275,7 +275,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                           Row(
                                             children: [
                                               SizedBox(
-                                                width: screenWidth * 0.07,
+                                                width: screenWidth * 0.1,
                                                 child: const Text(
                                                   "Họ tên:",
                                                   style: TextStyle(

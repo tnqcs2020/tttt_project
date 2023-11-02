@@ -1,15 +1,17 @@
 // ignore_for_file: use_build_context_synchronously, dead_code
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_stepper/easy_stepper.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/services.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/models/credit_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
@@ -31,17 +33,14 @@ class RegisterTrainee extends StatefulWidget {
 
 class _RegisterTraineeState extends State<RegisterTrainee> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // final FirebaseStorage storage = FirebaseStorage.instance;
   final currentUser = Get.put(UserController());
   List<String> dshk = [
     HocKy.hk1,
     HocKy.hk2,
     HocKy.hk3,
   ];
-  List<NamHoc> dsnh = [
-    NamHoc.n2122,
-    NamHoc.n2223,
-    NamHoc.n2324
-  ];
+  List<NamHoc> dsnh = [NamHoc.n2122, NamHoc.n2223, NamHoc.n2324];
   List<CreditModel> dshp = [];
   List<CreditModel> ds = [
     CreditModel(
@@ -61,6 +60,10 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   String? userId;
   UserModel user = UserModel();
   RegisterTraineeModel trainee = RegisterTraineeModel();
+  // List<FileModel> files = [];
+  List<PlatformFile> fileSelect = [];
+  // List<String> fileUrls = [];
+  List<FileModel> submits = [];
 
   @override
   void initState() {
@@ -87,6 +90,14 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         setState(() {
           user = loadUser;
         });
+        // DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
+        //     await firestore.collection('submits').doc(userId).get();
+        // if (isExitSubmit.data() != null) {
+        //   final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
+        //   setState(() {
+        //     files = loadSubmit.files!;
+        //   });
+        // }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
@@ -304,7 +315,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                           ),
                                           EasyStep(
                                             icon: const Icon(
-                                              CupertinoIcons.checkmark_alt,
+                                              CupertinoIcons
+                                                  .checkmark_seal_fill,
                                               grade: 5,
                                             ),
                                             customTitle: Text(
@@ -1114,62 +1126,67 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                     ),
                                   ],
                                 ),
-                                TableRow(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      child: const Column(
-                                        children: [
-                                          Text(
-                                            '1',
+                                for (int i = 0; i < plan.listWork!.length; i++)
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                GV.readTimestamp(plan
+                                                    .listWork![i].dayStart!),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              Text(
+                                                '${i + 1}',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              Text(
+                                                GV.readTimestamp(
+                                                    plan.listWork![i].dayEnd!),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                plan.listWork![i].content!,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            '${plan.listWork![i].totalDay}',
                                             textAlign: TextAlign.center,
                                           ),
-                                          Text(
-                                            '15/05/2023 - 21/06/2023',
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      child: const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 5),
-                                            child: Text(
-                                                'Tìm hiểu tài liệu về FVM, Get Cli.'),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 5),
-                                            child: Text(
-                                                'Tìm hiểu về quản lý trạng thái - BloC.'),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 5),
-                                            child: Text(
-                                                'Tìm hiểu về dio, retrofit.'),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      child: const Column(
-                                        children: [
-                                          Text(
-                                            '10',
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
@@ -1177,8 +1194,14 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                       ],
                     ),
                   ),
-                  // const SizedBox(height: 35),
-                  // _nextStep(StepEnabling.sequential),
+                  const SizedBox(height: 15),
+                  IconButton(
+                    onPressed: () {
+                      _nextStep(StepEnabling.sequential);
+                    },
+                    icon: const Icon(Icons.arrow_forward_outlined),
+                  ),
+                  const SizedBox(height: 35),
                 ],
               ),
             );
@@ -1205,14 +1228,196 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             ),
           ),
           SizedBox(
-            width: screenWidth * 0.25,
-            child: const Column(children: []),
+            width: screenWidth * 0.35,
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.08,
+                      child: const Text(
+                        "Tài liệu cần nộp: ",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const Expanded(
+                      child: Text(
+                          "Báo cáo thực tập thực tế (.pdf, .docx), các hình ảnh, source, website, ứng dụng liên quan đến quá trình thực tập (nếu có)."),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.08,
+                      child: const Text(
+                        "Hạn nộp: ",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const Text("Đến hết ngày 15/11/2023"),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.08,
+                      child: const Text(
+                        "Đã nộp: ",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Expanded(
+                      child: StreamBuilder(
+                        stream: firestore
+                            .collection('submits')
+                            .where('userId', isEqualTo: userId)
+                            .snapshots(),
+                        builder: (context, snapshotSubmit) {
+                          if (snapshotSubmit.hasData) {
+                            if (snapshotSubmit.data != null &&
+                                snapshotSubmit.data!.docs.isNotEmpty &&
+                                snapshotSubmit.connectionState ==
+                                    ConnectionState.active) {
+                              List<FileModel> files = [];
+                              snapshotSubmit.data!.docs.forEach((element) {
+                                if (SubmitModel.fromMap(element.data())
+                                        .userId ==
+                                    userId) {
+                                  files = SubmitModel.fromMap(element.data())
+                                      .files!;
+                                  submits = files;
+                                }
+                              });
+
+                              return files.isNotEmpty
+                                  ? ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: files.length,
+                                      itemBuilder: (context, index) {
+                                        return InkWell(
+                                          onTap: () {},
+                                          child: Text(
+                                            files[index].fileName!,
+                                            style: TextStyle(
+                                              color: Colors.blue.shade900,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor:
+                                                  Colors.blue.shade900,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : const Text("Bạn chưa nộp!");
+                            } else if (snapshotSubmit.connectionState ==
+                                ConnectionState.waiting) {
+                              return Loading();
+                            }
+                          }
+                          return const Text("Bạn chưa nộp!");
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 75),
+                SizedBox(
+                  width: 150,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await selectMultipleFiles();
+                      await uploadMultipleFiles();
+                    },
+                    style: const ButtonStyle(
+                        elevation: MaterialStatePropertyAll(5)),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Tải lên",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(
+                            Icons.upload_file,
+                            size: 35,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
           // const SizedBox(height: 35),
           // _nextStep(StepEnabling.sequential),
         ],
       ),
     );
+  }
+
+  selectMultipleFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.any,
+    );
+    if (result != null) {
+      setState(() {
+        fileSelect = result.files;
+      });
+    }
+  }
+
+  uploadMultipleFiles() async {
+    try {
+      for (var i = 0; i < fileSelect.length; i++) {
+        storage.UploadTask uploadTask;
+        storage.Reference ref = storage.FirebaseStorage.instance
+            .ref()
+            .child('docSubmit')
+            .child('/$userId')
+            .child(fileSelect[i].name);
+        uploadTask = ref.putData(fileSelect[i].bytes!);
+        await uploadTask.whenComplete(() => null);
+        var url = await ref.getDownloadURL();
+        final fileModel = FileModel(
+          fileName: fileSelect[i].name,
+          fileUrl: url,
+        );
+        bool hasFile = false;
+        if (submits.isNotEmpty) {
+          for (var file in submits) {
+            if (file.fileName == fileModel.fileName) {
+              setState(() {
+                file.fileUrl = url;
+                hasFile = true;
+              });
+              break;
+            }
+          }
+        }
+        if (!hasFile) {
+          setState(() {
+            submits.add(fileModel);
+          });
+        }
+      }
+      await firestore
+          .collection('submits')
+          .doc(userId)
+          .set(SubmitModel(userId: userId, files: submits).toMap());
+    } catch (e) {
+      print(e);
+    }
   }
 
   Widget _completed() {
