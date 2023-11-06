@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
@@ -31,6 +32,9 @@ class _CVScreenState extends State<CVScreen> {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
@@ -41,17 +45,25 @@ class _CVScreenState extends State<CVScreen> {
                   .toString())
               .get();
       if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
-          setUid: isExistUser.data()?['uid'],
-          setUserId: isExistUser.data()?['userId'],
-          setName: isExistUser.data()?['name'],
-          setClassName: isExistUser.data()?['className'],
-          setCourse: isExistUser.data()?['course'],
-          setGroup: isExistUser.data()?['group'],
-          setMajor: isExistUser.data()?['major'],
-          setEmail: isExistUser.data()?['email'],
-          setMenuSelected: sharedPref.getInt('menuSelected'),
-          setIsRegistered: isExistUser.data()!['isRegistered'],
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
         );
       }
     }
@@ -126,7 +138,7 @@ class _CVScreenState extends State<CVScreen> {
                                       Column(children: [
                                         LineDetail(
                                             field: "Họ tên",
-                                            display: currentUser.name.value)
+                                            display: currentUser.userName.value)
                                       ]),
                                       Column(children: [
                                         LineDetail(

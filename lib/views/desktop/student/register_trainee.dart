@@ -1,13 +1,15 @@
-// ignore_for_file: use_build_context_synchronously, dead_code
+// ignore_for_file: use_build_context_synchronously, avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:tttt_project/data/constant.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/credit_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
@@ -19,10 +21,8 @@ import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
+import 'package:tttt_project/widgets/user_controller.dart';
 
 class RegisterTrainee extends StatefulWidget {
   const RegisterTrainee({Key? key}) : super(key: key);
@@ -33,7 +33,6 @@ class RegisterTrainee extends StatefulWidget {
 
 class _RegisterTraineeState extends State<RegisterTrainee> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  // final FirebaseStorage storage = FirebaseStorage.instance;
   final currentUser = Get.put(UserController());
   List<String> dshk = [
     HocKy.hk1,
@@ -60,10 +59,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   String? userId;
   UserModel user = UserModel();
   RegisterTraineeModel trainee = RegisterTraineeModel();
-  // List<FileModel> files = [];
   List<PlatformFile> fileSelect = [];
-  // List<String> fileUrls = [];
   List<FileModel> submits = [];
+  List<FileModel> files = [];
 
   @override
   void initState() {
@@ -90,14 +88,14 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         setState(() {
           user = loadUser;
         });
-        // DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
-        //     await firestore.collection('submits').doc(userId).get();
-        // if (isExitSubmit.data() != null) {
-        //   final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
-        //   setState(() {
-        //     files = loadSubmit.files!;
-        //   });
-        // }
+        DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
+            await firestore.collection('submits').doc(userId).get();
+        if (isExitSubmit.data() != null) {
+          final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
+          setState(() {
+            files = loadSubmit.files ?? [];
+          });
+        }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
@@ -109,28 +107,42 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
-            setName: loadUser.name,
+            setUserName: loadUser.userName,
             setClassName: loadUser.className,
             setCourse: loadUser.course,
             setGroup: loadUser.group,
             setMajor: loadUser.major,
             setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
+            setAddress: loadUser.address,
+            setBirthday: loadUser.birthday,
+            setCvChucVu: loadUser.cvChucVu,
+            setCvId: loadUser.cvId,
+            setCvName: loadUser.cvName,
+            setGender: loadUser.gender,
+            setPhone: loadUser.phone,
+            setClassId: loadUser.classId,
+            setCVClass: loadUser.cvClass,
             setReachedStep: loadTrainee.reachedStep,
-            setSelectedStep: loadTrainee.reachedStep,
           );
-          // selectedStep.value = loadTrainee.reachedStep!;
         } else {
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
-            setName: loadUser.name,
+            setUserName: loadUser.userName,
             setClassName: loadUser.className,
             setCourse: loadUser.course,
             setGroup: loadUser.group,
             setMajor: loadUser.major,
             setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
+            setAddress: loadUser.address,
+            setBirthday: loadUser.birthday,
+            setCvChucVu: loadUser.cvChucVu,
+            setCvId: loadUser.cvId,
+            setCvName: loadUser.cvName,
+            setGender: loadUser.gender,
+            setPhone: loadUser.phone,
+            setClassId: loadUser.classId,
+            setCVClass: loadUser.cvClass,
           );
         }
       }
@@ -193,7 +205,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Đăng ký thực tập thực tế",
+                                  "Quản lý thực tập thực tế",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
@@ -248,7 +260,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             icon: const Icon(
                                                 CupertinoIcons.house_fill),
                                             customTitle: Text(
-                                              'Tìm công ty',
+                                              'Công ty',
                                               style: TextStyle(
                                                   color: currentUser
                                                               .selectedStep
@@ -365,8 +377,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                         2 => _trainee(),
                                         3 => _submit(),
                                         4 => _completed(),
-                                        _ => user.userId != null &&
-                                                user.isRegistered == true
+                                        _ => user.userId != null
                                             ? _infoCredit(trainee)
                                             : _regisCredit(),
                                       },
@@ -567,7 +578,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   userId: userId ?? '',
                   yearEnd: selectedNH.end,
                   course: currentUser.course.value,
-                  studentName: currentUser.name.value,
+                  studentName: currentUser.userName.value,
                   reachedStep: 0,
                   listRegis: [],
                 );
@@ -577,11 +588,6 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     .doc(registerTraineeModel.userId);
                 final json = registerTraineeModel.toMap();
                 await docRegister.set(json);
-                firestore
-                    .collection('users')
-                    .doc(registerTraineeModel.userId)
-                    .update({'isRegistered': true});
-                currentUser.setCurrentUser(setIsRegistered: true);
                 GV.success(context: context, message: 'Đã đăng ký!');
                 _nextStep(StepEnabling.sequential);
               } else {
@@ -870,7 +876,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                           .get();
                                                                       final cbhdName =
                                                                           UserModel.fromMap(loadCBHD.data()!)
-                                                                              .name;
+                                                                              .userName;
                                                                       final plan =
                                                                           PlanModel(
                                                                         cbhdId:
@@ -1214,11 +1220,12 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   }
 
   Widget _submit() {
-    // double screenHeight = MediaQuery.of(context).size.height;
+    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.only(top: 15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             color: Colors.amber,
@@ -1272,97 +1279,270 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                       ),
                     ),
                     Expanded(
-                      child: StreamBuilder(
-                        stream: firestore
-                            .collection('submits')
-                            .where('userId', isEqualTo: userId)
-                            .snapshots(),
-                        builder: (context, snapshotSubmit) {
-                          if (snapshotSubmit.hasData) {
-                            if (snapshotSubmit.data != null &&
-                                snapshotSubmit.data!.docs.isNotEmpty &&
-                                snapshotSubmit.connectionState ==
-                                    ConnectionState.active) {
-                              List<FileModel> files = [];
-                              snapshotSubmit.data!.docs.forEach((element) {
-                                if (SubmitModel.fromMap(element.data())
-                                        .userId ==
-                                    userId) {
-                                  files = SubmitModel.fromMap(element.data())
-                                      .files!;
-                                  submits = files;
-                                }
-                              });
-
-                              return files.isNotEmpty
-                                  ? ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: files.length,
-                                      itemBuilder: (context, index) {
-                                        return InkWell(
-                                          onTap: () {},
-                                          child: Text(
-                                            files[index].fileName!,
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              decorationColor:
-                                                  Colors.blue.shade900,
-                                            ),
-                                          ),
-                                        );
+                      child: files.isNotEmpty
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: files.length,
+                              itemBuilder: (context, index) {
+                                return Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        openInANewTab(files[index].fileUrl);
                                       },
-                                    )
-                                  : const Text("Bạn chưa nộp!");
-                            } else if (snapshotSubmit.connectionState ==
-                                ConnectionState.waiting) {
-                              return Loading();
-                            }
-                          }
-                          return const Text("Bạn chưa nộp!");
-                        },
-                      ),
+                                      child: Text(
+                                        files[index].fileName!,
+                                        style: TextStyle(
+                                          color: Colors.blue.shade900,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: Colors.blue.shade900,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    InkWell(
+                                      onTap: () async {
+                                        showDialog(
+                                            context: context,
+                                            barrierColor: Colors.black12,
+                                            builder: (context) {
+                                              return Padding(
+                                                padding: EdgeInsets.only(
+                                                  top: screenHeight * 0.06,
+                                                  bottom: screenHeight * 0.02,
+                                                  left: screenWidth * 0.27,
+                                                  right: screenWidth * 0.08,
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    AlertDialog(
+                                                      title: Container(
+                                                        color: Colors
+                                                            .blue.shade600,
+                                                        height: 50,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 10),
+                                                        child: const Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              'Xóa tài liệu',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 20),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      titlePadding:
+                                                          EdgeInsets.zero,
+                                                      shape: Border.all(
+                                                          width: 0.5),
+                                                      content: const Text(
+                                                          "Bạn có chắc chắn muốn xóa tài liệu này?"),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          child: const Text(
+                                                            "Hủy",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            await deleteFile(
+                                                                deleteAt:
+                                                                    index);
+                                                          },
+                                                          child: const Text(
+                                                            "Đồng ý",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            });
+                                      },
+                                      child: const Icon(
+                                        Icons.delete_outlined,
+                                        color: Colors.red,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            )
+                          : const Text("Bạn chưa nộp!"),
                     ),
                   ],
                 ),
                 const SizedBox(height: 75),
-                SizedBox(
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await selectMultipleFiles();
-                      await uploadMultipleFiles();
-                    },
-                    style: const ButtonStyle(
-                        elevation: MaterialStatePropertyAll(5)),
-                    child: const Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Tải lên",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 150,
+                      height: 35,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await selectMultipleFiles();
+                          await uploadMultipleFiles();
+                          _nextStep(StepEnabling.sequential);
+                        },
+                        style: const ButtonStyle(
+                            elevation: MaterialStatePropertyAll(5)),
+                        child: const Padding(
+                          padding: EdgeInsets.all(5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Tải lên",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.upload_file,
+                                size: 25,
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 10),
-                          Icon(
-                            Icons.upload_file,
-                            size: 35,
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 35),
+                    SizedBox(
+                      width: 150,
+                      height: 35,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          showDialog(
+                              context: context,
+                              barrierColor: Colors.black12,
+                              builder: (context) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    top: screenHeight * 0.06,
+                                    bottom: screenHeight * 0.02,
+                                    left: screenWidth * 0.27,
+                                    right: screenWidth * 0.08,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      AlertDialog(
+                                        title: Container(
+                                          color: Colors.blue.shade600,
+                                          height: 50,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 10),
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Xóa tài liệu',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        titlePadding: EdgeInsets.zero,
+                                        shape: Border.all(width: 0.5),
+                                        content: const Text(
+                                            "Bạn có chắc chắn muốn xóa tất cả tài liệu này?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text(
+                                              "Hủy",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              await deleteFile();
+                                            },
+                                            child: const Text(
+                                              "Đồng ý",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        },
+                        style: const ButtonStyle(
+                            elevation: MaterialStatePropertyAll(5)),
+                        child: const Padding(
+                          padding: EdgeInsets.all(5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Xóa tất cả",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),
           ),
-          // const SizedBox(height: 35),
-          // _nextStep(StepEnabling.sequential),
         ],
       ),
     );
+  }
+
+  openInANewTab(url) {
+    html.window.open(url, 'PlaceholderName');
+  }
+
+  void downloadFile(String url) {
+    html.AnchorElement anchorElement = html.AnchorElement(href: url);
+    anchorElement.download = url;
+    anchorElement.click();
   }
 
   selectMultipleFiles() async {
@@ -1378,6 +1558,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   }
 
   uploadMultipleFiles() async {
+    // var temp = submits;
     try {
       for (var i = 0; i < fileSelect.length; i++) {
         storage.UploadTask uploadTask;
@@ -1394,30 +1575,55 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           fileUrl: url,
         );
         bool hasFile = false;
-        if (submits.isNotEmpty) {
-          for (var file in submits) {
-            if (file.fileName == fileModel.fileName) {
+        if (files.isNotEmpty) {
+          for (int i = 0; i < files.length; i++) {
+            if (files[i].fileName == fileModel.fileName) {
+              hasFile = true;
               setState(() {
-                file.fileUrl = url;
-                hasFile = true;
+                files[i].fileUrl = url;
               });
-              break;
             }
           }
         }
-        if (!hasFile) {
+        if (hasFile != true) {
           setState(() {
-            submits.add(fileModel);
+            files.add(fileModel);
           });
         }
       }
-      await firestore
+      GV.success(context: context, message: 'Tài liệu đã được tải lên.');
+      firestore
           .collection('submits')
           .doc(userId)
-          .set(SubmitModel(userId: userId, files: submits).toMap());
+          .set(SubmitModel(userId: userId, files: files).toMap());
     } catch (e) {
       print(e);
+      GV.error(context: context, message: 'Đã có lỗi xảy ra.');
     }
+  }
+
+  deleteFile({int? deleteAt}) async {
+    List<FileModel> temp = [];
+    if (deleteAt != null) {
+      setState(() {
+        files[deleteAt].fileName = '';
+        files[deleteAt].fileUrl = '';
+      });
+
+      files.forEach((e) {
+        if (e.fileName != '' && e.fileUrl != '') {
+          temp.add(e);
+        }
+      });
+    }
+    setState(() {
+      files = temp;
+    });
+    firestore.collection('submits').doc(userId).update({
+      'files': temp.map((i) => i.toMap()).toList(),
+    });
+    Navigator.of(context).pop();
+    GV.success(context: context, message: 'Tài liệu đã được xóa.');
   }
 
   Widget _completed() {
@@ -1426,25 +1632,33 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     return Padding(
       padding: const EdgeInsets.only(top: 15),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            color: Colors.amber,
-            child: const Text(
-              'Hoàn thành',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Hoàn thành',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
+          SizedBox(height: 15),
           SizedBox(
             width: screenWidth * 0.25,
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Kết quả thực tập'),
+                Text('Học phần: '),
+                Text('Công ty:'),
+                Text('Cán bộ:'),
+                Text('Cố vấn:'),
+                Text('Trạng thái: Đang chờ chấm điểm'),
+                Text('Điểm:'),
+                Text('Kết quả: Hoàn thành môn học')
               ],
             ),
           ),
-          // const SizedBox(height: 35),
-          // _nextStep(StepEnabling.sequential),
         ],
       ),
     );

@@ -14,6 +14,9 @@ class CustomTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyBoardType;
   final String? initialValue;
+  final Function(String?)? onFieldSubmitted;
+  final String? label;
+  final bool isEmail;
 
   const CustomTextField({
     super.key,
@@ -29,6 +32,9 @@ class CustomTextField extends StatefulWidget {
     this.onSaved,
     this.keyBoardType,
     this.initialValue,
+    this.onFieldSubmitted,
+    this.label,
+    this.isEmail = false,
   });
 
   @override
@@ -49,28 +55,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: TextFormField(
         controller: widget.controller,
         initialValue: widget.initialValue,
+        readOnly: widget.isEmail,
         decoration: InputDecoration(
-          labelText: widget.hintText,
+          labelText: widget.label,
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          // border: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10),
-          //   borderSide: const BorderSide(
-          //     color: Colors.black38,
-          //   ),
-          // ),
-          // enabledBorder: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10),
-          //   borderSide: const BorderSide(
-          //     color: Colors.black38,
-          //   ),
-          // ),
-          // filled: true,
           contentPadding: const EdgeInsets.only(bottom: 0),
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: Colors.grey.shade400),
+          hintStyle: widget.isEmail
+              ? const TextStyle(color: Colors.black)
+              : TextStyle(color: Colors.grey.shade400),
           errorText: widget.errorText,
           errorMaxLines: 2,
-          // prefixIcon: widget.iconData == null ? null : Icon(widget.iconData),
           suffixIcon: widget.isPassword
               ? showPassword
                   ? Align(
@@ -118,6 +113,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         onSaved: widget.onSaved,
         validator: widget.validator,
         keyboardType: widget.keyBoardType,
+        onFieldSubmitted: widget.onFieldSubmitted,
       ),
     );
   }

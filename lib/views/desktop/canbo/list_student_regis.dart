@@ -25,13 +25,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
   String? userId;
   List<UserModel> loadUsers = [];
   List<JobRegisterModel> listRegis = [];
-  UserModel user = UserModel(
-    uid: null,
-    userId: null,
-    name: null,
-    password: null,
-    group: null,
-  );
+  UserModel user = UserModel();
 
   @override
   void initState() {
@@ -53,25 +47,34 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
     }
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
-      DocumentSnapshot<Map<String, dynamic>> isExistUser = await GV.usersCol
-          .doc(sharedPref
-              .getString(
-                'userId',
-              )
-              .toString())
-          .get();
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
+      DocumentSnapshot<Map<String, dynamic>> isExistUser =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
-          setUid: isExistUser.data()?['uid'],
-          setUserId: isExistUser.data()?['userId'],
-          setName: isExistUser.data()?['name'],
-          setClassName: isExistUser.data()?['className'],
-          setCourse: isExistUser.data()?['course'],
-          setGroup: isExistUser.data()?['group'],
-          setMajor: isExistUser.data()?['major'],
-          setEmail: isExistUser.data()?['email'],
-          setMenuSelected: sharedPref.getInt('menuSelected'),
-          setIsRegistered: isExistUser.data()!['isRegistered'],
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
         );
       }
     }
@@ -236,7 +239,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                             Text(
                                                                 'Mã sinh viên: ${user.userId!.toUpperCase()}'),
                                                             Text(
-                                                              'Họ tên: ${user.name!}',
+                                                              'Họ tên: ${user.userName!}',
                                                             ),
                                                             Text(
                                                               'Ngành: ${user.major!}',

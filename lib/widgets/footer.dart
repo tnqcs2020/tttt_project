@@ -17,29 +17,32 @@ class Footer extends StatelessWidget {
             dashHeight: 0.5,
             dashWidth: 2,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Trường Công nghệ Thông tin và Truyền thông - Trường Đại học Cần Thơ",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    "Địa chỉ: Khu II, Đường 3/2, Phường Xuân Khánh, Quận Ninh Kiêu, Cần Thơ",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    "k",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Trường Công nghệ Thông tin và Truyền thông - Trường Đại học Cần Thơ",
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      "Địa chỉ: Khu II, Đường 3/2, Phường Xuân Khánh, Quận Ninh Kiêu, Cần Thơ",
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                        "Điện thoại: 84 0292 3 734713 - 0292 3 831301; Fax: 84 0292 3830841; Email: tcntt@ctu.edu.vn")
+                  ],
+                ),
+              ],
+            ),
           ),
           CustomDivider(
             color: Colors.grey,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tttt_project/views/desktop/admin/add_user_screen.dart';
 import 'package:tttt_project/views/desktop/admin/list_trainee_screen.dart';
+import 'package:tttt_project/views/desktop/admin/list_user.dart';
 import 'package:tttt_project/views/desktop/admin/manage_credit_screen.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_info_canbo.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_trainee.dart';
@@ -12,17 +13,18 @@ import 'package:tttt_project/views/desktop/student/register_trainee.dart';
 import 'package:tttt_project/views/login/login_screen.dart';
 
 class RouteGenerator {
-  static const String login = '/dangnhap';
-  static const String info = '/thongtin';
-  static const String register = '/dkytttt';
-  static const String firm = '/congty';
-  static const String home = '/trangchu';
-  static const String cv = '/hoso';
-  static const String addUser = '/taotk';
-  static const String dstttt = '/dstttt';
-  static const String manageCredit = '/qlhocphan';
-  static const String manageInfoCB = '/qlthongtin';
-  static const String manageTraineeCB = '/qlthuctap';
+  static const String login = '/dang-nhap';
+  static const String info = '/thong-tin';
+  static const String register = '/dky-tttt';
+  static const String firm = '/cong-ty';
+  static const String home = '/trang-chu';
+  static const String cv = '/ho-so';
+  static const String addUser = '/tao-tk';
+  static const String dstttt = '/ds-tttt';
+  static const String manageCredit = '/ql-hoc-phan';
+  static const String manageInfoCB = '/ql-thong-tin';
+  static const String manageTraineeCB = '/ql-thuc-tap';
+  static const String dsNguoiDung = '/ds-nguoi-dung';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -85,6 +87,11 @@ class RouteGenerator {
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const ManageTrainee(),
+        );
+      case dsNguoiDung:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ListUserScreen(),
         );
       default:
         return MaterialPageRoute(

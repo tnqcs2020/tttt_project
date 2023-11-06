@@ -1,27 +1,31 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   String? uid,
       userId,
-      name,
+      userName,
       email,
       phone,
       password,
       gender,
       birthday,
-      avatar,
       classId,
       className,
       course,
       major,
       address,
-      group;
-  bool? isRegistered;
+      group,
+      cvId,
+      cvName,
+      cvChucVu;
+  List<ClassModel>? cvClass;
 
   UserModel({
     this.uid,
     this.userId,
-    this.name,
+    this.userName,
     this.classId,
     this.className,
     this.course,
@@ -32,92 +36,109 @@ class UserModel {
     this.phone,
     this.birthday,
     this.gender,
-    this.avatar,
     this.address,
-    this.isRegistered = false,
+    this.cvId,
+    this.cvName,
+    this.cvChucVu,
+    this.cvClass,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'userId': userId,
-      'name': name,
+      'userName': userName,
       'email': email,
       'password': password,
       'phone': phone,
       'gender': gender,
       'birthday': birthday,
-      'avatar': avatar,
       'classId': classId,
       'className': className,
       'course': course,
       'major': major,
       'address': address,
-      'isRegistered': isRegistered,
       'group': group,
+      'cvId': cvId,
+      'cvName': cvName,
+      'cvChucVu': cvChucVu,
+      'cvClass': cvClass!.map((e) => e.toMap()).toList(),
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-        uid: map['uid'] ?? '',
-        userId: map['userId'] ?? '',
-        name: map['name'] ?? '',
-        email: map['email'] ?? '',
-        password: map['password'] ?? '',
-        phone: map['phone'] ?? '',
-        birthday: map['birthday'] ?? '',
-        gender: map['gender'] ?? '',
-        avatar: map['avatar'] ?? '',
-        classId: map['classId'] ?? '',
-        className: map['className'] ?? '',
-        course: map['course'] ?? '',
-        major: map['major'] ?? '',
-        address: map['address'] ?? '',
-        group: map['group'] ?? '',
-        isRegistered: map['isRegistered'] ?? false);
+      uid: map['uid'] ?? '',
+      userId: map['userId'] ?? '',
+      userName: map['userName'] ?? '',
+      email: map['email'] ?? '',
+      password: map['password'] ?? '',
+      phone: map['phone'] ?? '',
+      birthday: map['birthday'] ?? '',
+      gender: map['gender'] ?? '',
+      classId: map['classId'] ?? '',
+      className: map['className'] ?? '',
+      course: map['course'] ?? '',
+      major: map['major'] ?? '',
+      address: map['address'] ?? '',
+      group: map['group'] ?? '',
+      cvId: map['cvId'] ?? '',
+      cvName: map['cvName'] ?? '',
+      cvChucVu: map['cvChucVu'] ?? '',
+      cvClass:
+          map['cvClass'].map<ClassModel>((i) => ClassModel.fromMap(i)).toList(),
+    );
   }
 
   String toJson() => json.encode(toMap());
 
   factory UserModel.fromJson(String source) =>
       UserModel.fromMap(json.decode(source));
+}
 
-  UserModel copyWith({
-    String? uid,
-    String? userId,
-    String? name,
-    String? email,
-    String? password,
-    String? phone,
-    String? birthday,
-    String? gender,
-    String? avatar,
-    String? classId,
-    String? className,
-    String? course,
-    String? major,
-    String? address,
-    String? group,
-    bool? isRegistered,
-  }) {
-    return UserModel(
-      uid: uid ?? this.uid,
-      userId: userId ?? this.userId,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      password: password ?? this.password,
-      phone: phone ?? this.phone,
-      birthday: birthday ?? this.birthday,
-      gender: gender ?? this.gender,
-      avatar: avatar ?? this.avatar,
-      classId: classId ?? this.classId,
-      className: className ?? this.className,
-      course: course ?? this.course,
-      major: major ?? this.major,
-      address: address ?? this.address,
-      group: group ?? this.group,
-      isRegistered: isRegistered ?? this.isRegistered,
+class ClassModel {
+  String? className, quantity, classId, course, cvId, major;
+  Timestamp? yearStart, yearEnd;
+
+  ClassModel({
+    this.className,
+    this.classId,
+    this.quantity,
+    this.course,
+    this.cvId,
+    this.major,
+    this.yearStart,
+    this.yearEnd,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'className': className,
+      'classId': classId,
+      'quantity': quantity,
+      'course': course,
+      'cvId': cvId,
+      'yearStart': yearStart,
+      'yearEnd': yearEnd,
+      'major': major,
+    };
+  }
+
+  factory ClassModel.fromMap(Map<String, dynamic> map) {
+    return ClassModel(
+      className: map['className'] ?? '',
+      classId: map['classId'] ?? '',
+      quantity: map['quantity'] ?? '',
+      course: map['course'] ?? '',
+      cvId: map['cvId'] ?? '',
+      major: map['major'] ?? '',
+      yearStart: map['yearStart'],
+      yearEnd: map['yearEnd'],
     );
   }
+
+  String toJson() => json.encode(toMap());
+
+  factory ClassModel.fromJson(String source) =>
+      ClassModel.fromMap(json.decode(source));
 }

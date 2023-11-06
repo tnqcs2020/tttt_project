@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/models/firm_model.dart';
+import 'package:tttt_project/models/user_model.dart';
 
 class UserController extends GetxController {
   RxString uid = "".obs;
-  RxString name = "".obs;
+  RxString userName = "".obs;
   RxString userId = "".obs;
   RxString birthday = "".obs;
   RxString email = "".obs;
@@ -16,9 +17,12 @@ class UserController extends GetxController {
   RxString address = "".obs;
   RxString group =
       "".obs; //0:firm, 1:student, 2: teacher, 3: supervisor, 4: admin
-  RxString gender = "".obs; //true: male, false: female
+  RxString gender = "".obs;
+  RxString cvId = "".obs;
+  RxString cvName = "".obs;
+  RxString cvChucVu = "".obs;
+  RxList<ClassModel> cvClass = RxList();
   RxInt menuSelected = 0.obs;
-  RxBool isRegistered = false.obs;
   RxInt selectedStep = 0.obs;
   RxInt reachedStep = 0.obs;
   RxBool loadIn = false.obs;
@@ -26,11 +30,11 @@ class UserController extends GetxController {
   Rx<DateTimeRange> traineeTime =
       DateTimeRange(start: DateTime.now(), end: DateTime.now()).obs;
   RxBool isCompleted = false.obs;
-  // RxBool isActive = false.obs;
+  RxInt selected = 999.obs;
 
   setCurrentUser({
     String? setUid,
-    String? setName,
+    String? setUserName,
     String? setUserId,
     String? setBirthday,
     String? setEmail,
@@ -42,14 +46,16 @@ class UserController extends GetxController {
     String? setAddress,
     String? setGroup,
     String? setGender,
+    String? setCvId,
+    String? setCvName,
+    List<ClassModel>? setCVClass,
+    String? setCvChucVu,
     int? setMenuSelected,
-    bool? setIsRegistered,
     int? setReachedStep,
-    int? setSelectedStep,
     bool? setLoadIn,
   }) {
     uid.value = setUid ?? uid.value;
-    name.value = setName ?? name.value;
+    userName.value = setUserName ?? userName.value;
     userId.value = setUserId ?? userId.value;
     email.value = setEmail ?? email.value;
     birthday.value = setBirthday ?? birthday.value;
@@ -61,16 +67,18 @@ class UserController extends GetxController {
     group.value = setGroup ?? group.value;
     gender.value = setGender ?? gender.value;
     address.value = setAddress ?? address.value;
+    cvId.value = setCvId ?? cvId.value;
+    cvName.value = setCvName ?? cvName.value;
+    cvChucVu.value = setCvChucVu ?? cvChucVu.value;
+    cvClass = setCVClass != null ? RxList(setCVClass) : cvClass;
     menuSelected.value = setMenuSelected ?? menuSelected.value;
-    isRegistered.value = setIsRegistered ?? isRegistered.value;
     reachedStep.value = setReachedStep ?? reachedStep.value;
-    selectedStep.value = setSelectedStep ?? selectedStep.value;
     loadIn.value = setLoadIn ?? false;
   }
 
   resetUser() {
     uid.value = "";
-    name.value = "";
+    userName.value = "";
     userId.value = "";
     email.value = "";
     birthday.value = "";
@@ -82,8 +90,11 @@ class UserController extends GetxController {
     group.value = "";
     gender.value = "";
     address.value = "";
+    cvId.value = "";
+    cvName.value = "";
+    cvChucVu.value = "";
+    cvClass.value = [];
     menuSelected.value = 0;
-    isRegistered.value = false;
     reachedStep.value = 0;
     selectedStep.value = 0;
     loadIn.value = false;

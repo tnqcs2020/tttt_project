@@ -57,37 +57,25 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
           await firestore.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
-        DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
-            await firestore.collection('trainees').doc(userId).get();
-        if (isExitTrainee.data() != null) {
-          final loadTrainee =
-              RegisterTraineeModel.fromMap(isExitTrainee.data()!);
           currentUser.setCurrentUser(
-            setUid: loadUser.uid,
-            setUserId: loadUser.userId,
-            setName: loadUser.name,
-            setClassName: loadUser.className,
-            setCourse: loadUser.course,
-            setGroup: loadUser.group,
-            setMajor: loadUser.major,
-            setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
-            setReachedStep: loadTrainee.reachedStep,
-            setSelectedStep: loadTrainee.reachedStep,
-          );
-        } else {
-          currentUser.setCurrentUser(
-            setUid: loadUser.uid,
-            setUserId: loadUser.userId,
-            setName: loadUser.name,
-            setClassName: loadUser.className,
-            setCourse: loadUser.course,
-            setGroup: loadUser.group,
-            setMajor: loadUser.major,
-            setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
-          );
-        }
+         setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
+        );    
       }
     }
     currentUser.loadIn.value = true;
@@ -184,8 +172,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                             showDialog(
                                               context: context,
                                               barrierColor: Colors.black12,
-                                              barrierDismissible:
-                                                                                false,
+                                              barrierDismissible: false,
                                               builder: (context) {
                                                 return Padding(
                                                   padding: EdgeInsets.only(
@@ -497,7 +484,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                             .doc(firm.firmId)
                                                                             .get();
                                                                         final cbhdName =
-                                                                            UserModel.fromMap(loadCBHD.data()!).name;
+                                                                            UserModel.fromMap(loadCBHD.data()!).userName;
                                                                         final plan =
                                                                             PlanModel(
                                                                           cbhdId:

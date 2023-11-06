@@ -86,7 +86,7 @@ class Header extends StatelessWidget {
                     else
                       Obx(
                         () => Text(
-                          currentUser.name.value,
+                          currentUser.userName.value,
                           style: const TextStyle(
                               fontSize: 16,
                               color: Colors.white,

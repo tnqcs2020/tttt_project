@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
@@ -27,30 +28,38 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
 
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
+    String? userId = sharedPref
+        .getString(
+          'userId',
+        )
+        .toString();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(sharedPref
-                  .getString(
-                    'userId',
-                  )
-                  .toString())
-              .get();
+          await FirebaseFirestore.instance.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
-          setUid: isExistUser.data()?['uid'],
-          setUserId: isExistUser.data()?['userId'],
-          setName: isExistUser.data()?['name'],
-          setClassName: isExistUser.data()?['className'],
-          setCourse: isExistUser.data()?['course'],
-          setGroup: isExistUser.data()?['group'],
-          setMajor: isExistUser.data()?['major'],
-          setEmail: isExistUser.data()?['email'],
-          setPhone: isExistUser.data()?['phone'],
-          setMenuSelected: sharedPref.getInt('menuSelected'),
-          setIsRegistered: isExistUser.data()!['isRegistered'],
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
         );
       }
     }
@@ -86,7 +95,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                       children: [
                         Container(
                           constraints:
-                              BoxConstraints(minHeight: screenHeight * 0.3),
+                              BoxConstraints(minHeight: screenHeight * 0.35),
                           decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               border: Border.all(
@@ -113,7 +122,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Thông báo",
+                                            "Tin Giáo Vụ Khoa",
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
@@ -130,7 +139,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                         const SizedBox(height: 20),
                         Container(
                           constraints:
-                              BoxConstraints(minHeight: screenHeight * 0.3),
+                              BoxConstraints(minHeight: screenHeight * 0.35),
                           decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               border: Border.all(
@@ -157,51 +166,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Tin mới",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          constraints:
-                              BoxConstraints(minHeight: screenHeight * 0.3),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade600,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(5.0),
-                                          topRight: Radius.circular(5.0),
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Nghiên cứu",
+                                            "Tin Việc Làm",
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),

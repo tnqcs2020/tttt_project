@@ -7,16 +7,17 @@ class FirmModel {
   List<JobPositionModel>? listJob;
   List<JobRegisterModel>? listRegis;
 
-  FirmModel(
-      {this.firmId,
-      this.firmName,
-      this.email,
-      this.owner,
-      this.phone,
-      this.describe,
-      this.address,
-      this.listJob,
-      this.listRegis});
+  FirmModel({
+    this.firmId,
+    this.firmName,
+    this.email,
+    this.owner,
+    this.phone,
+    this.describe,
+    this.address,
+    this.listJob,
+    this.listRegis,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -25,7 +26,7 @@ class FirmModel {
       'email': email,
       'owner': owner,
       'phone': phone,
-      'describe': describe,
+      'describe': describe ?? '',
       'address': address,
       'listJob': listJob!.map((i) => i.toMap()).toList(),
       'listRegis': listRegis!.map((i) => i.toMap()).toList(),
@@ -141,4 +142,36 @@ class JobRegisterModel {
 
   factory JobRegisterModel.fromJson(String source) =>
       JobRegisterModel.fromMap(json.decode(source));
+}
+
+class FirmSuggestModel {
+  String? firmId, firmName;
+  double? similarityScore;
+
+  FirmSuggestModel({
+    this.firmId,
+    this.firmName,
+    this.similarityScore,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'firmId': firmId,
+      'firmName': firmName,
+      'email': similarityScore,
+    };
+  }
+
+  factory FirmSuggestModel.fromMap(Map<String, dynamic> data) {
+    return FirmSuggestModel(
+      firmId: data['firmId'] ?? '',
+      firmName: data['firmName'] ?? '',
+      similarityScore: data['similarityScore'] ?? 0,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory FirmSuggestModel.fromJson(String source) =>
+      FirmSuggestModel.fromMap(json.decode(source));
 }

@@ -2,10 +2,10 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/routes.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_textfield.dart';
@@ -35,12 +35,154 @@ class FormSignIn extends StatelessWidget {
         children: [
           CustomTextField(
             controller: _userIdCtrl,
-            hintText: 'Tài khoản',
+            label: 'Tài khoản',
+            hintText: 'Mã số cá nhân',
+            validator: (value) =>
+                value == "" ? 'Vui lòng điền tài khoản' : null,
+            onFieldSubmitted: (p0) async {
+              if (_signInFormKey.currentState!.validate()) {
+                DocumentSnapshot<Map<String, dynamic>> isExistUser =
+                    await GV.usersCol.doc(_userIdCtrl.text.toLowerCase()).get();
+                if (isExistUser.data() != null) {
+                  if (isExistUser.data()!['password'] == _pwdCtrl.text) {
+                    String str = "";
+                    if (isExistUser.data()!['group'] == NguoiDung.quantri ||
+                        isExistUser.data()!['group'] == NguoiDung.giaovu ||
+                        isExistUser.data()!['group'] == NguoiDung.covan ||
+                        isExistUser.data()!['group'] == NguoiDung.cbhd) {
+                      str = "${_userIdCtrl.text.toLowerCase()}@ctu.edu.vn";
+                      await GV.auth.signInWithEmailAndPassword(
+                        email: str,
+                        password: _pwdCtrl.text,
+                      );
+                    } else if (isExistUser.data()!['group'] ==
+                        NguoiDung.sinhvien) {
+                      str =
+                          "${_userIdCtrl.text.toLowerCase()}@student.ctu.edu.vn";
+                      await GV.auth.signInWithEmailAndPassword(
+                        email: str,
+                        password: _pwdCtrl.text,
+                      );
+                    } else {
+                      GV.error(
+                          context: context,
+                          message: 'Tài khoản không tồn tại!');
+                    }
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setString(
+                      'userId',
+                      _userIdCtrl.text,
+                    );
+                    prefs.setInt('menuSelected', 0);
+                    prefs.setBool("isLoggedIn", true);
+                    final loadUser = UserModel.fromMap(isExistUser.data()!);
+                    currentUser.setCurrentUser(
+                      setUid: loadUser.uid,
+                      setUserId: loadUser.userId,
+                      setUserName: loadUser.userName,
+                      setClassName: loadUser.className,
+                      setCourse: loadUser.course,
+                      setGroup: loadUser.group,
+                      setMajor: loadUser.major,
+                      setEmail: loadUser.email,
+                      setAddress: loadUser.address,
+                      setBirthday: loadUser.birthday,
+                      setCvChucVu: loadUser.cvChucVu,
+                      setCvId: loadUser.cvId,
+                      setCvName: loadUser.cvName,
+                      setGender: loadUser.gender,
+                      setPhone: loadUser.phone,
+                      setClassId: loadUser.classId,
+                      setCVClass: loadUser.cvClass,
+                      setMenuSelected: 0,
+                    );
+                    Navigator.pushNamed(context, RouteGenerator.home);
+                  } else {
+                    GV.error(context: context, message: 'Mật khẩu không đúng!');
+                  }
+                } else {
+                  GV.error(
+                      context: context, message: 'Tài khoản không tồn tại!');
+                }
+              }
+            },
           ),
           CustomTextField(
             controller: _pwdCtrl,
+            label: 'Mật khẩu',
             hintText: 'Mật khẩu',
             isPassword: true,
+            validator: (value) =>
+                value == "" ? 'Vui lòng điền mật khẩu.' : null,
+            onFieldSubmitted: (p0) async {
+              if (_signInFormKey.currentState!.validate()) {
+                DocumentSnapshot<Map<String, dynamic>> isExistUser =
+                    await GV.usersCol.doc(_userIdCtrl.text.toLowerCase()).get();
+                if (isExistUser.data() != null) {
+                  if (isExistUser.data()!['password'] == _pwdCtrl.text) {
+                    String str = "";
+                    if (isExistUser.data()!['group'] == NguoiDung.quantri ||
+                        isExistUser.data()!['group'] == NguoiDung.giaovu ||
+                        isExistUser.data()!['group'] == NguoiDung.covan ||
+                        isExistUser.data()!['group'] == NguoiDung.cbhd) {
+                      str = "${_userIdCtrl.text.toLowerCase()}@ctu.edu.vn";
+                      await GV.auth.signInWithEmailAndPassword(
+                        email: str,
+                        password: _pwdCtrl.text,
+                      );
+                    } else if (isExistUser.data()!['group'] ==
+                        NguoiDung.sinhvien) {
+                      str =
+                          "${_userIdCtrl.text.toLowerCase()}@student.ctu.edu.vn";
+                      await GV.auth.signInWithEmailAndPassword(
+                        email: str,
+                        password: _pwdCtrl.text,
+                      );
+                    } else {
+                      GV.error(
+                          context: context,
+                          message: 'Tài khoản không tồn tại!');
+                    }
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setString(
+                      'userId',
+                      _userIdCtrl.text,
+                    );
+                    prefs.setInt('menuSelected', 0);
+                    prefs.setBool("isLoggedIn", true);
+                    final loadUser = UserModel.fromMap(isExistUser.data()!);
+                    currentUser.setCurrentUser(
+                      setUid: loadUser.uid,
+                      setUserId: loadUser.userId,
+                      setUserName: loadUser.userName,
+                      setClassName: loadUser.className,
+                      setCourse: loadUser.course,
+                      setGroup: loadUser.group,
+                      setMajor: loadUser.major,
+                      setEmail: loadUser.email,
+                      setAddress: loadUser.address,
+                      setBirthday: loadUser.birthday,
+                      setCvChucVu: loadUser.cvChucVu,
+                      setCvId: loadUser.cvId,
+                      setCvName: loadUser.cvName,
+                      setGender: loadUser.gender,
+                      setPhone: loadUser.phone,
+                      setClassId: loadUser.classId,
+                      setCVClass: loadUser.cvClass,
+                      setMenuSelected: 0,
+                    );
+                    Navigator.pushNamed(context, RouteGenerator.home);
+                  } else {
+                    GV.error(context: context, message: 'Mật khẩu không đúng!');
+                  }
+                } else {
+                  GV.error(
+                      context: context, message: 'Tài khoản không tồn tại!');
+                }
+              }
+            },
           ),
           const SizedBox(height: 15),
           CustomButton(
@@ -57,9 +199,8 @@ class FormSignIn extends StatelessWidget {
                     String str = "";
                     if (isExistUser.data()!['group'] == NguoiDung.quantri ||
                         isExistUser.data()!['group'] == NguoiDung.giaovu ||
-                        isExistUser.data()!['group'] == NguoiDung.covan ||
-                        isExistUser.data()!['group'] == NguoiDung.cbhd) {
-                      str = "${_userIdCtrl.text.toLowerCase()}@cict.ctu.vn";
+                        isExistUser.data()!['group'] == NguoiDung.covan ) {
+                      str = "${_userIdCtrl.text.toLowerCase()}@ctu.edu.vn";
                       await GV.auth.signInWithEmailAndPassword(
                         email: str,
                         password: _pwdCtrl.text,
@@ -67,13 +208,15 @@ class FormSignIn extends StatelessWidget {
                     } else if (isExistUser.data()!['group'] ==
                         NguoiDung.sinhvien) {
                       str =
-                          "${_userIdCtrl.text.toLowerCase()}@student.cict.ctu.vn";
+                          "${_userIdCtrl.text.toLowerCase()}@student.ctu.edu.vn";
                       await GV.auth.signInWithEmailAndPassword(
                         email: str,
                         password: _pwdCtrl.text,
                       );
                     } else {
-                      EasyLoading.showError('Tài khoản không tồn tại!');
+                      GV.error(
+                          context: context,
+                          message: 'Tài khoản không tồn tại!');
                     }
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
@@ -83,28 +226,39 @@ class FormSignIn extends StatelessWidget {
                     );
                     prefs.setInt('menuSelected', 0);
                     prefs.setBool("isLoggedIn", true);
+                    final loadUser = UserModel.fromMap(isExistUser.data()!);
                     currentUser.setCurrentUser(
-                      setUid: isExistUser.data()!['uid'],
-                      setUserId: isExistUser.data()!['userId'],
-                      setName: isExistUser.data()!['name'],
-                      setClassName: isExistUser.data()!['className'],
-                      setCourse: isExistUser.data()!['course'],
-                      setGroup: isExistUser.data()!['group'],
-                      setMajor: isExistUser.data()!['major'],
-                      setEmail: isExistUser.data()!['email'],
-                      setIsRegistered: isExistUser.data()!['isRegistered'],
-                      setPhone: isExistUser.data()!['phone'],
+                      setUid: loadUser.uid,
+                      setUserId: loadUser.userId,
+                      setUserName: loadUser.userName,
+                      setClassName: loadUser.className,
+                      setCourse: loadUser.course,
+                      setGroup: loadUser.group,
+                      setMajor: loadUser.major,
+                      setEmail: loadUser.email,
+                      setAddress: loadUser.address,
+                      setBirthday: loadUser.birthday,
+                      setCvChucVu: loadUser.cvChucVu,
+                      setCvId: loadUser.cvId,
+                      setCvName: loadUser.cvName,
+                      setGender: loadUser.gender,
+                      setPhone: loadUser.phone,
+                      setClassId: loadUser.classId,
+                      setCVClass: loadUser.cvClass,
                       setMenuSelected: 0,
                     );
                     Navigator.pushNamed(context, RouteGenerator.home);
                   } else {
-                    EasyLoading.showError('Mật khẩu không đúng!');
+                    GV.error(context: context, message: 'Mật khẩu không đúng!');
                   }
                 } else {
-                  EasyLoading.showError('Tài khoản không tồn tại!');
+                  GV.error(
+                      context: context, message: 'Tài khoản không tồn tại!');
                 }
               } else {
-                EasyLoading.showError('Vui lòng điền thông tin đăng nhập!');
+                GV.error(
+                    context: context,
+                    message: 'Vui lòng điền thông tin đăng nhập!');
               }
             },
           ),

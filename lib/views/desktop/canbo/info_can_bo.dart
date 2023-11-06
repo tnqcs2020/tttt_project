@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
@@ -20,6 +24,52 @@ class _InfoCBState extends State<InfoCB> {
   final TextEditingController nameCBCtrl = TextEditingController();
   final TextEditingController phoneCBCtrl = TextEditingController();
   final TextEditingController emailCBCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
+
+  getUserData() async {
+    final SharedPreferences sharedPref = await SharedPreferences.getInstance();
+    String? userId = sharedPref
+        .getString(
+          'userId',
+        )
+        .toString();
+    bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
+    if (isLoggedIn == true) {
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
+      DocumentSnapshot<Map<String, dynamic>> isExistUser =
+          await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
+        currentUser.setCurrentUser(
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     nameCBCtrl.dispose();
@@ -27,11 +77,12 @@ class _InfoCBState extends State<InfoCB> {
     emailCBCtrl.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    nameCBCtrl.text = currentUser.name.value;
+    nameCBCtrl.text = currentUser.userName.value;
     phoneCBCtrl.text = currentUser.phone.value;
     emailCBCtrl.text = currentUser.email.value;
     return Obx(
@@ -74,6 +125,9 @@ class _InfoCBState extends State<InfoCB> {
                   LineDetail(
                     field: "Điện thoại",
                     ctrl: phoneCBCtrl,
+                    textFormat: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
                   )
                 ],
               ),
@@ -96,7 +150,7 @@ class _InfoCBState extends State<InfoCB> {
                 width: screenWidth * 0.1,
                 height: screenHeight * 0.07,
                 onTap: () async {
-                  if (nameCBCtrl.text != currentUser.name.value ||
+                  if (nameCBCtrl.text != currentUser.userName.value ||
                       phoneCBCtrl.text != currentUser.phone.value ||
                       emailCBCtrl.text != currentUser.email.value) {
                     GV.usersCol.doc(currentUser.userId.value).update({
@@ -105,12 +159,12 @@ class _InfoCBState extends State<InfoCB> {
                       'email': emailCBCtrl.text
                     });
                     currentUser.setCurrentUser(
-                      setName: nameCBCtrl.text,
+                      setUserName: nameCBCtrl.text,
                       setEmail: emailCBCtrl.text,
                       setPhone: phoneCBCtrl.text,
                     );
                     EasyLoading.showSuccess('Thay đổi thành công!');
-                  } else if (nameCBCtrl.text == currentUser.name.value &&
+                  } else if (nameCBCtrl.text == currentUser.userName.value &&
                       phoneCBCtrl.text == currentUser.phone.value &&
                       emailCBCtrl.text == currentUser.email.value) {
                     EasyLoading.showError('Không có gì thay đổi!');

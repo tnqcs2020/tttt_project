@@ -30,6 +30,7 @@ class _ListFirmState extends State<ListFirm> {
   ValueNotifier isSearch = ValueNotifier(false);
   String? userId;
   final currentUser = Get.put(UserController());
+  bool isRegistered = false;
 
   @override
   void initState() {
@@ -56,34 +57,29 @@ class _ListFirmState extends State<ListFirm> {
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
-          final loadTrainee =
-              RegisterTraineeModel.fromMap(isExitTrainee.data()!);
-          currentUser.setCurrentUser(
-            setUid: loadUser.uid,
-            setUserId: loadUser.userId,
-            setName: loadUser.name,
-            setClassName: loadUser.className,
-            setCourse: loadUser.course,
-            setGroup: loadUser.group,
-            setMajor: loadUser.major,
-            setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
-            setReachedStep: loadTrainee.reachedStep,
-            setSelectedStep: loadTrainee.reachedStep,
-          );
-        } else {
-          currentUser.setCurrentUser(
-            setUid: loadUser.uid,
-            setUserId: loadUser.userId,
-            setName: loadUser.name,
-            setClassName: loadUser.className,
-            setCourse: loadUser.course,
-            setGroup: loadUser.group,
-            setMajor: loadUser.major,
-            setEmail: loadUser.email,
-            setIsRegistered: loadUser.isRegistered,
-          );
+          setState(() {
+            isRegistered = true;
+          });
         }
+        currentUser.setCurrentUser(
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
+        );
       }
     }
     currentUser.loadIn.value = true;
@@ -485,9 +481,8 @@ class _ListFirmState extends State<ListFirm> {
                                                               ),
                                                               onPressed:
                                                                   () async {
-                                                                if (currentUser
-                                                                    .isRegistered
-                                                                    .isTrue) {
+                                                                if (isRegistered
+                                                                    == true) {
                                                                   if (firmResult[
                                                                           indexFirm]
                                                                       .listRegis!
@@ -617,7 +612,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                             .value
                                                                             .jobId,
                                                                         userName: currentUser
-                                                                            .name
+                                                                            .userName
                                                                             .value,
                                                                         jobName: currentUser
                                                                             .selectedJob
@@ -738,7 +733,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                         .get();
                                                                     final cbhdName =
                                                                         UserModel.fromMap(loadCBHD.data()!)
-                                                                            .name;
+                                                                            .userName;
                                                                     final plan =
                                                                         PlanModel(
                                                                       cbhdId: firmResult[
@@ -1174,9 +1169,8 @@ class _ListFirmState extends State<ListFirm> {
                                                             ),
                                                           ),
                                                           onPressed: () async {
-                                                            if (currentUser
-                                                                .isRegistered
-                                                                .isTrue) {
+                                                            if (isRegistered
+                                                                == true) {
                                                               if (firms[
                                                                       indexFirm]
                                                                   .listRegis!
@@ -1355,7 +1349,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                         .jobId,
                                                                     userName:
                                                                         currentUser
-                                                                            .name
+                                                                            .userName
                                                                             .value,
                                                                     jobName: currentUser
                                                                         .selectedJob
@@ -1482,7 +1476,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                 final cbhdName =
                                                                     UserModel.fromMap(
                                                                             loadCBHD.data()!)
-                                                                        .name;
+                                                                        .userName;
                                                                 final plan =
                                                                     PlanModel(
                                                                   cbhdId: firms[

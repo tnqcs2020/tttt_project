@@ -27,6 +27,8 @@ dependencies:
   motion_toast: ^2.7.9
   intl: ^0.18.1
   file_picker: ^6.0.0
+  http: ^1.1.0
+  tiengviet: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -22,37 +22,37 @@ class _MenuLeftState extends State<MenuLeft> {
   final currentUser = Get.put(UserController());
 
   List<String> checkMenuTitle() {
-    final List<String> titles;
-    switch (
-        widget.user != null ? widget.user?.group : currentUser.group.value) {
-      case NguoiDung.sinhvien:
-        titles = menuSinhVien;
-      case NguoiDung.quantri:
-        titles = menuQuanTri;
-      case NguoiDung.cbhd:
-        titles = menuCanBo;
-      case NguoiDung.covan:
-        titles = menuCoVan;
-      default:
-        titles = menuSinhVien;
+    List<String> titles = [];
+    final group =
+        widget.user != null ? widget.user?.group : currentUser.group.value;
+    if (group == NguoiDung.sinhvien) {
+      titles = menuSinhVien;
+    } else if (group == NguoiDung.quantri) {
+      titles = menuQuanTri;
+    } else if (group == NguoiDung.cbhd) {
+      titles = menuCanBo;
+    } else if (group == NguoiDung.covan) {
+      titles = menuCoVan;
+    } else if (group == NguoiDung.giaovu) {
+      titles = menuGiaoVu;
     }
     return titles;
   }
 
   List<String> checkMenuPage() {
-    final List<String> pages;
-    switch (
-        widget.user != null ? widget.user?.group : currentUser.group.value) {
-      case NguoiDung.sinhvien:
-        pages = pageSinhVien;
-      case NguoiDung.quantri:
-        pages = pageQuanTri;
-      case NguoiDung.cbhd:
-        pages = pageCanBo;
-      case NguoiDung.covan:
-        pages = pageCoVan;
-      default:
-        pages = pageSinhVien;
+    List<String> pages = [];
+    final group =
+        widget.user != null ? widget.user?.group : currentUser.group.value;
+    if (group == NguoiDung.sinhvien) {
+      pages = pageSinhVien;
+    } else if (group == NguoiDung.quantri) {
+      pages = pageQuanTri;
+    } else if (group == NguoiDung.cbhd) {
+      pages = pageCanBo;
+    } else if (group == NguoiDung.covan) {
+      pages = pageCoVan;
+    } else if (group == NguoiDung.giaovu) {
+      pages = pageGiaoVu;
     }
     return pages;
   }

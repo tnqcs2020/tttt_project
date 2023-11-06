@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
@@ -50,40 +51,76 @@ class _InfoFirmState extends State<InfoFirm> {
           'userId',
         )
         .toString();
-    DocumentSnapshot<Map<String, dynamic>> isExistFirm =
-        await FirebaseFirestore.instance.collection('firms').doc(userId).get();
-    if (isExistFirm.data() != null) {
-      loadFirm = FirmModel.fromMap(isExistFirm.data()!);
-      nameFirmCtrl.text = loadFirm.firmName ?? '';
-      ownerCtrl.text = loadFirm.owner ?? '';
-      phoneCtrl.text = loadFirm.phone ?? '';
-      emailCtrl.text = loadFirm.email ?? '';
-      addressCtrl.text = loadFirm.address ?? '';
-      describeCtrl.text = loadFirm.describe ?? '';
-      if (loadFirm.listJob != null && loadFirm.listJob!.isNotEmpty) {
-        setState(() {
-          positions = [];
-          quantities = [];
-          describes = [];
-          temp = 0;
-          loadFirm.listJob!.forEach((element) {
-            positions.add(TextEditingController(text: element.jobName));
-            quantities.add(TextEditingController(text: element.quantity));
-            describes.add(TextEditingController(text: element.describeJob));
-            temp++;
+    bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
+    if (isLoggedIn == true) {
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
+      DocumentSnapshot<Map<String, dynamic>> isExistUser =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
+      if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
+        currentUser.setCurrentUser(
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
+        );
+      }
+      DocumentSnapshot<Map<String, dynamic>> isExistFirm =
+          await FirebaseFirestore.instance
+              .collection('firms')
+              .doc(userId)
+              .get();
+      if (isExistFirm.data() != null) {
+        loadFirm = FirmModel.fromMap(isExistFirm.data()!);
+        nameFirmCtrl.text = loadFirm.firmName ?? '';
+        ownerCtrl.text = loadFirm.owner ?? '';
+        phoneCtrl.text = loadFirm.phone ?? '';
+        emailCtrl.text = loadFirm.email ?? '';
+        addressCtrl.text = loadFirm.address ?? '';
+        describeCtrl.text = loadFirm.describe ?? '';
+        if (loadFirm.listJob != null && loadFirm.listJob!.isNotEmpty) {
+          setState(() {
+            positions = [];
+            quantities = [];
+            describes = [];
+            temp = 0;
+            loadFirm.listJob!.forEach((element) {
+              positions.add(TextEditingController(text: element.jobName));
+              quantities.add(TextEditingController(text: element.quantity));
+              describes.add(TextEditingController(text: element.describeJob));
+              temp++;
+            });
+            totalJob.value = temp;
+            loadData = true;
           });
-          totalJob.value = temp;
-          loadData = true;
-        });
+        } else {
+          setState(() {
+            loadData = true;
+          });
+        }
       } else {
         setState(() {
           loadData = true;
         });
       }
-    } else {
-      setState(() {
-        loadData = true;
-      });
     }
   }
 

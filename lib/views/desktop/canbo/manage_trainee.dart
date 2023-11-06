@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/views/desktop/canbo/list_student_regis.dart';
 import 'package:tttt_project/views/desktop/canbo/list_student_trainee.dart';
 import 'package:tttt_project/widgets/footer.dart';
@@ -21,7 +22,6 @@ class ManageTrainee extends StatefulWidget {
 
 class _ManageTraineeState extends State<ManageTrainee> {
   final currentUser = Get.put(UserController());
-  String? userId;
   ValueNotifier selectedMenu = ValueNotifier(1);
   @override
   void initState() {
@@ -31,28 +31,41 @@ class _ManageTraineeState extends State<ManageTrainee> {
 
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
-    bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
-    userId = sharedPref
+    String? userId = sharedPref
         .getString(
           'userId',
         )
         .toString();
+    bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
+      currentUser.setCurrentUser(
+        setMenuSelected: sharedPref.getInt('menuSelected'),
+      );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
               .doc(userId)
               .get();
       if (isExistUser.data() != null) {
+        final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
-          setUid: isExistUser.data()?['uid'],
-          setUserId: isExistUser.data()?['userId'],
-          setName: isExistUser.data()?['name'],
-          setGroup: isExistUser.data()?['group'],
-          setEmail: isExistUser.data()?['email'],
-          setPhone: isExistUser.data()?['phone'],
-          setMenuSelected: sharedPref.getInt('menuSelected'),
-          setIsRegistered: isExistUser.data()!['isRegistered'],
+          setUid: loadUser.uid,
+          setUserId: loadUser.userId,
+          setUserName: loadUser.userName,
+          setClassName: loadUser.className,
+          setCourse: loadUser.course,
+          setGroup: loadUser.group,
+          setMajor: loadUser.major,
+          setEmail: loadUser.email,
+          setAddress: loadUser.address,
+          setBirthday: loadUser.birthday,
+          setCvChucVu: loadUser.cvChucVu,
+          setCvId: loadUser.cvId,
+          setCvName: loadUser.cvName,
+          setGender: loadUser.gender,
+          setPhone: loadUser.phone,
+          setClassId: loadUser.classId,
+          setCVClass: loadUser.cvClass,
         );
       }
     }
