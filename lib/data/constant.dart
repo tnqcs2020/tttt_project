@@ -151,12 +151,14 @@ List<String> menuGiaoVu = [
   "Thêm thông báo",
   "Quản lý các mốc thời gian",
   "Quản lý học phần",
+  "Danh sách thực tập",
 ];
 List<String> pageGiaoVu = [
   RouteGenerator.home,
-  RouteGenerator.info,
-  RouteGenerator.info,
+  RouteGenerator.manageAnnouncement,
+  RouteGenerator.manageTime,
   RouteGenerator.manageCredit,
+  RouteGenerator.dstttt
 ];
 List<String> menuCoVan = [
   'Trang chu',

@@ -4,11 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/models/announcement_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
+import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
+import 'dart:html' as html;
 
 class HomeViewDesktop extends StatefulWidget {
   const HomeViewDesktop({Key? key}) : super(key: key);
@@ -18,8 +22,10 @@ class HomeViewDesktop extends StatefulWidget {
 }
 
 class _HomeViewDesktopState extends State<HomeViewDesktop> {
+  final firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
-
+  ValueNotifier<AnnouncementModel> readAnnouncement =
+      ValueNotifier(AnnouncementModel());
   @override
   void initState() {
     getUserData();
@@ -39,7 +45,10 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
@@ -76,121 +85,485 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
         child: Column(
           children: [
             const Header(),
-            // Obx(
-            //   () =>
-            Padding(
-              padding: EdgeInsets.only(
-                top: screenHeight * 0.02,
-                bottom: screenHeight * 0.02,
-                left: screenWidth * 0.08,
-                right: screenWidth * 0.08,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MenuLeft(),
-                  SizedBox(width: screenWidth * 0.03),
-                  Expanded(
-                    child: Column(
+            ValueListenableBuilder(
+                valueListenable: readAnnouncement,
+                builder: (context, readAnnouncementVal, child) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: screenHeight * 0.02,
+                      bottom: screenHeight * 0.02,
+                      left: screenWidth * 0.08,
+                      right: screenWidth * 0.08,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          constraints:
-                              BoxConstraints(minHeight: screenHeight * 0.35),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 35,
+                        MenuLeft(),
+                        SizedBox(width: screenWidth * 0.03),
+                        readAnnouncement.value.announcementId == null
+                            ? Expanded(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          minHeight: screenHeight * 0.35),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.shade600,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(5.0),
-                                          topRight: Radius.circular(5.0),
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                          color: Colors.grey.shade100,
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 0.1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Column(
                                         children: [
-                                          Text(
-                                            "Tin Giáo Vụ Khoa",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade600,
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(5.0),
+                                                      topRight:
+                                                          Radius.circular(5.0),
+                                                    ),
+                                                  ),
+                                                  child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        "Tin Giáo Vụ Khoa",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          StreamBuilder(
+                                            stream: firestore
+                                                .collection('announcements')
+                                                .where('type',
+                                                    isEqualTo: 'Tin giáo vụ')
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              final List<AnnouncementModel>
+                                                  listAnnouncement = [];
+                                              if (snapshot.hasData &&
+                                                  snapshot.connectionState ==
+                                                      ConnectionState.active) {
+                                                snapshot.data?.docs
+                                                    .forEach((element) {
+                                                  listAnnouncement.add(
+                                                      AnnouncementModel.fromMap(
+                                                          element.data()));
+                                                });
+                                                return listAnnouncement
+                                                        .isNotEmpty
+                                                    ? ListView.builder(
+                                                        itemCount:
+                                                            listAnnouncement
+                                                                .length,
+                                                        shrinkWrap: true,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                readAnnouncement
+                                                                        .value =
+                                                                    listAnnouncement[
+                                                                        index];
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.05,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                              child: Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                        '${index + 1}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 5,
+                                                                    child: Text(
+                                                                        listAnnouncement[index]
+                                                                            .title!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child: Text(
+                                                                        GV.readTimestamp(listAnnouncement[index]
+                                                                            .createdAt!),
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 150),
+                                                        child: Center(
+                                                          child: Text(
+                                                              'Chưa có thông báo.'),
+                                                        ),
+                                                      );
+                                              } else {
+                                                return const Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 150),
+                                                  child: Loading(),
+                                                );
+                                              }
+                                            },
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          constraints:
-                              BoxConstraints(minHeight: screenHeight * 0.35),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              border: Border.all(
-                                style: BorderStyle.solid,
-                                width: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 35,
+                                    const SizedBox(height: 20),
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          minHeight: screenHeight * 0.35),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.shade600,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(5.0),
-                                          topRight: Radius.circular(5.0),
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Tin Việc Làm",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
+                                          color: Colors.grey.shade100,
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 0.1,
                                           ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade600,
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(5.0),
+                                                      topRight:
+                                                          Radius.circular(5.0),
+                                                    ),
+                                                  ),
+                                                  child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        "Tin Việc Làm",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          StreamBuilder(
+                                            stream: firestore
+                                                .collection('announcements')
+                                                .where('type',
+                                                    isEqualTo: 'Tin việc làm')
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              final List<AnnouncementModel>
+                                                  listAnnouncement = [];
+                                              if (snapshot.hasData &&
+                                                  snapshot.connectionState ==
+                                                      ConnectionState.active) {
+                                                snapshot.data?.docs
+                                                    .forEach((element) {
+                                                  listAnnouncement.add(
+                                                      AnnouncementModel.fromMap(
+                                                          element.data()));
+                                                });
+                                                return listAnnouncement
+                                                        .isNotEmpty
+                                                    ? ListView.builder(
+                                                        itemCount:
+                                                            listAnnouncement
+                                                                .length,
+                                                        shrinkWrap: true,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                readAnnouncement
+                                                                        .value =
+                                                                    listAnnouncement[
+                                                                        index];
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.05,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                              child: Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                        '${index + 1}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 5,
+                                                                    child: Text(
+                                                                        listAnnouncement[index]
+                                                                            .title!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child: Text(
+                                                                        GV.readTimestamp(listAnnouncement[index]
+                                                                            .createdAt!),
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 110),
+                                                        child: Center(
+                                                          child: Text(
+                                                              'Chưa có thông báo.'),
+                                                        ),
+                                                      );
+                                              } else {
+                                                return const Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 150),
+                                                  child: Loading(),
+                                                );
+                                              }
+                                            },
+                                          )
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              )
+                            : Expanded(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          minHeight: screenHeight * 0.35),
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey.shade100,
+                                          border: Border.all(
+                                            style: BorderStyle.solid,
+                                            width: 0.1,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade600,
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(5.0),
+                                                      topRight:
+                                                          Radius.circular(5.0),
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 35),
+                                                        child: SizedBox(
+                                                          width: 30,
+                                                          child: IconButton(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    bottom: 1),
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                readAnnouncement
+                                                                        .value =
+                                                                    AnnouncementModel();
+                                                              });
+                                                            },
+                                                            icon: const Icon(Icons
+                                                                .arrow_back_outlined),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const Expanded(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              "Chi Tiết Tin",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 30),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 30, horizontal: 50),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                        'Tiêu đề: ${readAnnouncement.value.title} - ${GV.readTimestamp(readAnnouncement.value.createdAt!)}'),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                        'Nội dung: ${readAnnouncement.value.content}'),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    const Text(
+                                                        'Tệp đính kèm: '),
+                                                    Expanded(
+                                                      child: Column(
+                                                        children: [
+                                                          ListView.builder(
+                                                            itemCount:
+                                                                readAnnouncement
+                                                                    .value
+                                                                    .files!
+                                                                    .length,
+                                                            shrinkWrap: true,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return InkWell(
+                                                                onTap: () {
+                                                                  openInANewTab(readAnnouncement
+                                                                      .value
+                                                                      .files![
+                                                                          index]
+                                                                      .fileUrl);
+                                                                },
+                                                                child: Text(
+                                                                  '${readAnnouncement.value.files![index].fileName}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    decoration:
+                                                                        TextDecoration
+                                                                            .underline,
+                                                                    color: Colors
+                                                                        .blue
+                                                                        .shade900,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            // ),
+                  );
+                }),
             const Footer(),
           ],
         ),
       ),
     );
+  }
+
+  openInANewTab(url) {
+    html.window.open(url, 'PlaceholderName');
   }
 }

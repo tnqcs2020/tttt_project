@@ -25,6 +25,7 @@ class ListTraineeScreen extends StatefulWidget {
 }
 
 class _ListTraineeScreenState extends State<ListTraineeScreen> {
+  final firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
   List<String> dshk = [
     HocKy.hk1,
@@ -32,10 +33,8 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
     HocKy.hk3,
   ];
   List<NamHoc> dsnh = [NamHoc.n2021, NamHoc.n2122, NamHoc.n2223, NamHoc.n2324];
-
-  ValueNotifier<String> selectedHK = ValueNotifier<String>('');
-  ValueNotifier<NamHoc> selectedNH =
-      ValueNotifier<NamHoc>(NamHoc(start: "", end: ""));
+  String selectedHK = '';
+  NamHoc selectedNH = NamHoc(start: "", end: "");
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
   @override
   void initState() {
@@ -168,63 +167,52 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             const SizedBox(width: 15),
-                                            ValueListenableBuilder<String>(
-                                              valueListenable: selectedHK,
-                                              builder:
-                                                  (context, valueHK, child) {
-                                                return DropdownButtonHideUnderline(
-                                                  child:
-                                                      DropdownButton2<String>(
-                                                    isExpanded: true,
-                                                    hint: Center(
-                                                      child: Text(
-                                                        'Chọn',
-                                                        style: DropdownStyle
-                                                            .hintStyle,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                    items: dshk
-                                                        .map((String hk) =>
-                                                            DropdownMenuItem<
-                                                                String>(
-                                                              value: hk,
-                                                              child: Text(
-                                                                hk,
-                                                                style: DropdownStyle
-                                                                    .itemStyle,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ))
-                                                        .toList(),
-                                                    value: selectedHK
-                                                            .value.isNotEmpty
-                                                        ? selectedHK.value
-                                                        : null,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        isLook.value = false;
-                                                        selectedHK.value =
-                                                            value!;
-                                                      });
-                                                    },
-                                                    buttonStyleData:
-                                                        DropdownStyle
-                                                            .buttonStyleShort,
-                                                    iconStyleData: DropdownStyle
-                                                        .iconStyleData,
-                                                    dropdownStyleData:
-                                                        DropdownStyle
-                                                            .dropdownStyleShort,
-                                                    menuItemStyleData:
-                                                        DropdownStyle
-                                                            .menuItemStyleData,
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton2<String>(
+                                                isExpanded: true,
+                                                hint: Center(
+                                                  child: Text(
+                                                    'Chọn',
+                                                    style:
+                                                        DropdownStyle.hintStyle,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                );
-                                              },
+                                                ),
+                                                items: dshk
+                                                    .map((String hk) =>
+                                                        DropdownMenuItem<
+                                                            String>(
+                                                          value: hk,
+                                                          child: Text(
+                                                            hk,
+                                                            style: DropdownStyle
+                                                                .itemStyle,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ))
+                                                    .toList(),
+                                                value: selectedHK.isNotEmpty
+                                                    ? selectedHK
+                                                    : null,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    selectedHK = value!;
+                                                  });
+                                                  currentUser.isCompleted
+                                                      .value = false;
+                                                },
+                                                buttonStyleData: DropdownStyle
+                                                    .buttonStyleShort,
+                                                iconStyleData:
+                                                    DropdownStyle.iconStyleData,
+                                                dropdownStyleData: DropdownStyle
+                                                    .dropdownStyleShort,
+                                                menuItemStyleData: DropdownStyle
+                                                    .menuItemStyleData,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -247,67 +235,55 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             const SizedBox(width: 15),
-                                            ValueListenableBuilder<NamHoc>(
-                                              valueListenable: selectedNH,
-                                              builder:
-                                                  (context, valueNH, child) {
-                                                return DropdownButtonHideUnderline(
-                                                  child:
-                                                      DropdownButton2<NamHoc>(
-                                                    isExpanded: true,
-                                                    hint: Center(
-                                                      child: Text(
-                                                        "Chọn",
-                                                        style: DropdownStyle
-                                                            .hintStyle,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                    items: dsnh
-                                                        .map((NamHoc nh) =>
-                                                            DropdownMenuItem<
-                                                                NamHoc>(
-                                                              value: nh,
-                                                              child: Text(
-                                                                "${nh.start} - ${nh.end}",
-                                                                style: DropdownStyle
-                                                                    .itemStyle,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ))
-                                                        .toList(),
-                                                    value: selectedNH
-                                                                .value
-                                                                .start
-                                                                .isNotEmpty &&
-                                                            selectedNH.value.end
-                                                                .isNotEmpty
-                                                        ? selectedNH.value
-                                                        : null,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        isLook.value = false;
-                                                        selectedNH.value =
-                                                            value!;
-                                                      });
-                                                    },
-                                                    buttonStyleData:
-                                                        DropdownStyle
-                                                            .buttonStyleMedium,
-                                                    iconStyleData: DropdownStyle
-                                                        .iconStyleData,
-                                                    dropdownStyleData:
-                                                        DropdownStyle
-                                                            .dropdownStyleMedium,
-                                                    menuItemStyleData:
-                                                        DropdownStyle
-                                                            .menuItemStyleData,
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton2<NamHoc>(
+                                                isExpanded: true,
+                                                hint: Center(
+                                                  child: Text(
+                                                    "Chọn",
+                                                    style:
+                                                        DropdownStyle.hintStyle,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                );
-                                              },
+                                                ),
+                                                items: dsnh
+                                                    .map((NamHoc nh) =>
+                                                        DropdownMenuItem<
+                                                            NamHoc>(
+                                                          value: nh,
+                                                          child: Text(
+                                                            "${nh.start} - ${nh.end}",
+                                                            style: DropdownStyle
+                                                                .itemStyle,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ))
+                                                    .toList(),
+                                                value: selectedNH
+                                                            .start.isNotEmpty &&
+                                                        selectedNH
+                                                            .end.isNotEmpty
+                                                    ? selectedNH
+                                                    : null,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    selectedNH = value!;
+                                                  });
+                                                  currentUser.isCompleted
+                                                      .value = false;
+                                                },
+                                                buttonStyleData: DropdownStyle
+                                                    .buttonStyleMedium,
+                                                iconStyleData:
+                                                    DropdownStyle.iconStyleData,
+                                                dropdownStyleData: DropdownStyle
+                                                    .dropdownStyleMedium,
+                                                menuItemStyleData: DropdownStyle
+                                                    .menuItemStyleData,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -319,12 +295,13 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       width: screenWidth * 0.07,
                                       height: screenHeight * 0.06,
                                       onTap: () {
-                                        if (selectedHK.value.isNotEmpty &&
-                                            selectedNH.value.start.isNotEmpty &&
-                                            selectedNH.value.end.isNotEmpty) {
+                                        if (selectedHK.isNotEmpty &&
+                                            selectedNH.start.isNotEmpty &&
+                                            selectedNH.end.isNotEmpty) {
                                           setState(() {
                                             isLook.value = true;
                                           });
+                                          currentUser.isCompleted.value = true;
                                         }
                                       },
                                     ),
@@ -345,114 +322,279 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       child: const Row(
                                         children: [
                                           Expanded(
-                                              flex: 1,
-                                              child: Text('STT',
-                                                  textAlign: TextAlign.center)),
+                                            flex: 1,
+                                            child: Text(
+                                              'STT',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              flex: 2,
-                                              child: Text('MSSV',
-                                                  textAlign: TextAlign.center)),
+                                            flex: 2,
+                                            child: Text(
+                                              'MSSV',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              flex: 4,
-                                              child: Text('Họ tên',
-                                                  textAlign: TextAlign.center)),
+                                            flex: 4,
+                                            child: Text(
+                                              'Họ tên',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              flex: 5,
-                                              child: Text('Học phần',
-                                                  textAlign: TextAlign.center)),
+                                            flex: 5,
+                                            child: Text(
+                                              'Học phần',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                           Expanded(
-                                              flex: 1,
-                                              child: Text('Khóa',
-                                                  textAlign: TextAlign.center)),
+                                            flex: 1,
+                                            child: Text(
+                                              'Khóa',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    StreamBuilder(
-                                      stream: GV.traineesCol
-                                          .where('term',
-                                              isEqualTo: selectedHK.value)
-                                          .where('yearStart',
-                                              isEqualTo: selectedNH.value.start)
-                                          .where('yearEnd',
-                                              isEqualTo: selectedNH.value.end)
-                                          .snapshots(),
-                                      builder: (context, snapshot) {
-                                        final List<RegisterTraineeModel>
-                                            dstttt = [];
-                                        if (snapshot.hasData &&
-                                            isLook.value &&
-                                            selectedHK.value.isNotEmpty &&
-                                            selectedNH.value.start.isNotEmpty &&
-                                            selectedNH.value.end.isNotEmpty &&
-                                            snapshot.connectionState ==
-                                                ConnectionState.active) {
-                                          snapshot.data?.docs
-                                              .forEach((element) {
-                                            dstttt.add(
-                                                RegisterTraineeModel.fromMap(
-                                                    element.data()));
-                                          });
-                                          return ListView.builder(
-                                            itemCount: dstttt.length,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) {
-                                              return Container(
-                                                decoration:
-                                                    const BoxDecoration(),
-                                                height: screenHeight * 0.04,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: Text(
-                                                          '${index + 1}',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Text(
-                                                          dstttt[index]
-                                                              .userId!
-                                                              .toUpperCase(),
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 4,
-                                                      child: Text(
-                                                          dstttt[index]
-                                                              .studentName!,
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 5,
-                                                      child: Text(
-                                                          '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: Text(
-                                                          dstttt[index].course!,
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
+                                    isLook.value &&
+                                            currentUser.isCompleted.isTrue &&
+                                            selectedHK.isNotEmpty &&
+                                            selectedNH.start.isNotEmpty &&
+                                            selectedNH.end.isNotEmpty
+                                        ? StreamBuilder(
+                                            stream: firestore
+                                                .collection('trainees')
+                                                .where('term',
+                                                    isEqualTo: selectedHK)
+                                                .where('yearStart',
+                                                    isEqualTo: selectedNH.start)
+                                                .where('yearEnd',
+                                                    isEqualTo: selectedNH.end)
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              final List<RegisterTraineeModel>
+                                                  dstttt = [];
+                                              if (snapshot.hasData &&
+                                                  snapshot.connectionState ==
+                                                      ConnectionState.active) {
+                                                snapshot.data?.docs
+                                                    .forEach((element) {
+                                                  dstttt.add(
+                                                      RegisterTraineeModel
+                                                          .fromMap(
+                                                              element.data()));
+                                                });
+                                                return dstttt.isNotEmpty
+                                                    ? ListView.builder(
+                                                        itemCount:
+                                                            dstttt.length,
+                                                        shrinkWrap: true,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return Container(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.04,
+                                                            color:
+                                                                index % 2 == 0
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade50
+                                                                    : null,
+                                                            child: Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  flex: 1,
+                                                                  child: Text(
+                                                                      '${index + 1}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: Text(
+                                                                      dstttt[index]
+                                                                          .userId!
+                                                                          .toUpperCase(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 4,
+                                                                  child: Text(
+                                                                      dstttt[index]
+                                                                          .studentName!,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 5,
+                                                                  child: Text(
+                                                                      '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 1,
+                                                                  child: Text(
+                                                                      dstttt[index]
+                                                                          .course!,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 150),
+                                                        child: Center(
+                                                          child: Text(
+                                                              'Chưa có sinh viên đăng ký.'),
+                                                        ),
+                                                      );
+                                              } else {
+                                                return const Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 150),
+                                                  child: Loading(),
+                                                );
+                                              }
                                             },
-                                          );
-                                        } else if (isLook.value &&
-                                            snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                          return const Loading();
-                                        }
-                                        return SizedBox();
-                                      },
-                                    ),
+                                          )
+                                        : selectedHK.isEmpty &&
+                                                selectedNH.start.isEmpty &&
+                                                selectedNH.end.isEmpty
+                                            ? StreamBuilder(
+                                                stream: firestore
+                                                    .collection('trainees')
+                                                    .snapshots(),
+                                                builder: (context, snapshot) {
+                                                  List<RegisterTraineeModel>
+                                                      dstttt = [];
+                                                  if (snapshot.hasData &&
+                                                      snapshot.connectionState ==
+                                                          ConnectionState
+                                                              .active) {
+                                                    snapshot.data?.docs
+                                                        .forEach((element) {
+                                                      dstttt.add(
+                                                          RegisterTraineeModel
+                                                              .fromMap(element
+                                                                  .data()));
+                                                    });
+                                                    return dstttt.isNotEmpty
+                                                        ? ListView.builder(
+                                                            itemCount:
+                                                                dstttt.length,
+                                                            shrinkWrap: true,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return Container(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.04,
+                                                                color: index %
+                                                                            2 ==
+                                                                        0
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade50
+                                                                    : null,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      flex: 1,
+                                                                      child: Text(
+                                                                          '${index + 1}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          dstttt[index]
+                                                                              .userId!
+                                                                              .toUpperCase(),
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 4,
+                                                                      child: Text(
+                                                                          dstttt[index]
+                                                                              .studentName!,
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 5,
+                                                                      child: Text(
+                                                                          '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 1,
+                                                                      child: Text(
+                                                                          dstttt[index]
+                                                                              .course!,
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 150),
+                                                            child: Center(
+                                                              child: Text(
+                                                                  'Chưa có sinh viên đăng ký.'),
+                                                            ),
+                                                          );
+                                                  } else {
+                                                    return const Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 150),
+                                                      child: Loading(),
+                                                    );
+                                                  }
+                                                },
+                                              )
+                                            : const Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 150),
+                                                child: Center(
+                                                  child: Text(
+                                                      'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                                ),
+                                              ),
                                   ],
                                 ),
                               ),

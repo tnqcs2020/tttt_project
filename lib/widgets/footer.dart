@@ -8,8 +8,8 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.14,
-      padding: const EdgeInsets.only(top: 20),
+      height: screenHeight * 0.17,
+      padding: const EdgeInsets.only(top: 20, bottom: 20),
       child: const Column(
         children: [
           CustomDivider(

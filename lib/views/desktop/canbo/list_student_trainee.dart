@@ -1886,7 +1886,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                             }
                           },
                         )
-                      : const SizedBox.shrink(),
+                      : const Padding(
+                          padding: EdgeInsets.only(top: 150),
+                          child: Center(
+                            child:
+                                Text('Vui lòng nhấn vào nút xem để tiếp tục.'),
+                          ),
+                        ),
             ],
           );
         });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
+import 'dart:html' as html;
 
 class Announcement extends StatefulWidget {
   const Announcement({
@@ -57,7 +58,9 @@ class _AnnouncementState extends State<Announcement> {
               return Column(
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      html.window.open('/#/tin-tuc', "_blank");
+                    },
                     child: Text("Tin Tức $index"),
                   ),
                   const Divider(
@@ -71,5 +74,9 @@ class _AnnouncementState extends State<Announcement> {
         ],
       ),
     );
+  }
+
+  openInANewTab(url) {
+    html.window.open(url, 'PlaceholderName');
   }
 }

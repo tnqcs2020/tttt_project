@@ -10,14 +10,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 
-class ManageCreditScreen extends StatefulWidget {
-  const ManageCreditScreen({Key? key}) : super(key: key);
+class ManageTimeScreen extends StatefulWidget {
+  const ManageTimeScreen({Key? key}) : super(key: key);
 
   @override
-  State<ManageCreditScreen> createState() => _ManageCreditScreenState();
+  State<ManageTimeScreen> createState() => _ManageTimeScreenState();
 }
 
-class _ManageCreditScreenState extends State<ManageCreditScreen> {
+class _ManageTimeScreenState extends State<ManageTimeScreen> {
   final currentUser = Get.put(UserController());
 
   @override
@@ -119,7 +119,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Quản lý học phần",
+                                  "Quản lý các mốc thời gian thực tập",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),

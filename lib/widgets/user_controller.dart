@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/models/firm_model.dart';
+import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
 
 class UserController extends GetxController {
@@ -31,6 +32,8 @@ class UserController extends GetxController {
       DateTimeRange(start: DateTime.now(), end: DateTime.now()).obs;
   RxBool isCompleted = false.obs;
   RxInt selected = 999.obs;
+  RxString selectedString = ''.obs;
+  RxList<FileModel> selectedFiles = RxList();
 
   setCurrentUser({
     String? setUid,
