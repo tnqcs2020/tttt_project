@@ -8,7 +8,7 @@ import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/work_model.dart';
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
@@ -191,11 +191,10 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                         title: Container(
                                                           color: Colors
                                                               .blue.shade600,
-                                                          height: 50,
+                                                          height: screenHeight * 0.06,
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
-                                                                  vertical: 10,
                                                                   horizontal:
                                                                       10),
                                                           child: Row(
@@ -486,7 +485,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                         final cbhdName =
                                                                             UserModel.fromMap(loadCBHD.data()!).userName;
                                                                         final plan =
-                                                                            PlanModel(
+                                                                            PlanWorkModel(
                                                                           cbhdId:
                                                                               firm.firmId,
                                                                           cbhdName:

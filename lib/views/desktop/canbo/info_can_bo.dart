@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
@@ -44,7 +43,10 @@ class _InfoCBState extends State<InfoCB> {
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
@@ -112,7 +114,7 @@ class _InfoCBState extends State<InfoCB> {
               child: Column(
                 children: [
                   LineDetail(
-                    field: "Mã cbhd",
+                    field: "Mã cán bộ",
                     display: currentUser.userId.value.toUpperCase(),
                   )
                 ],
@@ -163,11 +165,13 @@ class _InfoCBState extends State<InfoCB> {
                       setEmail: emailCBCtrl.text,
                       setPhone: phoneCBCtrl.text,
                     );
-                    EasyLoading.showSuccess('Thay đổi thành công!');
+                    GV.success(
+                        context: context, message: 'Thay đổi thành công!');
                   } else if (nameCBCtrl.text == currentUser.userName.value &&
                       phoneCBCtrl.text == currentUser.phone.value &&
                       emailCBCtrl.text == currentUser.email.value) {
-                    EasyLoading.showError('Không có gì thay đổi!');
+                    GV.error(
+                        context: context, message: 'Không có gì thay đổi!');
                   }
                 },
               ),

@@ -27,14 +27,8 @@ class ListTraineeScreen extends StatefulWidget {
 class _ListTraineeScreenState extends State<ListTraineeScreen> {
   final firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
-  List<String> dshk = [
-    HocKy.hk1,
-    HocKy.hk2,
-    HocKy.hk3,
-  ];
-  List<NamHoc> dsnh = [NamHoc.n2021, NamHoc.n2122, NamHoc.n2223, NamHoc.n2324];
-  String selectedHK = '';
-  NamHoc selectedNH = NamHoc(start: "", end: "");
+  String selectedHK = HocKy.empty;
+  NamHoc selectedNH = NamHoc.empty;
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
   @override
   void initState() {
@@ -110,7 +104,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                   Expanded(
                     child: Container(
                       constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.7),
+                          BoxConstraints(minHeight: screenHeight * 0.67),
                       decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           border: Border.all(
@@ -124,7 +118,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                           return Column(
                             children: [
                               Container(
-                                height: 35,
+                                height: screenHeight * 0.05,
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade600,
                                   borderRadius: const BorderRadius.only(
@@ -179,7 +173,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                         TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                items: dshk
+                                                items: dshkAll
                                                     .map((String hk) =>
                                                         DropdownMenuItem<
                                                             String>(
@@ -247,13 +241,15 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                         TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                items: dsnh
+                                                items: dsnhAll
                                                     .map((NamHoc nh) =>
                                                         DropdownMenuItem<
                                                             NamHoc>(
                                                           value: nh,
                                                           child: Text(
-                                                            "${nh.start} - ${nh.end}",
+                                                            nh.start == nh.end
+                                                                ? nh.start
+                                                                : "${nh.start} - ${nh.end}",
                                                             style: DropdownStyle
                                                                 .itemStyle,
                                                             overflow:
@@ -295,9 +291,8 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       width: screenWidth * 0.07,
                                       height: screenHeight * 0.06,
                                       onTap: () {
-                                        if (selectedHK.isNotEmpty &&
-                                            selectedNH.start.isNotEmpty &&
-                                            selectedNH.end.isNotEmpty) {
+                                        if (selectedHK != HocKy.empty &&
+                                            selectedNH != NamHoc.empty) {
                                           setState(() {
                                             isLook.value = true;
                                           });
@@ -308,7 +303,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 35),
+                              const SizedBox(height: 20),
                               Container(
                                 decoration:
                                     const BoxDecoration(color: Colors.white),
@@ -369,232 +364,257 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                         ],
                                       ),
                                     ),
-                                    isLook.value &&
-                                            currentUser.isCompleted.isTrue &&
-                                            selectedHK.isNotEmpty &&
-                                            selectedNH.start.isNotEmpty &&
-                                            selectedNH.end.isNotEmpty
-                                        ? StreamBuilder(
-                                            stream: firestore
-                                                .collection('trainees')
-                                                .where('term',
-                                                    isEqualTo: selectedHK)
-                                                .where('yearStart',
-                                                    isEqualTo: selectedNH.start)
-                                                .where('yearEnd',
-                                                    isEqualTo: selectedNH.end)
-                                                .snapshots(),
-                                            builder: (context, snapshot) {
-                                              final List<RegisterTraineeModel>
-                                                  dstttt = [];
-                                              if (snapshot.hasData &&
-                                                  snapshot.connectionState ==
-                                                      ConnectionState.active) {
-                                                snapshot.data?.docs
-                                                    .forEach((element) {
-                                                  dstttt.add(
-                                                      RegisterTraineeModel
-                                                          .fromMap(
-                                                              element.data()));
-                                                });
-                                                return dstttt.isNotEmpty
-                                                    ? ListView.builder(
-                                                        itemCount:
-                                                            dstttt.length,
-                                                        shrinkWrap: true,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          return Container(
-                                                            height:
-                                                                screenHeight *
-                                                                    0.04,
-                                                            color:
-                                                                index % 2 == 0
-                                                                    ? Colors
-                                                                        .blue
-                                                                        .shade50
-                                                                    : null,
-                                                            child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                  flex: 1,
-                                                                  child: Text(
-                                                                      '${index + 1}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 2,
-                                                                  child: Text(
-                                                                      dstttt[index]
-                                                                          .userId!
-                                                                          .toUpperCase(),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 4,
-                                                                  child: Text(
-                                                                      dstttt[index]
-                                                                          .studentName!,
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 5,
-                                                                  child: Text(
-                                                                      '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 1,
-                                                                  child: Text(
-                                                                      dstttt[index]
-                                                                          .course!,
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      )
-                                                    : const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 150),
-                                                        child: Center(
+                                    Expanded(
+                                      child: isLook.value &&
+                                              currentUser.isCompleted.isTrue
+                                          ? StreamBuilder(
+                                              stream: firestore
+                                                  .collection('trainees')
+                                                  .where('term',
+                                                      isEqualTo: selectedHK)
+                                                  .where('yearStart',
+                                                      isEqualTo:
+                                                          selectedNH.start)
+                                                  .where('yearEnd',
+                                                      isEqualTo: selectedNH.end)
+                                                  .snapshots(),
+                                              builder: (context, snapshot) {
+                                                List<RegisterTraineeModel>
+                                                    loadTrainee = [];
+                                                List<RegisterTraineeModel>
+                                                    dstttt = [];
+                                                if (snapshot.hasData &&
+                                                    snapshot.connectionState ==
+                                                        ConnectionState
+                                                            .active) {
+                                                  snapshot.data?.docs
+                                                      .forEach((element) {
+                                                    loadTrainee.add(
+                                                        RegisterTraineeModel
+                                                            .fromMap(element
+                                                                .data()));
+                                                  });
+                                                  if (selectedHK ==
+                                                          HocKy.tatca &&
+                                                      selectedNH ==
+                                                          NamHoc.tatca) {
+                                                    loadTrainee.forEach((e) {
+                                                      dstttt.add(e);
+                                                    });
+                                                  } else if (selectedHK ==
+                                                      HocKy.tatca) {
+                                                    loadTrainee.forEach((e) {
+                                                      if (e.yearStart ==
+                                                          selectedNH.start) {
+                                                        dstttt.add(e);
+                                                      }
+                                                    });
+                                                  } else if (selectedNH ==
+                                                      NamHoc.tatca) {
+                                                    loadTrainee.forEach((e) {
+                                                      if (e.term ==
+                                                          selectedHK) {
+                                                        dstttt.add(e);
+                                                      }
+                                                    });
+                                                  } else {
+                                                    loadTrainee.forEach((e) {
+                                                      if (e.term ==
+                                                              selectedHK &&
+                                                          e.yearStart ==
+                                                              selectedNH
+                                                                  .start) {
+                                                        dstttt.add(e);
+                                                      }
+                                                    });
+                                                  }
+                                                  dstttt.sort(
+                                                    (a, b) => a.userId!
+                                                        .compareTo(b.userId!),
+                                                  );
+                                                  return dstttt.isNotEmpty
+                                                      ? ListView.builder(
+                                                          itemCount:
+                                                              dstttt.length,
+                                                          shrinkWrap: true,
+                                                          scrollDirection:
+                                                              Axis.vertical,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Container(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.04,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                              child: Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                        '${index + 1}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                        dstttt[index]
+                                                                            .userId!
+                                                                            .toUpperCase(),
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 4,
+                                                                    child: Text(
+                                                                        dstttt[index]
+                                                                            .studentName!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 5,
+                                                                    child: Text(
+                                                                        '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                        dstttt[index]
+                                                                            .course!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          },
+                                                        )
+                                                      : const Center(
                                                           child: Text(
                                                               'Chưa có sinh viên đăng ký.'),
-                                                        ),
+                                                        );
+                                                } else {
+                                                  return const Center(
+                                                      child: Loading());
+                                                }
+                                              },
+                                            )
+                                          : selectedHK.isEmpty &&
+                                                  selectedNH.start.isEmpty &&
+                                                  selectedNH.end.isEmpty
+                                              ? StreamBuilder(
+                                                  stream: firestore
+                                                      .collection('trainees')
+                                                      .snapshots(),
+                                                  builder: (context, snapshot) {
+                                                    List<RegisterTraineeModel>
+                                                        dstttt = [];
+                                                    if (snapshot.hasData &&
+                                                        snapshot.connectionState ==
+                                                            ConnectionState
+                                                                .active) {
+                                                      snapshot.data?.docs
+                                                          .forEach((element) {
+                                                        dstttt.add(
+                                                            RegisterTraineeModel
+                                                                .fromMap(element
+                                                                    .data()));
+                                                      });
+                                                      dstttt.sort(
+                                                        (a, b) => a.userId!
+                                                            .compareTo(
+                                                                b.userId!),
                                                       );
-                                              } else {
-                                                return const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 150),
-                                                  child: Loading(),
-                                                );
-                                              }
-                                            },
-                                          )
-                                        : selectedHK.isEmpty &&
-                                                selectedNH.start.isEmpty &&
-                                                selectedNH.end.isEmpty
-                                            ? StreamBuilder(
-                                                stream: firestore
-                                                    .collection('trainees')
-                                                    .snapshots(),
-                                                builder: (context, snapshot) {
-                                                  List<RegisterTraineeModel>
-                                                      dstttt = [];
-                                                  if (snapshot.hasData &&
-                                                      snapshot.connectionState ==
-                                                          ConnectionState
-                                                              .active) {
-                                                    snapshot.data?.docs
-                                                        .forEach((element) {
-                                                      dstttt.add(
-                                                          RegisterTraineeModel
-                                                              .fromMap(element
-                                                                  .data()));
-                                                    });
-                                                    return dstttt.isNotEmpty
-                                                        ? ListView.builder(
-                                                            itemCount:
-                                                                dstttt.length,
-                                                            shrinkWrap: true,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return Container(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.04,
-                                                                color: index %
-                                                                            2 ==
-                                                                        0
-                                                                    ? Colors
-                                                                        .blue
-                                                                        .shade50
-                                                                    : null,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      flex: 1,
-                                                                      child: Text(
-                                                                          '${index + 1}',
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 2,
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .userId!
-                                                                              .toUpperCase(),
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .studentName!,
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 5,
-                                                                      child: Text(
-                                                                          '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 1,
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .course!,
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            },
-                                                          )
-                                                        : const Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    top: 150),
-                                                            child: Center(
+                                                      return dstttt.isNotEmpty
+                                                          ? ListView.builder(
+                                                              itemCount:
+                                                                  dstttt.length,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Container(
+                                                                  height:
+                                                                      screenHeight *
+                                                                          0.04,
+                                                                  color: index %
+                                                                              2 ==
+                                                                          0
+                                                                      ? Colors
+                                                                          .blue
+                                                                          .shade50
+                                                                      : null,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        flex: 1,
+                                                                        child: Text(
+                                                                            '${index + 1}',
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 2,
+                                                                        child: Text(
+                                                                            dstttt[index]
+                                                                                .userId!
+                                                                                .toUpperCase(),
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 4,
+                                                                        child: Text(
+                                                                            dstttt[index]
+                                                                                .studentName!,
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 5,
+                                                                        child: Text(
+                                                                            '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 1,
+                                                                        child: Text(
+                                                                            dstttt[index]
+                                                                                .course!,
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                            )
+                                                          : const Center(
                                                               child: Text(
                                                                   'Chưa có sinh viên đăng ký.'),
-                                                            ),
-                                                          );
-                                                  } else {
-                                                    return const Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 150),
-                                                      child: Loading(),
-                                                    );
-                                                  }
-                                                },
-                                              )
-                                            : const Padding(
-                                                padding:
-                                                    EdgeInsets.only(top: 150),
-                                                child: Center(
+                                                            );
+                                                    } else {
+                                                      return const Center(
+                                                          child: Loading());
+                                                    }
+                                                  },
+                                                )
+                                              : const Center(
                                                   child: Text(
                                                       'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
                                                 ),
-                                              ),
+                                    )
                                   ],
                                 ),
                               ),

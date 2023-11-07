@@ -39,7 +39,10 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
@@ -93,7 +96,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                   Expanded(
                     child: Container(
                       constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.74),
+                          BoxConstraints(minHeight: screenHeight * 0.67),
                       decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           border: Border.all(
@@ -104,7 +107,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                       child: Column(
                         children: [
                           Container(
-                            height: 35,
+                            height: screenHeight * 0.05,
                             decoration: BoxDecoration(
                               color: Colors.blue.shade600,
                               borderRadius: const BorderRadius.only(

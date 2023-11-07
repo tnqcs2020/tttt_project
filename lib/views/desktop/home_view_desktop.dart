@@ -106,7 +106,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                   children: [
                                     Container(
                                       constraints: BoxConstraints(
-                                          minHeight: screenHeight * 0.35),
+                                          minHeight: screenHeight * 0.3),
                                       decoration: BoxDecoration(
                                           color: Colors.grey.shade100,
                                           border: Border.all(
@@ -121,7 +121,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                             children: [
                                               Expanded(
                                                 child: Container(
-                                                  height: 35,
+                                                  height: screenHeight * 0.05,
                                                   decoration: BoxDecoration(
                                                     color: Colors.blue.shade600,
                                                     borderRadius:
@@ -176,6 +176,8 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             listAnnouncement
                                                                 .length,
                                                         shrinkWrap: true,
+                                                        scrollDirection:
+                                                            Axis.vertical,
                                                         itemBuilder:
                                                             (context, index) {
                                                           return InkWell(
@@ -190,7 +192,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             child: Container(
                                                               height:
                                                                   screenHeight *
-                                                                      0.05,
+                                                                      0.04,
                                                               color: index %
                                                                           2 ==
                                                                       0
@@ -252,7 +254,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                     const SizedBox(height: 20),
                                     Container(
                                       constraints: BoxConstraints(
-                                          minHeight: screenHeight * 0.35),
+                                          minHeight: screenHeight * 0.3),
                                       decoration: BoxDecoration(
                                           color: Colors.grey.shade100,
                                           border: Border.all(
@@ -267,7 +269,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                             children: [
                                               Expanded(
                                                 child: Container(
-                                                  height: 35,
+                                                  height: screenHeight * 0.05,
                                                   decoration: BoxDecoration(
                                                     color: Colors.blue.shade600,
                                                     borderRadius:
@@ -403,7 +405,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                   children: [
                                     Container(
                                       constraints: BoxConstraints(
-                                          minHeight: screenHeight * 0.35),
+                                          minHeight: screenHeight * 0.55),
                                       decoration: BoxDecoration(
                                           color: Colors.grey.shade100,
                                           border: Border.all(
@@ -418,7 +420,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                             children: [
                                               Expanded(
                                                 child: Container(
-                                                  height: 35,
+                                                  height: screenHeight * 0.05,
                                                   decoration: BoxDecoration(
                                                     color: Colors.blue.shade600,
                                                     borderRadius:
@@ -463,11 +465,13 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             Text(
                                                               "Chi Tiết Tin",
                                                               style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18,
+                                                              ),
                                                             ),
                                                           ],
                                                         ),
@@ -489,19 +493,40 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                        'Tiêu đề: ${readAnnouncement.value.title} - ${GV.readTimestamp(readAnnouncement.value.createdAt!)}'),
+                                                      'Tiêu đề: ${readAnnouncement.value.title} - ${GV.readTimestamp(readAnnouncement.value.createdAt!)}',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 22,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                                 Row(
                                                   children: [
-                                                    Text(
-                                                        'Nội dung: ${readAnnouncement.value.content}'),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'Nội dung: ${readAnnouncement.value.content}',
+                                                        maxLines: 100,
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                        ),
+                                                        overflow:
+                                                            TextOverflow.clip,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                                 Row(
                                                   children: [
                                                     const Text(
-                                                        'Tệp đính kèm: '),
+                                                      'Tệp đính kèm: ',
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.clip,
+                                                    ),
                                                     Expanded(
                                                       child: Column(
                                                         children: [
@@ -533,7 +558,12 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                     color: Colors
                                                                         .blue
                                                                         .shade900,
+                                                                    fontSize:
+                                                                        18,
                                                                   ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .clip,
                                                                 ),
                                                               );
                                                             },

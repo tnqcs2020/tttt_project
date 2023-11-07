@@ -74,14 +74,10 @@ class _ManageTraineeState extends State<ManageTrainee> {
   List manageInfo = [
     'Danh sách đăng ký',
     'Danh sách thực tập',
-    'Phân công & theo dõi tiến độ',
-    'Đánh giá',
   ];
   List contentInfo = [
     const ListStudentRegis(),
     const ListStudentTrainee(),
-    const Text('td'),
-    const Text('dg')
   ];
 
   @override

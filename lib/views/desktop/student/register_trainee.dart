@@ -15,7 +15,7 @@ import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/work_model.dart';
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/footer.dart';
@@ -34,12 +34,6 @@ class RegisterTrainee extends StatefulWidget {
 class _RegisterTraineeState extends State<RegisterTrainee> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
-  List<String> dshk = [
-    HocKy.hk1,
-    HocKy.hk2,
-    HocKy.hk3,
-  ];
-  List<NamHoc> dsnh = [NamHoc.n2122, NamHoc.n2223, NamHoc.n2324];
   List<CreditModel> dshp = [];
   List<CreditModel> ds = [
     CreditModel(
@@ -52,8 +46,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     CreditModel(id: "CT476", name: "Thực tập thực tế - TT&MMT", course: '45'),
   ];
   CreditModel selectedHP = CreditModel(id: '', name: '', course: '');
-  String selectedHK = '';
-  NamHoc selectedNH = NamHoc(start: '', end: '');
+  String selectedHK = HocKy.empty;
+  NamHoc selectedNH = NamHoc.empty;
   int upperBound = 4;
   Set<int> reachedSteps = <int>{0, 1, 2, 3, 4};
   String? userId;
@@ -85,25 +79,23 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           await firestore.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
-        setState(() {
-          user = loadUser;
-        });
+
+        user = loadUser;
         DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
             await firestore.collection('submits').doc(userId).get();
         if (isExitSubmit.data() != null) {
           final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
-          setState(() {
-            files = loadSubmit.files ?? [];
-          });
+
+          files = loadSubmit.files ?? [];
         }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
           final loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
-          setState(() {
-            trainee = loadTrainee;
-          });
+
+          trainee = loadTrainee;
+
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
@@ -179,45 +171,45 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   children: [
                     MenuLeft(),
                     SizedBox(width: screenWidth * 0.03),
-                    Expanded(
-                        child: Container(
-                      constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.70),
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.1,
-                          ),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 35,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade600,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(5.0),
-                                topRight: Radius.circular(5.0),
+                    Obx(
+                      () => Expanded(
+                          child: Container(
+                        constraints:
+                            BoxConstraints(minHeight: screenHeight * 0.70),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade600,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(5.0),
+                                  topRight: Radius.circular(5.0),
+                                ),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Quản lý thực tập thực tế",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Quản lý thực tập thực tế",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                          currentUser.loadIn.isTrue
-                              ? Column(
-                                  children: [
-                                    Obx(
-                                      () => EasyStepper(
+                            currentUser.loadIn.isTrue
+                                ? Column(
+                                    children: [
+                                      EasyStepper(
                                         activeStep:
                                             currentUser.selectedStep.value,
                                         maxReachedStep:
@@ -364,33 +356,30 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                           });
                                         },
                                       ),
-                                    ),
-                                    const Divider(
-                                      thickness: 0.1,
-                                      height: 0,
-                                      color: Colors.black,
-                                    ),
-                                    Obx(
-                                      () => switch (
-                                          currentUser.selectedStep.value) {
+                                      const Divider(
+                                        thickness: 0.1,
+                                        height: 0,
+                                        color: Colors.black,
+                                      ),
+                                      switch (currentUser.selectedStep.value) {
                                         1 => _regisFirm(),
                                         2 => _trainee(),
                                         3 => _submit(),
                                         4 => _completed(),
-                                        _ => user.userId != null
+                                        _ => trainee.userId != null
                                             ? _infoCredit(trainee)
                                             : _regisCredit(),
                                       },
-                                    ),
-                                  ],
-                                )
-                              : const Padding(
-                                  padding: EdgeInsets.only(top: 200),
-                                  child: Loading(),
-                                ),
-                        ],
-                      ),
-                    )),
+                                    ],
+                                  )
+                                : const Padding(
+                                    padding: EdgeInsets.only(top: 200),
+                                    child: Loading(),
+                                  ),
+                          ],
+                        ),
+                      )),
+                    ),
                   ],
                 ),
               ),
@@ -493,7 +482,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                             ),
                           ))
                       .toList(),
-                  value: selectedHK.isNotEmpty ? selectedHK : null,
+                  value: selectedHK != HocKy.empty ? selectedHK : null,
                   onChanged: (value) {
                     setState(() {
                       selectedHK = value!;
@@ -542,10 +531,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                             ),
                           ))
                       .toList(),
-                  value:
-                      selectedNH.start.isNotEmpty && selectedNH.end.isNotEmpty
-                          ? selectedNH
-                          : null,
+                  value: selectedNH != NamHoc.empty ? selectedNH : null,
                   onChanged: (value) {
                     setState(() {
                       selectedNH = value!;
@@ -567,9 +553,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             onTap: () async {
               if (selectedHP.id.isNotEmpty &&
                   selectedHP.name.isNotEmpty &&
-                  selectedHK.isNotEmpty &&
-                  selectedNH.start.isNotEmpty &&
-                  selectedNH.end.isNotEmpty) {
+                  selectedHK != HocKy.empty &&
+                  selectedNH != NamHoc.empty) {
                 final registerTraineeModel = RegisterTraineeModel(
                   creditId: selectedHP.id,
                   term: selectedHK,
@@ -787,11 +772,11 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                   color: Colors
                                                                       .blue
                                                                       .shade600,
-                                                                  height: 50,
+                                                                  height:
+                                                                      screenHeight *
+                                                                          0.06,
                                                                   padding: const EdgeInsets
                                                                       .symmetric(
-                                                                      vertical:
-                                                                          10,
                                                                       horizontal:
                                                                           10),
                                                                   child: Row(
@@ -799,6 +784,10 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                         CrossAxisAlignment
                                                                             .center,
                                                                     children: [
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            30,
+                                                                      ),
                                                                       const Expanded(
                                                                         child: Text(
                                                                             'Chi tiết tuyển dụng',
@@ -806,17 +795,16 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                                 TextStyle(fontWeight: FontWeight.bold),
                                                                             textAlign: TextAlign.center),
                                                                       ),
-                                                                      IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom:
-                                                                                  1),
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          icon:
-                                                                              const Icon(Icons.close))
+                                                                      SizedBox(
+                                                                        width:
+                                                                            30,
+                                                                        child: IconButton(
+                                                                            padding: const EdgeInsets.only(bottom: 1),
+                                                                            onPressed: () {
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            icon: const Icon(Icons.close)),
+                                                                      )
                                                                     ],
                                                                   ),
                                                                 ),
@@ -878,7 +866,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                           UserModel.fromMap(loadCBHD.data()!)
                                                                               .userName;
                                                                       final plan =
-                                                                          PlanModel(
+                                                                          PlanWorkModel(
                                                                         cbhdId:
                                                                             firm.firmId,
                                                                         cbhdName:
@@ -1063,7 +1051,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           if (snapshotPlan.hasData &&
               snapshotPlan.data != null &&
               snapshotPlan.connectionState == ConnectionState.active) {
-            final plan = PlanModel.fromMap(snapshotPlan.data!.data()!);
+            final plan = PlanWorkModel.fromMap(snapshotPlan.data!.data()!);
             return Padding(
               padding: const EdgeInsets.only(top: 15),
               child: Column(
@@ -1321,11 +1309,11 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                       title: Container(
                                                         color: Colors
                                                             .blue.shade600,
-                                                        height: 50,
+                                                        height:
+                                                            screenHeight * 0.06,
                                                         padding:
                                                             const EdgeInsets
                                                                 .symmetric(
-                                                                vertical: 10,
                                                                 horizontal: 10),
                                                         child: const Row(
                                                           mainAxisAlignment:
@@ -1456,9 +1444,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                       AlertDialog(
                                         title: Container(
                                           color: Colors.blue.shade600,
-                                          height: 50,
+                                          height: screenHeight * 0.06,
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                              horizontal: 10),
                                           child: const Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,

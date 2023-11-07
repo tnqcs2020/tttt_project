@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/services.dart'; 
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
@@ -165,9 +166,12 @@ class _InfoFirmState extends State<InfoFirm> {
                       padding: const EdgeInsets.only(top: 15, bottom: 5),
                       child: const Text(
                         'Thông tin',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -181,6 +185,7 @@ class _InfoFirmState extends State<InfoFirm> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -194,6 +199,7 @@ class _InfoFirmState extends State<InfoFirm> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -208,6 +214,7 @@ class _InfoFirmState extends State<InfoFirm> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 15),
                     Container(
                       width: screenWidth * 0.5,
                       decoration: const BoxDecoration(
@@ -221,9 +228,12 @@ class _InfoFirmState extends State<InfoFirm> {
                       padding: const EdgeInsets.only(top: 15, bottom: 5),
                       child: const Text(
                         'Tuyển dụng',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    const SizedBox(height: 10),
                     ValueListenableBuilder(
                         valueListenable: totalJob,
                         builder: (context, vTotalJob, child) {
@@ -279,9 +289,8 @@ class _InfoFirmState extends State<InfoFirm> {
                                               color: Colors.red,
                                             )),
                                       ),
-                                      Container(
+                                      Padding(
                                         padding: const EdgeInsets.only(top: 15),
-                                        width: 50,
                                         child: IconButton(
                                             onPressed: () {
                                               setState(() {
@@ -372,12 +381,15 @@ class _InfoFirmState extends State<InfoFirm> {
                             GV.firmsCol
                                 .doc(currentUser.userId.value)
                                 .update(firmModel.toMap());
-                            EasyLoading.showSuccess('Cập nhật thành công!');
+                            GV.success(
+                                context: context,
+                                message: 'Cập nhật thành công!');
                           } else {
                             GV.firmsCol
                                 .doc(currentUser.userId.value)
                                 .set(firmModel.toMap());
-                            EasyLoading.showSuccess('Thêm thành công!');
+                            GV.success(
+                                context: context, message: 'Thêm thành công!');
                           }
                         },
                       ),
@@ -387,6 +399,9 @@ class _InfoFirmState extends State<InfoFirm> {
               );
             },
           )
-        : const Loading();
+        : const Padding(
+            padding: EdgeInsets.only(top: 180),
+            child: Center(child: Loading()),
+          );
   }
 }

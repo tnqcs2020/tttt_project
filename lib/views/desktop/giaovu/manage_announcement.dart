@@ -34,18 +34,10 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
   final currentUser = Get.put(UserController());
   final GlobalKey<FormState> addAnnouncementFormKey = GlobalKey<FormState>();
   List<String> type = [
+    "Tất cả",
     "Tin giáo vụ",
     "Tin việc làm",
   ];
-  List<String> dshk = [
-    HocKy.hk1,
-    HocKy.hk2,
-    HocKy.hk3,
-  ];
-  List<NamHoc> dsnh = [NamHoc.n2021, NamHoc.n2122, NamHoc.n2223, NamHoc.n2324];
-  ValueNotifier<String> selectedHK = ValueNotifier<String>('');
-  ValueNotifier<NamHoc> selectedNH =
-      ValueNotifier<NamHoc>(NamHoc(start: "", end: ""));
   ValueNotifier<String> selectedType = ValueNotifier<String>('');
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
   List<PlatformFile> fileSelect = [];
@@ -120,8 +112,6 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
         child: Column(
           children: [
             const Header(),
-            // Obx(
-            //   () =>
             Padding(
               padding: EdgeInsets.only(
                 top: screenHeight * 0.02,
@@ -151,7 +141,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: 35,
+                                  height: screenHeight * 0.05,
                                   decoration: BoxDecoration(
                                     color: Colors.blue.shade600,
                                     borderRadius: const BorderRadius.only(
@@ -202,7 +192,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                   isExpanded: true,
                                                   hint: Center(
                                                     child: Text(
-                                                      "Chọn",
+                                                      "Tất cả",
                                                       style: DropdownStyle
                                                           .hintStyle,
                                                       overflow:
@@ -281,7 +271,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(height: 35),
+                                const SizedBox(height: 20),
                                 Container(
                                   decoration:
                                       const BoxDecoration(color: Colors.white),
@@ -342,12 +332,11 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                           ? StreamBuilder(
                                               stream: firestore
                                                   .collection('announcements')
-                                                  .where('type',
-                                                      isEqualTo:
-                                                          selectedType.value)
                                                   .snapshots(),
                                               builder: (context, snapshot) {
-                                                final List<AnnouncementModel>
+                                                List<AnnouncementModel>
+                                                    loadAnnouncement = [];
+                                                List<AnnouncementModel>
                                                     listAnnouncement = [];
                                                 if (snapshot.hasData &&
                                                     selectedType
@@ -357,11 +346,28 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                             .active) {
                                                   snapshot.data?.docs
                                                       .forEach((element) {
-                                                    listAnnouncement.add(
+                                                    loadAnnouncement.add(
                                                         AnnouncementModel
                                                             .fromMap(element
                                                                 .data()));
                                                   });
+                                                  if (selectedType.value ==
+                                                      "Tất cả") {
+                                                    loadAnnouncement
+                                                        .forEach((element) {
+                                                      listAnnouncement
+                                                          .add(element);
+                                                    });
+                                                  } else {
+                                                    loadAnnouncement
+                                                        .forEach((element) {
+                                                      if (element.type ==
+                                                          selectedType.value) {
+                                                        listAnnouncement
+                                                            .add(element);
+                                                      }
+                                                    });
+                                                  }
                                                   return listAnnouncement
                                                           .isNotEmpty
                                                       ? ListView.builder(
@@ -439,7 +445,12 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                                               .only(
                                                                               bottom: 1),
                                                                           onPressed:
-                                                                              () {},
+                                                                              () async {
+                                                                            await deleteAnnouncement(
+                                                                              context: context,
+                                                                              announcement: listAnnouncement[index],
+                                                                            );
+                                                                          },
                                                                           icon:
                                                                               const Icon(
                                                                             Icons.delete_rounded,
@@ -629,7 +640,6 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                 ],
               ),
             ),
-            // ),
             const Footer(),
           ],
         ),
@@ -674,23 +684,28 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                   scrollable: true,
                   title: Container(
                     color: Colors.blue.shade600,
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    height: screenHeight * 0.06,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        const SizedBox(
+                          width: 30,
+                        ),
                         const Expanded(
                           child: Text('Chi tiết thông báo',
                               style: TextStyle(fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center),
                         ),
-                        IconButton(
-                            padding: const EdgeInsets.only(bottom: 1),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.close))
+                        SizedBox(
+                          width: 30,
+                          child: IconButton(
+                              padding: const EdgeInsets.only(bottom: 1),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close)),
+                        )
                       ],
                     ),
                   ),
@@ -815,10 +830,9 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                                               .blue
                                                                               .shade600,
                                                                           height:
-                                                                              50,
+                                                                              screenHeight * 0.06,
                                                                           padding: const EdgeInsets
                                                                               .symmetric(
-                                                                              vertical: 10,
                                                                               horizontal: 10),
                                                                           child:
                                                                               const Row(
@@ -1013,9 +1027,8 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                 AlertDialog(
                   title: Container(
                     color: Colors.blue.shade600,
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    height: screenHeight * 0.06,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -11,7 +11,7 @@ import 'package:tttt_project/models/appreciate_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/work_model.dart';
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
@@ -33,20 +33,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   String? userId;
   List<UserModel> loadUsers = [];
   UserModel user = UserModel();
-  String selectedHK = '';
-  NamHoc selectedNH = NamHoc(start: '', end: '');
-  List<String> dshk = [
-    HocKy.tatca,
-    HocKy.hk1,
-    HocKy.hk2,
-    HocKy.hk3,
-  ];
-  List<NamHoc> dsnh = [
-    NamHoc.tatca,
-    NamHoc.n2122,
-    NamHoc.n2223,
-    NamHoc.n2324,
-  ];
+  String selectedHK = HocKy.empty;
+  NamHoc selectedNH = NamHoc.empty;
   ValueNotifier<bool> isViewed = ValueNotifier(false);
   List<RegisterTraineeModel> trainees = [];
   List<TextEditingController> contents = [];
@@ -159,7 +147,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            items: dshk
+                            items: dshkAll
                                 .map((String hk) => DropdownMenuItem<String>(
                                       value: hk,
                                       child: Text(
@@ -169,7 +157,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                       ),
                                     ))
                                 .toList(),
-                            value: selectedHK.isNotEmpty ? selectedHK : null,
+                            value:
+                                selectedHK != HocKy.empty ? selectedHK : null,
                             onChanged: (value) {
                               setState(() {
                                 selectedHK = value!;
@@ -209,11 +198,11 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            items: dsnh
+                            items: dsnhAll
                                 .map((NamHoc nh) => DropdownMenuItem<NamHoc>(
                                       value: nh,
                                       child: Text(
-                                        nh.start == 'Tất cả'
+                                        nh.start == nh.end
                                             ? nh.start
                                             : "${nh.start} - ${nh.end}",
                                         style: DropdownStyle.itemStyle,
@@ -221,10 +210,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                       ),
                                     ))
                                 .toList(),
-                            value: selectedNH.start.isNotEmpty &&
-                                    selectedNH.end.isNotEmpty
-                                ? selectedNH
-                                : null,
+                            value:
+                                selectedNH != NamHoc.empty ? selectedNH : null,
                             onChanged: (value) {
                               setState(() {
                                 selectedNH = value!;
@@ -246,15 +233,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                         width: 100,
                         height: 45,
                         onTap: () {
-                          if (selectedHK.isEmpty) {
-                            GV.error(
-                                context: context,
-                                message: 'Bạn chưa chọn học kỳ');
-                          } else if (selectedNH.start.isEmpty) {
-                            GV.error(
-                                context: context,
-                                message: 'Bạn chưa chọn năm học');
-                          } else {
+                          if (selectedHK != HocKy.empty &&
+                              selectedNH != NamHoc.empty) {
                             setState(() {
                               isViewed.value = true;
                             });
@@ -342,15 +322,15 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                               .connectionState ==
                                                           ConnectionState
                                                               .active) {
-                                                    PlanModel plan =
-                                                        PlanModel();
-                                                    List<PlanModel> listPlan =
-                                                        [];
+                                                    PlanWorkModel plan =
+                                                        PlanWorkModel();
+                                                    List<PlanWorkModel>
+                                                        listPlan = [];
                                                     if (snapshotPlan.data!.docs
                                                         .isNotEmpty) {
-                                                      snapshotPlan.data!.docs
-                                                          .forEach((element) =>
-                                                              listPlan.add(PlanModel
+                                                      snapshotPlan.data!.docs.forEach(
+                                                          (element) => listPlan
+                                                              .add(PlanWorkModel
                                                                   .fromMap(element
                                                                       .data())));
                                                       listPlan
@@ -415,8 +395,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                     scrollable: true,
                                                                                     title: Container(
                                                                                       color: Colors.blue.shade600,
-                                                                                      height: 50,
-                                                                                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                                                      height: screenHeight * 0.06,
+                                                                                      padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                                       child: Row(
                                                                                         crossAxisAlignment: CrossAxisAlignment.center,
                                                                                         children: [
@@ -529,13 +509,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                           AlertDialog(
                                                                                             title: Container(
                                                                                               color: Colors.blue.shade600,
-                                                                                              height: 50,
-                                                                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                                                              height: screenHeight * 0.06,
+                                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                                               child: Row(
                                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                                                                 children: [
                                                                                                   const SizedBox(
-                                                                                                    width: 45,
+                                                                                                    width: 30,
                                                                                                   ),
                                                                                                   const Expanded(
                                                                                                     child: Text(
@@ -545,7 +525,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(
-                                                                                                    width: 45,
+                                                                                                    width: 30,
                                                                                                     child: IconButton(
                                                                                                         padding: const EdgeInsets.only(bottom: 1),
                                                                                                         onPressed: () {
@@ -768,13 +748,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                           AlertDialog(
                                                                                             title: Container(
                                                                                               color: Colors.blue.shade600,
-                                                                                              height: 50,
-                                                                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                                                              height: screenHeight * 0.06,
+                                                                                              padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                                               child: Row(
                                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                                                                 children: [
                                                                                                   const SizedBox(
-                                                                                                    width: 45,
+                                                                                                    width: 30,
                                                                                                   ),
                                                                                                   const Expanded(
                                                                                                     child: Text(
@@ -784,7 +764,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                                     ),
                                                                                                   ),
                                                                                                   SizedBox(
-                                                                                                    width: 45,
+                                                                                                    width: 30,
                                                                                                     child: IconButton(
                                                                                                         padding: const EdgeInsets.only(bottom: 1),
                                                                                                         onPressed: () {
@@ -1082,7 +1062,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                         }
                       },
                     )
-                  : selectedHK == '' && selectedNH.start == ''
+                  : selectedHK == HocKy.empty && selectedNH == NamHoc.empty
                       ? StreamBuilder(
                           stream: firestore.collection('firms').snapshots(),
                           builder: (context, snapshotFirm) {
@@ -1143,9 +1123,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                   .connectionState ==
                                                               ConnectionState
                                                                   .active) {
-                                                        PlanModel plan =
-                                                            PlanModel();
-                                                        List<PlanModel>
+                                                        PlanWorkModel plan =
+                                                            PlanWorkModel();
+                                                        List<PlanWorkModel>
                                                             listPlan = [];
                                                         if (snapshotPlan.data!
                                                             .docs.isNotEmpty) {
@@ -1153,7 +1133,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                               .data!.docs
                                                               .forEach((element) =>
                                                                   listPlan.add(
-                                                                      PlanModel.fromMap(
+                                                                      PlanWorkModel.fromMap(
                                                                           element
                                                                               .data())));
                                                           listPlan.forEach(
@@ -1227,8 +1207,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                         scrollable: true,
                                                                                         title: Container(
                                                                                           color: Colors.blue.shade600,
-                                                                                          height: 50,
-                                                                                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                                                          height: screenHeight * 0.06,
+                                                                                          padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                                           child: Row(
                                                                                             crossAxisAlignment: CrossAxisAlignment.center,
                                                                                             children: [
@@ -1575,13 +1555,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                               AlertDialog(
                                                                                                 title: Container(
                                                                                                   color: Colors.blue.shade600,
-                                                                                                  height: 50,
-                                                                                                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                                                                                  height: screenHeight * 0.06,
+                                                                                                  padding: const EdgeInsets.symmetric(horizontal: 10),
                                                                                                   child: Row(
                                                                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                                                                     children: [
                                                                                                       const SizedBox(
-                                                                                                        width: 45,
+                                                                                                        width: 30,
                                                                                                       ),
                                                                                                       const Expanded(
                                                                                                         child: Text(
@@ -1591,7 +1571,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                                         ),
                                                                                                       ),
                                                                                                       SizedBox(
-                                                                                                        width: 45,
+                                                                                                        width: 30,
                                                                                                         child: IconButton(
                                                                                                             padding: const EdgeInsets.only(bottom: 1),
                                                                                                             onPressed: () {

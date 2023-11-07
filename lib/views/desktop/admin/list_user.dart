@@ -25,13 +25,7 @@ class ListUserScreen extends StatefulWidget {
 class _ListUserScreenState extends State<ListUserScreen> {
   final firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
-  List<String> dsnd = [
-    NguoiDung.giaovu,
-    NguoiDung.covan,
-    NguoiDung.cbhd,
-    NguoiDung.sinhvien,
-  ];
-  ValueNotifier<String> selectedND = ValueNotifier<String>('');
+  ValueNotifier<String> selectedND = ValueNotifier<String>(NguoiDung.empty);
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
   @override
   void initState() {
@@ -177,7 +171,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                         TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                items: dsnd
+                                                items: dsndAll
                                                     .map((String nd) =>
                                                         DropdownMenuItem<
                                                             String>(
@@ -192,10 +186,10 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                           ),
                                                         ))
                                                     .toList(),
-                                                value:
-                                                    selectedND.value.isNotEmpty
-                                                        ? selectedND.value
-                                                        : null,
+                                                value: selectedND.value !=
+                                                        NguoiDung.empty
+                                                    ? selectedND.value
+                                                    : null,
                                                 onChanged: (value) {
                                                   setState(() {
                                                     selectedND.value = value!;
@@ -234,7 +228,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 35),
+                              const SizedBox(height: 20),
                               Container(
                                 decoration:
                                     const BoxDecoration(color: Colors.white),
@@ -244,10 +238,10 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                   children: [
                                     Container(
                                       color: Colors.green,
-                                      height: screenHeight * 0.04,
-                                      child: Row(
+                                      height: screenHeight * 0.035,
+                                      child: const Row(
                                         children: [
-                                          const Expanded(
+                                          Expanded(
                                             flex: 1,
                                             child: Text(
                                               'STT',
@@ -256,7 +250,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
-                                          const Expanded(
+                                          Expanded(
                                             flex: 2,
                                             child: Text(
                                               'MSSV',
@@ -265,8 +259,8 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
-                                          const Expanded(
-                                            flex: 4,
+                                          Expanded(
+                                            flex: 3,
                                             child: Text(
                                               'Họ tên',
                                               textAlign: TextAlign.center,
@@ -275,21 +269,9 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 5,
+                                            flex: 3,
                                             child: Text(
-                                              selectedND.value ==
-                                                      NguoiDung.covan
-                                                  ? 'Lớp cố vấn'
-                                                  : 'Lớp',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          const Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                              'Khóa',
+                                              'Email',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold),
@@ -298,241 +280,213 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                         ],
                                       ),
                                     ),
-                                    isLook.value &&
-                                            currentUser.isCompleted.isTrue &&
-                                            selectedND.value.isNotEmpty
-                                        ? StreamBuilder(
-                                            stream: firestore
-                                                .collection('users')
-                                                .where('group',
-                                                    isEqualTo: selectedND.value)
-                                                .snapshots(),
-                                            builder: (context, snapshot) {
-                                              List<UserModel> listUser = [];
-                                              if (snapshot.hasData &&
-                                                  snapshot.connectionState ==
-                                                      ConnectionState.active) {
-                                                snapshot.data?.docs
-                                                    .forEach((element) {
-                                                  listUser.add(
-                                                      UserModel.fromMap(
-                                                          element.data()));
-                                                });
-                                                return listUser.isNotEmpty
-                                                    ? ListView.builder(
-                                                        itemCount:
-                                                            listUser.length,
-                                                        shrinkWrap: true,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          return Container(
-                                                            height:
-                                                                screenHeight *
-                                                                    0.04,
-                                                            color:
-                                                                index % 2 == 0
-                                                                    ? Colors
-                                                                        .blue
-                                                                        .shade50
-                                                                    : null,
-                                                            child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                  flex: 1,
-                                                                  child: Text(
-                                                                      '${index + 1}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 2,
-                                                                  child: Text(
-                                                                      listUser[
-                                                                              index]
-                                                                          .userId!
-                                                                          .toUpperCase(),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 4,
-                                                                  child: Text(
-                                                                      listUser[
-                                                                              index]
-                                                                          .userName!,
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 5,
-                                                                  child: Text(
-                                                                      selectedND.value ==
-                                                                              NguoiDung
-                                                                                  .covan
-                                                                          ? '${listUser[index].cvClass!.last.classId} - ${listUser[index].cvClass!.last.className}'
-                                                                          : '${listUser[index].classId} - ${listUser[index].className}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 1,
-                                                                  child: Text(
-                                                                      selectedND.value == NguoiDung.sinhvien &&
-                                                                              listUser[index].course !=
-                                                                                  null
-                                                                          ? listUser[index]
-                                                                              .course!
-                                                                          : selectedND.value == NguoiDung.covan &&
-                                                                                  listUser[index].cvClass!.last.course !=
-                                                                                      ""
-                                                                              ? '${listUser[index].cvClass!.last.course}'
-                                                                              : '-',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      )
-                                                    : const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 150),
-                                                        child: Center(
+                                    Expanded(
+                                      child: isLook.value &&
+                                              currentUser.isCompleted.isTrue
+                                          ? StreamBuilder(
+                                              stream: firestore
+                                                  .collection('users')
+                                                  .snapshots(),
+                                              builder: (context, snapshot) {
+                                                List<UserModel> loadUser = [];
+                                                List<UserModel> listUser = [];
+                                                if (snapshot.hasData &&
+                                                    snapshot.connectionState ==
+                                                        ConnectionState
+                                                            .active) {
+                                                  snapshot.data?.docs
+                                                      .forEach((element) {
+                                                    loadUser.add(
+                                                        UserModel.fromMap(
+                                                            element.data()));
+                                                  });
+                                                  if (selectedND.value ==
+                                                      NguoiDung.tatca) {
+                                                    loadUser.forEach((element) {
+                                                      listUser.add(element);
+                                                    });
+                                                  } else {
+                                                    loadUser.forEach((element) {
+                                                      if (element.group ==
+                                                          selectedND.value) {
+                                                        listUser.add(element);
+                                                      }
+                                                    });
+                                                  }
+                                                  listUser.sort(
+                                                    (a, b) => a.userId!
+                                                        .compareTo(b.userId!),
+                                                  );
+                                                  return listUser.isNotEmpty
+                                                      ? ListView.builder(
+                                                          itemCount:
+                                                              listUser.length,
+                                                          shrinkWrap: true,
+                                                          scrollDirection:
+                                                              Axis.vertical,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Container(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.04,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                              child: Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                        '${index + 1}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                        listUser[index]
+                                                                            .userId!
+                                                                            .toUpperCase(),
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child: Text(
+                                                                        listUser[index]
+                                                                            .userName!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child: Text(
+                                                                        listUser[index].email!.isNotEmpty
+                                                                            ? '${listUser[index].email}'
+                                                                            : "-",
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          },
+                                                        )
+                                                      : const Center(
                                                           child: Text(
                                                               'Chưa có thông báo.'),
-                                                        ),
+                                                        );
+                                                } else {
+                                                  return const Center(
+                                                      child: Loading());
+                                                }
+                                              },
+                                            )
+                                          : selectedND.value.isEmpty
+                                              ? StreamBuilder(
+                                                  stream: firestore
+                                                      .collection('users')
+                                                      .snapshots(),
+                                                  builder: (context, snapshot) {
+                                                    List<UserModel> listUser =
+                                                        [];
+                                                    if (snapshot.hasData &&
+                                                        snapshot.connectionState ==
+                                                            ConnectionState
+                                                                .active) {
+                                                      snapshot.data?.docs
+                                                          .forEach((element) {
+                                                        listUser.add(
+                                                            UserModel.fromMap(
+                                                                element
+                                                                    .data()));
+                                                      });
+                                                      listUser.sort(
+                                                        (a, b) => a.userId!
+                                                            .compareTo(
+                                                                b.userId!),
                                                       );
-                                              } else {
-                                                return const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 150),
-                                                  child: Loading(),
-                                                );
-                                              }
-                                            },
-                                          )
-                                        : selectedND.value.isEmpty
-                                            ? StreamBuilder(
-                                                stream: firestore
-                                                    .collection('users')
-                                                    .snapshots(),
-                                                builder: (context, snapshot) {
-                                                  List<UserModel> listUser = [];
-                                                  if (snapshot.hasData &&
-                                                      isLook.value &&
-                                                      selectedND
-                                                          .value.isNotEmpty &&
-                                                      snapshot.connectionState ==
-                                                          ConnectionState
-                                                              .active) {
-                                                    snapshot.data?.docs
-                                                        .forEach((element) {
-                                                      listUser.add(
-                                                          UserModel.fromMap(
-                                                              element.data()));
-                                                    });
-                                                    return listUser.isNotEmpty
-                                                        ? ListView.builder(
-                                                            itemCount:
-                                                                listUser.length,
-                                                            shrinkWrap: true,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return Container(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.04,
-                                                                color: index %
-                                                                            2 ==
-                                                                        0
-                                                                    ? Colors
-                                                                        .blue
-                                                                        .shade50
-                                                                    : null,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      flex: 1,
-                                                                      child: Text(
-                                                                          '${index + 1}',
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 2,
-                                                                      child: Text(
-                                                                          listUser[index]
-                                                                              .userId!
-                                                                              .toUpperCase(),
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child: Text(
-                                                                          listUser[index]
-                                                                              .userName!,
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 5,
-                                                                      child: Text(
-                                                                          selectedND.value == NguoiDung.covan
-                                                                              ? '${listUser[index].cvClass!.last.classId} - ${listUser[index].cvClass!.last.className}'
-                                                                              : '${listUser[index].classId} - ${listUser[index].className}',
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 1,
-                                                                      child: Text(
-                                                                          selectedND.value == NguoiDung.sinhvien && listUser[index].course != null
-                                                                              ? listUser[index].course!
-                                                                              : selectedND.value == NguoiDung.covan && listUser[index].cvClass!.last.course != ""
-                                                                                  ? '${listUser[index].cvClass!.last.course}'
-                                                                                  : '-',
-                                                                          textAlign: TextAlign.center),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            },
-                                                          )
-                                                        : const Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    top: 150),
-                                                            child: Center(
+                                                      return listUser.isNotEmpty
+                                                          ? ListView.builder(
+                                                              itemCount:
+                                                                  listUser
+                                                                      .length,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Container(
+                                                                  height:
+                                                                      screenHeight *
+                                                                          0.035,
+                                                                  color: index %
+                                                                              2 ==
+                                                                          0
+                                                                      ? Colors
+                                                                          .blue
+                                                                          .shade50
+                                                                      : null,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        flex: 1,
+                                                                        child: Text(
+                                                                            '${index + 1}',
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 2,
+                                                                        child: Text(
+                                                                            listUser[index]
+                                                                                .userId!
+                                                                                .toUpperCase(),
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 3,
+                                                                        child: Text(
+                                                                            listUser[index]
+                                                                                .userName!,
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 3,
+                                                                        child: Text(
+                                                                            listUser[index].email!.isNotEmpty
+                                                                                ? '${listUser[index].email}'
+                                                                                : "-",
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              },
+                                                            )
+                                                          : const Center(
                                                               child: Text(
                                                                   'Chưa có thông báo.'),
-                                                            ),
-                                                          );
-                                                  } else {
-                                                    return const Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 150),
-                                                      child: Loading(),
-                                                    );
-                                                  }
-                                                },
-                                              )
-                                            : const Padding(
-                                                padding:
-                                                    EdgeInsets.only(top: 150),
-                                                child: Center(
+                                                            );
+                                                    } else {
+                                                      return const Center(
+                                                          child: Loading());
+                                                    }
+                                                  },
+                                                )
+                                              : const Center(
                                                   child: Text(
                                                       'Vui lòng nhấn vào nút xem để tiếp tục.'),
                                                 ),
-                                              ),
+                                    )
                                   ],
                                 ),
                               ),

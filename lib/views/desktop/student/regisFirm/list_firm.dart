@@ -9,7 +9,7 @@ import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/work_model.dart';
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/loading.dart';
@@ -282,16 +282,19 @@ class _ListFirmState extends State<ListFirm> {
                                                     title: Container(
                                                       color:
                                                           Colors.blue.shade600,
-                                                      height: 50,
+                                                      height:
+                                                          screenHeight * 0.06,
                                                       padding: const EdgeInsets
                                                           .symmetric(
-                                                          vertical: 10,
                                                           horizontal: 10),
                                                       child: Row(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
                                                                 .center,
                                                         children: [
+                                                          const SizedBox(
+                                                            width: 30,
+                                                          ),
                                                           const Expanded(
                                                             child: Text(
                                                                 'Chi tiết tuyển dụng',
@@ -303,18 +306,22 @@ class _ListFirmState extends State<ListFirm> {
                                                                     TextAlign
                                                                         .center),
                                                           ),
-                                                          IconButton(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          1),
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              icon: const Icon(
-                                                                  Icons.close))
+                                                          SizedBox(
+                                                            width: 30,
+                                                            child: IconButton(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        bottom:
+                                                                            1),
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                icon: const Icon(
+                                                                    Icons
+                                                                        .close)),
+                                                          )
                                                         ],
                                                       ),
                                                     ),
@@ -481,8 +488,8 @@ class _ListFirmState extends State<ListFirm> {
                                                               ),
                                                               onPressed:
                                                                   () async {
-                                                                if (isRegistered
-                                                                    == true) {
+                                                                if (isRegistered ==
+                                                                    true) {
                                                                   if (firmResult[
                                                                           indexFirm]
                                                                       .listRegis!
@@ -735,7 +742,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                         UserModel.fromMap(loadCBHD.data()!)
                                                                             .userName;
                                                                     final plan =
-                                                                        PlanModel(
+                                                                        PlanWorkModel(
                                                                       cbhdId: firmResult[
                                                                               indexFirm]
                                                                           .firmId,
@@ -980,16 +987,18 @@ class _ListFirmState extends State<ListFirm> {
                                                 scrollable: true,
                                                 title: Container(
                                                   color: Colors.blue.shade600,
-                                                  height: 50,
+                                                  height: screenHeight * 0.06,
                                                   padding: const EdgeInsets
                                                       .symmetric(
-                                                      vertical: 10,
                                                       horizontal: 10),
                                                   child: Row(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .center,
                                                     children: [
+                                                      const SizedBox(
+                                                        width: 30,
+                                                      ),
                                                       const Expanded(
                                                         child: Text(
                                                             'Chi tiết tuyển dụng',
@@ -1000,17 +1009,20 @@ class _ListFirmState extends State<ListFirm> {
                                                             textAlign: TextAlign
                                                                 .center),
                                                       ),
-                                                      IconButton(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  bottom: 1),
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          icon: const Icon(
-                                                              Icons.close))
+                                                      SizedBox(
+                                                        width: 30,
+                                                        child: IconButton(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    bottom: 1),
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            icon: const Icon(
+                                                                Icons.close)),
+                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -1169,8 +1181,8 @@ class _ListFirmState extends State<ListFirm> {
                                                             ),
                                                           ),
                                                           onPressed: () async {
-                                                            if (isRegistered
-                                                                == true) {
+                                                            if (isRegistered ==
+                                                                true) {
                                                               if (firms[
                                                                       indexFirm]
                                                                   .listRegis!
@@ -1347,10 +1359,9 @@ class _ListFirmState extends State<ListFirm> {
                                                                         .selectedJob
                                                                         .value
                                                                         .jobId,
-                                                                    userName:
-                                                                        currentUser
-                                                                            .userName
-                                                                            .value,
+                                                                    userName: currentUser
+                                                                        .userName
+                                                                        .value,
                                                                     jobName: currentUser
                                                                         .selectedJob
                                                                         .value
@@ -1478,7 +1489,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                             loadCBHD.data()!)
                                                                         .userName;
                                                                 final plan =
-                                                                    PlanModel(
+                                                                    PlanWorkModel(
                                                                   cbhdId: firms[
                                                                           indexFirm]
                                                                       .firmId,

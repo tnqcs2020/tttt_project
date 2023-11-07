@@ -10,7 +10,7 @@ import 'package:tttt_project/models/cv_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/work_model.dart';
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
@@ -446,12 +446,9 @@ class _MyCVState extends State<MyCV> {
                                                                       color: Colors
                                                                           .blue
                                                                           .shade600,
-                                                                      height:
-                                                                          50,
+                                                                      height: screenHeight * 0.06,
                                                                       padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          vertical:
-                                                                              10,
+                                                                          .symmetric( 
                                                                           horizontal:
                                                                               10),
                                                                       child:
@@ -459,17 +456,22 @@ class _MyCVState extends State<MyCV> {
                                                                         crossAxisAlignment:
                                                                             CrossAxisAlignment.center,
                                                                         children: [
+                                                                          const SizedBox(
+                                                              width: 30,
+                                                            ),
                                                                           const Expanded(
                                                                             child: Text('Chi tiết tuyển dụng',
                                                                                 style: TextStyle(fontWeight: FontWeight.bold),
                                                                                 textAlign: TextAlign.center),
                                                                           ),
-                                                                          IconButton(
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              icon: const Icon(Icons.close))
+                                                                          SizedBox(width: 30,
+                                                                            child: IconButton(
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                icon: const Icon(Icons.close)),
+                                                                          )
                                                                         ],
                                                                       ),
                                                                     ),
@@ -676,7 +678,7 @@ class _MyCVState extends State<MyCV> {
                                                                                     var loadCBHD = await firestore.collection('users').doc(firm.firmId).get();
 
                                                                                     final cbhdName = UserModel.fromMap(loadCBHD.data()!).userName;
-                                                                                    final plan = PlanModel(
+                                                                                    final plan = PlanWorkModel(
                                                                                       cbhdId: firm.firmId,
                                                                                       cbhdName: cbhdName,
                                                                                       listWork: [],

@@ -164,7 +164,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           Expanded(
                             child: Container(
                               constraints: BoxConstraints(
-                                  minHeight: screenHeight * 0.74),
+                                  minHeight: screenHeight * 0.67),
                               decoration: BoxDecoration(
                                   color: Colors.grey.shade100,
                                   border: Border.all(

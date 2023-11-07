@@ -111,7 +111,6 @@ List<String> menuSinhVien = [
   "Thực tập thực tế",
   "Công ty liên kết",
 ];
-
 List<String> pageSinhVien = [
   RouteGenerator.home,
   RouteGenerator.info,
@@ -126,7 +125,6 @@ List<String> menuQuanTri = [
   "Danh sách thực tập",
   "Quản lý học phần",
 ];
-
 List<String> pageQuanTri = [
   RouteGenerator.home,
   RouteGenerator.addUser,
@@ -140,16 +138,16 @@ List<String> menuCanBo = [
   "Quản lý thông tin",
   "Quản lý thực tập",
 ];
-
 List<String> pageCanBo = [
   RouteGenerator.home,
   RouteGenerator.manageInfoCB,
   RouteGenerator.manageTraineeCB,
 ];
+
 List<String> menuGiaoVu = [
   "Trang chủ",
-  "Thêm thông báo",
-  "Quản lý các mốc thời gian",
+  "Quản lý thông báo",
+  "Quản lý kế hoạch thực tập",
   "Quản lý học phần",
   "Danh sách thực tập",
 ];
@@ -160,6 +158,7 @@ List<String> pageGiaoVu = [
   RouteGenerator.manageCredit,
   RouteGenerator.dstttt
 ];
+
 List<String> menuCoVan = [
   'Trang chu',
   "Thông tin",
@@ -179,8 +178,24 @@ class NguoiDung {
   static const String sinhvien = "Sinh viên";
   static const String covan = "Cố vấn học tập";
   static const String cbhd = "Cán bộ hướng dẫn";
+  static const String tatca = "Tất cả";
+  static const String empty = "";
   // static const String congty = "Công ty";
 }
+
+List<String> dsnd = [
+  NguoiDung.giaovu,
+  NguoiDung.covan,
+  NguoiDung.cbhd,
+  NguoiDung.sinhvien,
+];
+List<String> dsndAll = [
+  NguoiDung.tatca,
+  NguoiDung.giaovu,
+  NguoiDung.covan,
+  NguoiDung.cbhd,
+  NguoiDung.sinhvien,
+];
 
 class TrangThai {
   static const String wait = "Chờ duyệt";
@@ -196,28 +211,46 @@ class NamHoc {
     required this.end,
   });
   static NamHoc tatca = NamHoc(start: "Tất cả", end: "Tất cả");
-  static NamHoc n2021 = NamHoc(start: "2020", end: "2021");
   static NamHoc n2122 = NamHoc(start: "2021", end: "2022");
   static NamHoc n2223 = NamHoc(start: "2022", end: "2023");
   static NamHoc n2324 = NamHoc(start: "2023", end: "2024");
   static NamHoc n2425 = NamHoc(start: "2024", end: "2025");
+  static NamHoc empty = NamHoc(start: "", end: "");
 }
+
+List<NamHoc> dsnhAll = [
+  NamHoc.tatca,
+  NamHoc.n2122,
+  NamHoc.n2223,
+  NamHoc.n2324,
+  NamHoc.n2425,
+];
+List<NamHoc> dsnh = [
+  NamHoc.n2122,
+  NamHoc.n2223,
+  NamHoc.n2324,
+  NamHoc.n2425,
+];
 
 class HocKy {
   static const String tatca = "Tất cả";
   static const String hk1 = "1";
   static const String hk2 = "2";
   static const String hk3 = "Hè";
+  static const String empty = "";
 }
 
-class HocPhan {
-  final String maHP;
-  final String tenHP;
-  HocPhan({
-    required this.maHP,
-    required this.tenHP,
-  });
-}
+List<String> dshkAll = [
+  HocKy.tatca,
+  HocKy.hk1,
+  HocKy.hk2,
+  HocKy.hk3,
+];
+List<String> dshk = [
+  HocKy.hk1,
+  HocKy.hk2,
+  HocKy.hk3,
+];
 
 List<String> contentAppreciate = [
   'I.1. Thực hiện nội quy của cơ quan (nếu thực tập online thì không chẩm điểm)',
@@ -242,6 +275,42 @@ List<String> appreciatesCTDT = [
   'Tăng cường kỹ năng làm việc nhóm',
   'Tăng cường kỹ năng mềm',
 ];
+
+List<String> contentsPlan = [
+  'Trong các buôi sinh hoạt CVHT, giáo viên cô vân hướng dân sinh viên về mục đích, yêu cầu của thực tập thực tế, hướng dẫn sinh viên tìm các cơ quan có thể tiếp nhận SV TTTT.',
+  """Dự kiến mở các lớp HP TTTT:
+- Đối với các lớp đúng tiến độ (K45): Mở các lớp HP theo lớp do GVCV phụ trách.
+- Đôi với SV chậm tiên độ: mở chung 1 lớp HP do GVCV phụ trách.
+- Đối với SV vượt tiên độ (K46): mỗi ngành mở 1 lớp, các Khoa phân công GV phụ trách.""",
+  "In giấy giới thiệu cho SV theo DS SV đã lập KHHT",
+  """- Sinh viên nhận giấy giới thiệu để liên hệ địa điểm thực tập:
++ K45: Lớp trưởng nhận tại VP và phát cho các bạn (có thê phát trong buôi sinh hoạt lân 1).
++ Đôi với SV các khóa khác thì nhận trực tiêp tại VP.
+Lưu ý: Môi SV chí có 1 giây giới thiệu, vì vậy đê nghị SV sử dụng cẩn thận.""",
+  """GV phụ trách họp với SV đê hướng dân quy trình TTTT (hướng dân SV liên hệ công ty đê nộp giây giới thiệu và phiếu tiếp nhận SV, kế hoạc TTTT, đề cương HP TTTT, mẫu đánh giá, mẫu BC).
+GV lưu ý nhắc SV khi đăng ký HP cần đăng ký đúng nhóm do GV phụ trách. Khuyến khích họp trong giờ SH CVHT.
+(Lớp trưởng có thể phát giấy giới thiệu cho các bạn trong buổi họp này nếu thuận tiện).""",
+  """SV nộp "Phiếu tiếp nhận" của đơn vị tại VP, đồng thời điền dầy đủ các thông tin vào Form. Những SV không nộp phiếu và không diền thông tin vào Form sẽ không có tên trong danh sách xét duyệt TTTT
+(Lưu ý: S1 phải dang ky HP TTTT thì mới được TTTT).""",
+  "Các Khoa duyệt các phiêu tiêp nhận SV của các công ty",
+  "Chuẩn bị hồ sơ cho SV đi TTTT tại công ty",
+  "Công bố danh sách SV đi thực tập theo mẫu (chỉ những SV có đăng ký môn học mới có tên trong DS, không giải quyết ngoại lệ)",
+  "Các Khoa họp với SV để sinh hoạt nội quy khi đi TTTT.",
+  """SV nhận các giấy tờ có liên quan để đi thực tập (nhận tại sảnh VP). 
+Lớp trưởng có thể nhận và phát cho các bạn trong giờ sinh hoạt với GVHD nếu thuận tiện.""",
+  "Sinh viên bắt đầu thực tập (8 tuần)",
+  "Sinh viên nộp báo cáo thực tập cho giáo viên.",
+  "Giáo viên chấm và nhập điểm TTTT.",
+];
+
+class HocPhan {
+  final String maHP;
+  final String tenHP;
+  HocPhan({
+    required this.maHP,
+    required this.tenHP,
+  });
+}
 
 // class DSHocPhan45 {
 //   static HocPhan ct215h =

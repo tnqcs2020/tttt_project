@@ -172,11 +172,11 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                       title: Container(
                                                         color: Colors
                                                             .blue.shade600,
-                                                        height: 50,
+                                                        height:
+                                                            screenHeight * 0.06,
                                                         padding:
                                                             const EdgeInsets
                                                                 .symmetric(
-                                                                vertical: 10,
                                                                 horizontal: 10),
                                                         child: Row(
                                                           crossAxisAlignment:

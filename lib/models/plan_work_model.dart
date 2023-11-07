@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PlanModel {
+class PlanWorkModel {
   String? cbhdId, cbhdName, userId;
   Timestamp? createdAt, traineeStart, traineeEnd;
   List<WorkModel>? listWork;
   bool? completeTraining;
 
-  PlanModel(
+  PlanWorkModel(
       {this.cbhdId,
       this.cbhdName,
       this.createdAt,
@@ -31,8 +31,8 @@ class PlanModel {
     };
   }
 
-  factory PlanModel.fromMap(Map<String, dynamic> map) {
-    return PlanModel(
+  factory PlanWorkModel.fromMap(Map<String, dynamic> map) {
+    return PlanWorkModel(
       cbhdId: map['cbhdId'] ?? '',
       cbhdName: map['cbhdName'] ?? '',
       createdAt: map['createdAt'],
@@ -47,8 +47,8 @@ class PlanModel {
 
   String toJson() => json.encode(toMap());
 
-  factory PlanModel.fromJson(String source) =>
-      PlanModel.fromMap(json.decode(source));
+  factory PlanWorkModel.fromJson(String source) =>
+      PlanWorkModel.fromMap(json.decode(source));
 }
 
 class WorkModel {
