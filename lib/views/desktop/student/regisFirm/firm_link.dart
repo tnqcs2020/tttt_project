@@ -11,7 +11,6 @@ import 'package:tttt_project/views/desktop/student/regisFirm/my_cv.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 
 class FirmLink extends StatefulWidget {
@@ -24,7 +23,7 @@ class FirmLink extends StatefulWidget {
 class _FirmLinkState extends State<FirmLink> {
   final currentUser = Get.put(UserController());
   ValueNotifier selectedMenu = ValueNotifier(0);
-
+  String? userId;
   @override
   void initState() {
     getUserData();
@@ -33,7 +32,7 @@ class _FirmLinkState extends State<FirmLink> {
 
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
-    String? userId = sharedPref
+    userId = sharedPref
         .getString(
           'userId',
         )
@@ -79,35 +78,29 @@ class _FirmLinkState extends State<FirmLink> {
     'Công ty đã đăng ký'
   ];
 
-  List firmQuanTri = ['Danh sách công ty', 'Thêm công ty'];
+  // List firmQuanTri = ['Danh sách công ty', 'Thêm công ty'];
 
   List firmContentSV = [const MyCV(), const ListFirm(), const ListFirmRegis()];
-  List firmContentQT = [const Text('ds'), const Text('...')];
-  List checkFirmTitle() {
-    final List titles;
-    switch (currentUser.group.value) {
-      case NguoiDung.sinhvien:
-        titles = firmSinhVien;
-      case NguoiDung.quantri:
-        titles = firmQuanTri;
-      default:
-        titles = firmSinhVien;
-    }
-    return titles;
-  }
+  // List firmContentQT = [const Text('ds'), const Text('...')];
+  // List checkFirmTitle() {
+  //   List titles = [];
+  //   if (currentUser.group.value == NguoiDung.sinhvien) {
+  //     titles = firmSinhVien;
+  //   } else if (currentUser.group.value == NguoiDung.quantri) {
+  //     titles = firmQuanTri;
+  //   }
+  //   return titles;
+  // }
 
-  List checkFirmContent() {
-    final List pages;
-    switch (currentUser.group.value) {
-      case NguoiDung.sinhvien:
-        pages = firmContentSV;
-      case NguoiDung.quantri:
-        pages = firmContentQT;
-      default:
-        pages = firmContentSV;
-    }
-    return pages;
-  }
+  // List checkFirmContent() {
+  //   List pages = [];
+  //   if (currentUser.group.value == NguoiDung.sinhvien) {
+  //     pages = firmContentSV;
+  //   } else if (currentUser.group.value == NguoiDung.quantri) {
+  //     pages = firmContentSV;
+  //   }
+  //   return pages;
+  // }
 
   @override
   void dispose() {
@@ -153,7 +146,7 @@ class _FirmLinkState extends State<FirmLink> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 35,
+                            height: screenHeight * 0.06,
                             decoration: BoxDecoration(
                               color: Colors.blue.shade600,
                               borderRadius: const BorderRadius.only(
@@ -165,10 +158,12 @@ class _FirmLinkState extends State<FirmLink> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Danh sách các công ty liên kết với trường",
+                                  "Tìm Kiếm Công Ty Và Vị Trí Thực Tập",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ],
                             ),
@@ -176,58 +171,56 @@ class _FirmLinkState extends State<FirmLink> {
                           ValueListenableBuilder(
                             valueListenable: selectedMenu,
                             builder: (context, value, child) {
-                              return Obx(
-                                () => Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: screenHeight * 0.04,
-                                      child: ListView.builder(
-                                        itemCount: checkFirmTitle().length,
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.horizontal,
-                                        itemBuilder: (context, index) {
-                                          return Container(
-                                            width: screenWidth * 0.1,
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(width: 0.1),
-                                              color: value == index
-                                                  ? Colors.white
-                                                  : Colors.teal.shade100,
-                                            ),
-                                            child: InkWell(
-                                              child: Center(
-                                                child: Text(
-                                                  checkFirmTitle()[index],
-                                                  style: TextStyle(
-                                                    color: value == index
-                                                        ? Colors.blue.shade900
-                                                        : null,
-                                                    fontWeight: value == index
-                                                        ? FontWeight.bold
-                                                        : null,
-                                                  ),
-                                                  textAlign: TextAlign.center,
+                              return
+                                  //  Obx(
+                                  //   () =>
+                                  Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: screenHeight * 0.04,
+                                    child: ListView.builder(
+                                      itemCount: firmSinhVien.length,
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          width: screenWidth * 0.1,
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(width: 0.1),
+                                            color: value == index
+                                                ? Colors.white
+                                                : Colors.teal.shade100,
+                                          ),
+                                          child: InkWell(
+                                            child: Center(
+                                              child: Text(
+                                                firmSinhVien[index],
+                                                style: TextStyle(
+                                                  color: value == index
+                                                      ? Colors.blue.shade900
+                                                      : null,
+                                                  fontWeight: value == index
+                                                      ? FontWeight.bold
+                                                      : null,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedMenu.value = index;
-                                                });
-                                                // SharedPreferences prefs =
-                                                //     await SharedPreferences
-                                                //         .getInstance();
-                                                // prefs.setInt('menuSelected', index);
-                                              },
                                             ),
-                                          );
-                                        },
-                                      ),
+                                            onTap: () {
+                                              setState(() {
+                                                selectedMenu.value = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    checkFirmContent()[selectedMenu.value],
-                                  ],
-                                ),
+                                  ),
+                                  firmContentSV[selectedMenu.value],
+                                ],
+                                // ),
                               );
                             },
                           ),

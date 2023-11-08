@@ -107,7 +107,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                       child: Column(
                         children: [
                           Container(
-                            height: screenHeight * 0.05,
+                            height: screenHeight * 0.06,
                             decoration: BoxDecoration(
                               color: Colors.blue.shade600,
                               borderRadius: const BorderRadius.only(
@@ -119,10 +119,12 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Quản lý học phần",
+                                  "Quản Lý Học Phần",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ],
                             ),

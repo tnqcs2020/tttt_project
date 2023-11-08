@@ -118,7 +118,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                           return Column(
                             children: [
                               Container(
-                                height: screenHeight * 0.05,
+                                height: screenHeight * 0.06,
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade600,
                                   borderRadius: const BorderRadius.only(
@@ -130,10 +130,12 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Danh sách sinh viên đăng ký thực tập",
+                                      "Danh Sách Sinh Viên Đăng Ký Thực Tập",
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -444,7 +446,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                             return Container(
                                                               height:
                                                                   screenHeight *
-                                                                      0.04,
+                                                                      0.05,
                                                               color: index %
                                                                           2 ==
                                                                       0
@@ -546,7 +548,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                 return Container(
                                                                   height:
                                                                       screenHeight *
-                                                                          0.04,
+                                                                          0.05,
                                                                   color: index %
                                                                               2 ==
                                                                           0

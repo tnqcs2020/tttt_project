@@ -13,6 +13,7 @@ class RegisterTraineeModel {
       studentName;
   int? reachedStep;
   List<UserRegisterModel>? listRegis;
+  Timestamp? traineeStart, traineeEnd;
 
   RegisterTraineeModel({
     this.creditId,
@@ -25,6 +26,8 @@ class RegisterTraineeModel {
     this.studentName,
     this.reachedStep = 0,
     this.listRegis,
+    this.traineeStart,
+    this.traineeEnd,
   });
 
   Map<String, dynamic> toMap() {
@@ -38,7 +41,10 @@ class RegisterTraineeModel {
       'course': course,
       'studentName': studentName,
       'reachedStep': reachedStep,
-      'listRegis': listRegis!.map((i) => i.toMap()).toList(),
+      'listRegis':
+          listRegis != null ? listRegis!.map((i) => i.toMap()).toList() : [],
+      'traineeStart': traineeStart,
+      'traineeEnd': traineeEnd,
     };
   }
 
@@ -56,6 +62,8 @@ class RegisterTraineeModel {
       listRegis: map['listRegis']
           .map<UserRegisterModel>((i) => UserRegisterModel.fromMap(i))
           .toList(),
+      traineeStart: map['traineeStart'],
+      traineeEnd: map['traineeEnd'],
     );
   }
 
@@ -66,12 +74,13 @@ class RegisterTraineeModel {
 }
 
 class UserRegisterModel {
-  String? firmId, jobName, jobId, status;
+  String? firmId, firmName, jobName, jobId, status;
   Timestamp? createdAt, repliedAt, traineeStart, traineeEnd;
   bool? isConfirmed;
 
   UserRegisterModel({
     this.firmId,
+    this.firmName,
     this.jobId,
     this.jobName,
     this.status,
@@ -85,6 +94,7 @@ class UserRegisterModel {
   Map<String, dynamic> toMap() {
     return {
       'firmId': firmId,
+      'firmName': firmName,
       'jobId': jobId,
       'jobName': jobName,
       'status': status,
@@ -99,6 +109,7 @@ class UserRegisterModel {
   factory UserRegisterModel.fromMap(Map<String, dynamic> map) {
     return UserRegisterModel(
       firmId: map['firmId'] ?? '',
+      firmName: map['firmName'] ?? '',
       jobId: map['jobId'] ?? '',
       jobName: map['jobName'] ?? '',
       status: map['status'] ?? '',

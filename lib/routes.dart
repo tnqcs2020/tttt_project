@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tttt_project/views/desktop/admin/add_user_screen.dart';
 import 'package:tttt_project/views/desktop/admin/list_trainee_screen.dart';
-import 'package:tttt_project/views/desktop/admin/list_user.dart';
-import 'package:tttt_project/views/desktop/admin/manage_credit_screen.dart';
+import 'package:tttt_project/views/desktop/admin/list_user.dart'; 
 import 'package:tttt_project/views/desktop/canbo/manage_info_canbo.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_trainee.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_announcement.dart';
+import 'package:tttt_project/views/desktop/giaovu/manage_credit_screen.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_time.dart';
 import 'package:tttt_project/views/desktop/home_view_desktop.dart';
 import 'package:tttt_project/views/desktop/student/cv_screen.dart';

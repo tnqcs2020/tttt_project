@@ -49,7 +49,10 @@ class _InfoScreenState extends State<InfoScreen> {
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
+              .get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         currentUser.setCurrentUser(
@@ -130,7 +133,7 @@ class _InfoScreenState extends State<InfoScreen> {
                           child: Column(
                             children: [
                               Container(
-                                height: 35,
+                                height: screenHeight * 0.06,
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade600,
                                   borderRadius: const BorderRadius.only(
@@ -142,10 +145,12 @@ class _InfoScreenState extends State<InfoScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Thông tin sinh viên",
+                                      "Thông Tin Sinh Viên",
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -218,8 +223,8 @@ class _InfoScreenState extends State<InfoScreen> {
                                           children: [
                                             LineDetail(
                                                 field: "Mã Lớp",
-                                                display: currentUser
-                                                    .classId.value),
+                                                display:
+                                                    currentUser.classId.value),
                                             LineDetail(
                                                 field: "Lớp",
                                                 display: currentUser

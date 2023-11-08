@@ -8,18 +8,26 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        Column(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            LoadingAnimationWidget.discreteCircle(
-                color: Colors.blue,
-                size: 35,
-                secondRingColor: Colors.teal,
-                thirdRingColor: Colors.orangeAccent),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                LoadingAnimationWidget.discreteCircle(
+                    color: Colors.blue,
+                    size: 35,
+                    secondRingColor: Colors.teal,
+                    thirdRingColor: Colors.orangeAccent),
+              ],
+            ),
           ],
+        ),
+        const Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Text('Đang tải dữ liệu ...'),
         ),
       ],
     );

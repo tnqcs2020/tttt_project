@@ -77,7 +77,7 @@ class _MenuLeftState extends State<MenuLeft> {
           children: [
             Container(
               padding: const EdgeInsets.only(left: 5),
-              height: 30,
+              height: screenHeight * 0.05,
               decoration: BoxDecoration(
                 color: Colors.blue.shade600,
                 borderRadius: const BorderRadius.only(
@@ -95,7 +95,10 @@ class _MenuLeftState extends State<MenuLeft> {
                   Text(
                     "Menu",
                     style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),

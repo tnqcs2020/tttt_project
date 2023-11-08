@@ -141,7 +141,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: screenHeight * 0.05,
+                                  height: screenHeight * 0.06,
                                   decoration: BoxDecoration(
                                     color: Colors.blue.shade600,
                                     borderRadius: const BorderRadius.only(
@@ -153,10 +153,12 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "Quản lý thông báo",
+                                        "Quản Lý Thông Báo",
                                         style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -305,7 +307,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                               ),
                                             ),
                                             Expanded(
-                                              flex: 3,
+                                              flex: 2,
                                               child: Text(
                                                 'Ngày đăng',
                                                 textAlign: TextAlign.center,

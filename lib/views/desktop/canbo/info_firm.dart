@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
@@ -24,6 +24,7 @@ class InfoFirm extends StatefulWidget {
 
 class _InfoFirmState extends State<InfoFirm> {
   final currentUser = Get.put(UserController());
+  final GlobalKey<FormState> firmFormKey = GlobalKey<FormState>();
   final TextEditingController nameFirmCtrl = TextEditingController();
   final TextEditingController ownerCtrl = TextEditingController();
   final TextEditingController phoneCtrl = TextEditingController();
@@ -150,251 +151,269 @@ class _InfoFirmState extends State<InfoFirm> {
             builder: (context, snapshotFirm) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 70),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: screenWidth * 0.5,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black,
-                            width: 0.5,
+                child: Form(
+                  key: firmFormKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: screenWidth * 0.5,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
                           ),
                         ),
+                        padding: const EdgeInsets.only(top: 15, bottom: 5),
+                        child: const Text(
+                          'Thông tin',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      padding: const EdgeInsets.only(top: 15, bottom: 5),
-                      child: const Text(
-                        'Thông tin',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          LineDetail(
+                            field: "Tên công ty",
+                            ctrl: nameFirmCtrl,
+                            validator: (p0) =>
+                                p0!.isEmpty ? 'Không được để trống' : null,
+                          ),
+                          LineDetail(
+                            field: "Người đại diện",
+                            ctrl: ownerCtrl,
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        LineDetail(
-                          field: "Tên công ty",
-                          ctrl: nameFirmCtrl,
-                        ),
-                        LineDetail(
-                          field: "Người đại diện",
-                          ctrl: ownerCtrl,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        LineDetail(
-                          field: "Điện thoại",
-                          ctrl: phoneCtrl,
-                        ),
-                        LineDetail(
-                          field: "Email",
-                          ctrl: emailCtrl,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        LineDetail(
-                          field: "Địa chỉ",
-                          ctrl: addressCtrl,
-                        ),
-                        LineDetail(
-                          field: "Giới thiệu",
-                          ctrl: describeCtrl,
-                          minLines: 2,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                      width: screenWidth * 0.5,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black,
-                            width: 0.5,
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          LineDetail(
+                            field: "Điện thoại",
+                            ctrl: phoneCtrl,
+                          ),
+                          LineDetail(
+                            field: "Email",
+                            ctrl: emailCtrl,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          LineDetail(
+                            field: "Địa chỉ",
+                            ctrl: addressCtrl,
+                          ),
+                          LineDetail(
+                            field: "Giới thiệu",
+                            ctrl: describeCtrl,
+                            minLines: 1,
+                            validator: (p0) =>
+                                p0!.isEmpty ? 'Không được để trống' : null,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Container(
+                        width: screenWidth * 0.5,
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
                           ),
                         ),
+                        padding: const EdgeInsets.only(top: 15, bottom: 5),
+                        child: const Text(
+                          'Tuyển dụng',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      padding: const EdgeInsets.only(top: 15, bottom: 5),
-                      child: const Text(
-                        'Tuyển dụng',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ValueListenableBuilder(
-                        valueListenable: totalJob,
-                        builder: (context, vTotalJob, child) {
-                          return ListView.builder(
-                              itemCount: vTotalJob,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    LineDetail(
-                                      field: 'Vị trí',
-                                      widthField: 0.03,
-                                      widthForm: 0.1,
-                                      ctrl: positions[index],
-                                    ),
-                                    SizedBox(width: screenWidth * 0.015),
-                                    LineDetail(
-                                      field: 'Số lượng',
-                                      widthField: 0.03,
-                                      widthForm: 0.05,
-                                      ctrl: quantities[index],
-                                      textFormat: [
-                                        FilteringTextInputFormatter.allow(
-                                          RegExp(r'[0-9]'),
+                      const SizedBox(height: 10),
+                      ValueListenableBuilder(
+                          valueListenable: totalJob,
+                          builder: (context, vTotalJob, child) {
+                            return ListView.builder(
+                                itemCount: vTotalJob,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (context, index) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      LineDetail(
+                                        field: 'Vị trí',
+                                        widthField: 0.03,
+                                        widthForm: 0.1,
+                                        ctrl: positions[index],
+                                      ),
+                                      SizedBox(width: screenWidth * 0.015),
+                                      LineDetail(
+                                        field: 'Số lượng',
+                                        widthField: 0.05,
+                                        widthForm: 0.03,
+                                        ctrl: quantities[index],
+                                        textFormat: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'[0-9]'),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(width: screenWidth * 0.015),
+                                      LineDetail(
+                                        field: 'Mô tả',
+                                        widthField: 0.03,
+                                        widthForm: 0.2,
+                                        ctrl: describes[index],
+                                      ),
+                                      SizedBox(width: screenWidth * 0.015),
+                                      if (index == vTotalJob - 1) ...[
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalJob.value--;
+                                                  quantities.removeAt(index);
+                                                  positions.removeAt(index);
+                                                  describes.removeAt(index);
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_outlined,
+                                                size: 30,
+                                                color: Colors.red,
+                                              )),
                                         ),
-                                      ],
-                                    ),
-                                    SizedBox(width: screenWidth * 0.015),
-                                    LineDetail(
-                                      field: 'Mô tả',
-                                      widthField: 0.03,
-                                      widthForm: 0.15,
-                                      ctrl: describes[index],
-                                    ),
-                                    SizedBox(width: screenWidth * 0.015),
-                                    if (index == vTotalJob - 1) ...[
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                totalJob.value--;
-                                                quantities.removeAt(index);
-                                                positions.removeAt(index);
-                                                describes.removeAt(index);
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.remove_circle_outlined,
-                                              size: 30,
-                                              color: Colors.red,
-                                            )),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                totalJob.value++;
-                                                quantities.add(
-                                                    TextEditingController());
-                                                positions.add(
-                                                    TextEditingController());
-                                                describes.add(
-                                                    TextEditingController());
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.add_circle_outlined,
-                                              size: 30,
-                                              color: Colors.green,
-                                            )),
-                                      ),
-                                    ] else ...[
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                totalJob.value--;
-                                                quantities.removeAt(index);
-                                                positions.removeAt(index);
-                                                describes.removeAt(index);
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.remove_circle_outlined,
-                                              size: 30,
-                                              color: Colors.red,
-                                            )),
-                                      ),
-                                      const SizedBox(width: 50),
-                                    ]
-                                  ],
-                                );
-                              });
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: CustomButton(
-                        text: "Lưu",
-                        width: screenWidth * 0.1,
-                        height: screenHeight * 0.07,
-                        onTap: () async {
-                          jobs = [];
-                          if (positions.length == quantities.length &&
-                              positions.length == describes.length) {
-                            for (int i = 0; i < totalJob.value; i++) {
-                              if (positions[i].text != '' ||
-                                  quantities[i].text != '' ||
-                                  describes[i].text != '') {
-                                jobs.add(JobPositionModel(
-                                    jobName: positions[i].text,
-                                    quantity: quantities[i].text,
-                                    describeJob: describes[i].text,
-                                    jobId: GV.generateRandomString(10)));
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalJob.value++;
+                                                  quantities.add(
+                                                      TextEditingController());
+                                                  positions.add(
+                                                      TextEditingController());
+                                                  describes.add(
+                                                      TextEditingController());
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.add_circle_outlined,
+                                                size: 30,
+                                                color: Colors.green,
+                                              )),
+                                        ),
+                                      ] else ...[
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalJob.value--;
+                                                  quantities.removeAt(index);
+                                                  positions.removeAt(index);
+                                                  describes.removeAt(index);
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_outlined,
+                                                size: 30,
+                                                color: Colors.red,
+                                              )),
+                                        ),
+                                        const SizedBox(width: 50),
+                                      ]
+                                    ],
+                                  );
+                                });
+                          }),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: CustomButton(
+                          text: "Lưu",
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.07,
+                          onTap: () async {
+                            if (firmFormKey.currentState!.validate()) {
+                              jobs = [];
+                              if (positions.length == quantities.length &&
+                                  positions.length == describes.length) {
+                                for (int i = 0; i < totalJob.value; i++) {
+                                  if (positions[i].text != '' ||
+                                      quantities[i].text != '' ||
+                                      describes[i].text != '') {
+                                    jobs.add(JobPositionModel(
+                                        jobName: positions[i].text,
+                                        quantity: quantities[i].text,
+                                        describeJob: describes[i].text,
+                                        jobId: GV.generateRandomString(10)));
+                                  }
+                                }
+                              }
+                              FirmModel firmModel = FirmModel(
+                                firmId: currentUser.userId.value,
+                                firmName: nameFirmCtrl.text != ""
+                                    ? nameFirmCtrl.text
+                                    : null,
+                                owner: ownerCtrl.text != ""
+                                    ? ownerCtrl.text
+                                    : null,
+                                phone: phoneCtrl.text != ""
+                                    ? phoneCtrl.text
+                                    : null,
+                                email: emailCtrl.text != ""
+                                    ? emailCtrl.text
+                                    : null,
+                                address: addressCtrl.text != ""
+                                    ? addressCtrl.text
+                                    : null,
+                                describe: describeCtrl.text != ""
+                                    ? describeCtrl.text
+                                    : null,
+                                listJob: jobs.isNotEmpty ? jobs : [],
+                                listRegis: [],
+                              );
+                              DocumentSnapshot<Map<String, dynamic>>
+                                  isExistFirm = await GV.firmsCol
+                                      .doc(currentUser.userId.value)
+                                      .get();
+                              if (isExistFirm.data() != null) {
+                                GV.firmsCol
+                                    .doc(currentUser.userId.value)
+                                    .update(firmModel.toMap());
+                                GV.success(
+                                    context: context,
+                                    message: 'Cập nhật thành công!');
+                              } else {
+                                GV.firmsCol
+                                    .doc(currentUser.userId.value)
+                                    .set(firmModel.toMap());
+                                GV.success(
+                                    context: context,
+                                    message: 'Thêm thành công!');
                               }
                             }
-                          }
-
-                          FirmModel firmModel = FirmModel(
-                            firmId: currentUser.userId.value,
-                            firmName: nameFirmCtrl.text != ""
-                                ? nameFirmCtrl.text
-                                : null,
-                            owner: ownerCtrl.text != "" ? ownerCtrl.text : null,
-                            phone: phoneCtrl.text != "" ? phoneCtrl.text : null,
-                            email: emailCtrl.text != "" ? emailCtrl.text : null,
-                            address: addressCtrl.text != ""
-                                ? addressCtrl.text
-                                : null,
-                            describe: describeCtrl.text != ""
-                                ? describeCtrl.text
-                                : null,
-                            listJob: jobs.isNotEmpty ? jobs : [],
-                            listRegis: [],
-                          );
-                          DocumentSnapshot<Map<String, dynamic>> isExistFirm =
-                              await GV.firmsCol
-                                  .doc(currentUser.userId.value)
-                                  .get();
-                          if (isExistFirm.data() != null) {
-                            GV.firmsCol
-                                .doc(currentUser.userId.value)
-                                .update(firmModel.toMap());
-                            GV.success(
-                                context: context,
-                                message: 'Cập nhật thành công!');
-                          } else {
-                            GV.firmsCol
-                                .doc(currentUser.userId.value)
-                                .set(firmModel.toMap());
-                            GV.success(
-                                context: context, message: 'Thêm thành công!');
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

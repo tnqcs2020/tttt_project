@@ -22,7 +22,7 @@ class ManageTrainee extends StatefulWidget {
 
 class _ManageTraineeState extends State<ManageTrainee> {
   final currentUser = Get.put(UserController());
-  ValueNotifier selectedMenu = ValueNotifier(1);
+  ValueNotifier selectedMenu = ValueNotifier(0);
   @override
   void initState() {
     getUserData();
@@ -126,7 +126,7 @@ class _ManageTraineeState extends State<ManageTrainee> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      height: 35,
+                                      height: screenHeight * 0.06,
                                       decoration: BoxDecoration(
                                         color: Colors.blue.shade600,
                                         borderRadius: const BorderRadius.only(
@@ -139,10 +139,12 @@ class _ManageTraineeState extends State<ManageTrainee> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Quản lý thực tập",
+                                            "Quản Lý Thực Tập",
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ],
                                       ),

@@ -3,11 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/cv_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
+import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
@@ -29,6 +29,7 @@ class MyCV extends StatefulWidget {
 }
 
 class _MyCVState extends State<MyCV> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final TextEditingController skillCtrl = TextEditingController();
   final TextEditingController achieveCtrl = TextEditingController();
@@ -39,6 +40,7 @@ class _MyCVState extends State<MyCV> {
   CVModel loadCV = CVModel();
   ValueNotifier<List<FirmSuggestModel>> firmSuggest = ValueNotifier([]);
   List<FirmModel> firms = [];
+  RegisterTraineeModel trainee = RegisterTraineeModel();
   bool isTrainee = false;
   ValueNotifier<bool> isLoading = ValueNotifier(true);
   bool isRegistered = false;
@@ -97,7 +99,9 @@ class _MyCVState extends State<MyCV> {
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
-          isRegistered = true;
+          setState(() {
+            isRegistered = true;
+          });
           final loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
           if (loadTrainee.listRegis != null) {
@@ -107,6 +111,30 @@ class _MyCVState extends State<MyCV> {
               }
             });
           }
+          if (loadTrainee.traineeStart == null &&
+              loadTrainee.traineeEnd == null) {
+            QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
+                await firestore
+                    .collection('planTrainees')
+                    .where('term', isEqualTo: loadTrainee.term)
+                    .where('yearStart', isEqualTo: loadTrainee.yearStart)
+                    .where('yearEnd', isEqualTo: loadTrainee.yearEnd)
+                    .get();
+            if (isExitPlanTrainee.docs.isNotEmpty) {
+              final planTrainee =
+                  PlanTraineeModel.fromMap(isExitPlanTrainee.docs.first.data());
+              if (planTrainee.listContent!.isNotEmpty) {
+                firestore.collection('trainees').doc(userId).update({
+                  'traineeStart': planTrainee.listContent![11].dayStart,
+                  'traineeEnd': planTrainee.listContent![11].dayEnd,
+                });
+                loadTrainee.traineeStart =
+                    planTrainee.listContent![11].dayStart;
+                loadTrainee.traineeEnd = planTrainee.listContent![11].dayEnd;
+              }
+            }
+          }
+          trainee = loadTrainee;
         }
         DocumentSnapshot<Map<String, dynamic>> isExistCV =
             await firestore.collection('cvs').doc(userId).get();
@@ -119,13 +147,14 @@ class _MyCVState extends State<MyCV> {
         }
       }
     }
+    isLoading.value = false;
     await getFirmsSuggest();
   }
 
   Future getFirmsSuggest() async {
     currentUser.loadIn.value = false;
     final queryParameters = {
-      'userId': 'b1913331',
+      'userId': '$userId',
     };
     final uri = Uri.https(
         'suggest-firms-server.onrender.com', '/suggest', queryParameters);
@@ -146,7 +175,6 @@ class _MyCVState extends State<MyCV> {
           } else {
             firmSuggest.value = temp;
           }
-          isLoading.value = false;
         });
       }
       currentUser.loadIn.value = true;
@@ -168,13 +196,6 @@ class _MyCVState extends State<MyCV> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    // return StreamBuilder(
-    //     stream: firestore.collection('cvs').doc(userId).snapshots(),
-    //     builder: (context, snapshotCV) {
-    //       if (snapshotCV.hasData &&
-    //           snapshotCV.data != null &&
-    //           snapshotCV.connectionState == ConnectionState.active) {
-    // getFirmsSuggest();
     return ValueListenableBuilder(
         valueListenable: isLoading,
         builder: (context, isLoadingVal, child) {
@@ -184,578 +205,575 @@ class _MyCVState extends State<MyCV> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 20, bottom: 50),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LineDetail(
-                                    field: "Họ tên",
-                                    display: currentUser.userName.value),
-                                LineDetail(
-                                    field: "Mã số",
-                                    display:
-                                        currentUser.userId.value.toUpperCase()),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LineDetail(
-                                    field: "Lớp",
-                                    display: currentUser.className.value),
-                                LineDetail(
-                                    field: "Khóa",
-                                    display: currentUser.course.value),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LineDetail(field: "Kỹ năng", ctrl: skillCtrl),
-                                LineDetail(
-                                    field: "Thành tích", ctrl: achieveCtrl),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LineDetail(field: "Sở thích", ctrl: hobbyCtrl),
-                                LineDetail(
-                                    field: "Nguyện vọng", ctrl: wishCtrl),
-                              ],
-                            ),
-                            const SizedBox(height: 55),
-                            CustomButton(
-                              text: "Lưu",
-                              width: screenWidth * 0.1,
-                              height: screenHeight * 0.07,
-                              onTap: () async {
-                                DocumentSnapshot<Map<String, dynamic>>
-                                    isExistCV = await firestore
-                                        .collection('cvs')
-                                        .doc(userId)
-                                        .get();
-                                if (isExistCV.data() != null &&
-                                    (skillCtrl.text != '' ||
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  LineDetail(
+                                      field: "Họ tên",
+                                      display: currentUser.userName.value),
+                                  LineDetail(
+                                      field: "Mã số",
+                                      display: currentUser.userId.value
+                                          .toUpperCase()),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  LineDetail(
+                                      field: "Lớp",
+                                      display: currentUser.className.value),
+                                  LineDetail(
+                                      field: "Khóa",
+                                      display: currentUser.course.value),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  LineDetail(
+                                    field: "Kỹ năng",
+                                    ctrl: skillCtrl,
+                                    validator: (p0) => p0!.isEmpty
+                                        ? 'Không được để trống'
+                                        : null,
+                                  ),
+                                  LineDetail(
+                                      field: "Thành tích", ctrl: achieveCtrl),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  LineDetail(
+                                      field: "Sở thích", ctrl: hobbyCtrl),
+                                  LineDetail(
+                                      field: "Nguyện vọng", ctrl: wishCtrl),
+                                ],
+                              ),
+                              const SizedBox(height: 55),
+                              CustomButton(
+                                text: "Lưu",
+                                width: screenWidth * 0.1,
+                                height: screenHeight * 0.07,
+                                onTap: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    DocumentSnapshot<Map<String, dynamic>>
+                                        isExistCV = await firestore
+                                            .collection('cvs')
+                                            .doc(userId)
+                                            .get();
+                                    if (isExistCV.data() != null &&
+                                        (skillCtrl.text != '' ||
+                                            achieveCtrl.text != '' ||
+                                            hobbyCtrl.text != '' ||
+                                            wishCtrl.text != '')) {
+                                      final myCV = CVModel(
+                                          userId: currentUser.userId.value,
+                                          skill: skillCtrl.text,
+                                          achieve: achieveCtrl.text,
+                                          hobby: hobbyCtrl.text,
+                                          wish: wishCtrl.text);
+                                      final json = myCV.toMap();
+                                      firestore
+                                          .collection('cvs')
+                                          .doc(myCV.userId)
+                                          .update(json);
+                                      GV.success(
+                                          context: context,
+                                          message:
+                                              'Thông tin đã được cập nhật.');
+                                    } else if (skillCtrl.text != '' ||
                                         achieveCtrl.text != '' ||
                                         hobbyCtrl.text != '' ||
-                                        wishCtrl.text != '')) {
-                                  final myCV = CVModel(
-                                      userId: currentUser.userId.value,
-                                      skill: skillCtrl.text,
-                                      achieve: achieveCtrl.text,
-                                      hobby: hobbyCtrl.text,
-                                      wish: wishCtrl.text);
-                                  final json = myCV.toMap();
-                                  firestore
-                                      .collection('cvs')
-                                      .doc(myCV.userId)
-                                      .update(json);
-                                  // EasyLoading.showSuccess();
-                                  GV.success(
-                                      context: context,
-                                      message: 'Thông tin đã được cập nhật.');
-                                } else if (skillCtrl.text != '' ||
-                                    achieveCtrl.text != '' ||
-                                    hobbyCtrl.text != '' ||
-                                    wishCtrl.text != '') {
-                                  final myCV = CVModel(
-                                      userId: currentUser.userId.value,
-                                      skill: skillCtrl.text,
-                                      achieve: achieveCtrl.text,
-                                      hobby: hobbyCtrl.text,
-                                      wish: wishCtrl.text);
-                                  final json = myCV.toMap();
-                                  await firestore
-                                      .collection('cvs')
-                                      .doc(myCV.userId)
-                                      .set(json);
-                                  GV.success(
-                                      context: context,
-                                      message: 'Đã thêm các thông tin.');
-                                }
-                                await getFirmsSuggest();
-                              },
-                            ),
-                            firmSuggest.value.isNotEmpty
-                                ? ValueListenableBuilder(
-                                    valueListenable: firmSuggest,
-                                    builder: (context, firmSuggestVal, child) {
-                                      // return ListView.builder(
-                                      //     shrinkWrap: true,
-                                      //     itemCount: firmSuggest.value.length,
-                                      //     itemBuilder: (context, index) {
-                                      //   return Text(
-                                      //       '${firmSuggest.value[index].firmName} ${firmSuggest.value[index].similarityScore}');
-                                      // });
-                                      // // getFirmsSuggest();
-                                      return Container(
-                                        width: screenWidth * 0.5,
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: ListView.builder(
-                                          itemCount: firmSuggest.value.length,
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, indexFirm) {
-                                            FirmModel firm = FirmModel();
-                                            if (firms.isNotEmpty) {
-                                              firms.forEach((element) {
-                                                if (firmSuggest.value[indexFirm]
-                                                        .firmId ==
-                                                    element.firmId) {
-                                                  firm = element;
+                                        wishCtrl.text != '') {
+                                      final myCV = CVModel(
+                                          userId: currentUser.userId.value,
+                                          skill: skillCtrl.text,
+                                          achieve: achieveCtrl.text,
+                                          hobby: hobbyCtrl.text,
+                                          wish: wishCtrl.text);
+                                      final json = myCV.toMap();
+                                      await firestore
+                                          .collection('cvs')
+                                          .doc(myCV.userId)
+                                          .set(json);
+                                      GV.success(
+                                          context: context,
+                                          message: 'Đã thêm các thông tin.');
+                                    }
+                                    await getFirmsSuggest();
+                                  }
+                                },
+                              ),
+                              ValueListenableBuilder(
+                                  valueListenable: firmSuggest,
+                                  builder: (context, firmSuggestVal, child) {
+                                    return firmSuggest.value.isNotEmpty &&
+                                            currentUser.loadIn.isTrue
+                                        ? Container(
+                                            width: screenWidth * 0.5,
+                                            padding:
+                                                const EdgeInsets.only(top: 15),
+                                            child: ListView.builder(
+                                              itemCount:
+                                                  firmSuggest.value.length,
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (context, indexFirm) {
+                                                FirmModel firm = FirmModel();
+                                                if (firms.isNotEmpty) {
+                                                  firms.forEach((element) {
+                                                    if (firmSuggest
+                                                            .value[indexFirm]
+                                                            .firmId ==
+                                                        element.firmId) {
+                                                      firm = element;
+                                                    }
+                                                  });
                                                 }
-                                              });
-                                            }
-
-                                            return firm.firmId != null
-                                                ? Card(
-                                                    elevation: 5,
-                                                    child: ListTile(
-                                                      leading: const Icon(
-                                                          Icons.house),
-                                                      title:
-                                                          Text(firm.firmName!),
-                                                      subtitle: Text(
-                                                        firm.describe!,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      trailing: firm.listRegis!
-                                                                  .firstWhere(
-                                                                      (element) =>
-                                                                          element
-                                                                              .userId ==
-                                                                          userId)
-                                                                  .status ==
-                                                              TrangThai.accept
-                                                          ? Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                if (firm.listRegis!
-                                                                        .firstWhere((element) =>
-                                                                            element.userId ==
-                                                                            userId)
-                                                                        .isConfirmed ==
-                                                                    false)
-                                                                  Text(firm
-                                                                      .listRegis!
-                                                                      .firstWhere((element) =>
-                                                                          element
-                                                                              .userId ==
-                                                                          userId)
-                                                                      .status!),
-                                                                firm.listRegis!
-                                                                            .firstWhere((element) =>
-                                                                                element.userId ==
-                                                                                userId)
+                                                JobRegisterModel check =
+                                                    firm.listRegis!.firstWhere(
+                                                  (element) =>
+                                                      element.userId == userId,
+                                                  orElse: () =>
+                                                      JobRegisterModel(),
+                                                );
+                                                return firm.firmId != null
+                                                    ? Card(
+                                                        elevation: 5,
+                                                        child: ListTile(
+                                                          leading: const Icon(
+                                                              Icons.house),
+                                                          title: Text(
+                                                              firm.firmName!),
+                                                          subtitle: Text(
+                                                            firm.describe!,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          trailing: check
+                                                                      .status ==
+                                                                  TrangThai
+                                                                      .accept
+                                                              ? Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    if (check
                                                                             .isConfirmed ==
-                                                                        false
-                                                                    ? const Text(
-                                                                        'Chờ xác nhận',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                Colors.red),
-                                                                      )
-                                                                    : const Text(
-                                                                        'Công ty thực tập',
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                Colors.red),
-                                                                      ),
-                                                              ],
-                                                            )
-                                                          : Text(firm.listRegis!
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .userId ==
-                                                                      userId)
-                                                              .status!),
-                                                      onTap: () {
-                                                        JobRegisterModel
-                                                            loadRegis =
-                                                            JobRegisterModel();
-                                                        for (var d in firm
-                                                            .listRegis!) {
-                                                          if (d.userId ==
-                                                              userId) {
-                                                            currentUser
-                                                                    .selectedJob
-                                                                    .value =
-                                                                firm.listJob!.firstWhere(
-                                                                    (element) =>
+                                                                        false)
+                                                                      Text(check
+                                                                          .status!),
+                                                                    check.isConfirmed ==
+                                                                            false
+                                                                        ? const Text(
+                                                                            'Chờ xác nhận',
+                                                                            style:
+                                                                                TextStyle(color: Colors.red),
+                                                                          )
+                                                                        : const Text(
+                                                                            'Công ty thực tập',
+                                                                            style:
+                                                                                TextStyle(color: Colors.red),
+                                                                          ),
+                                                                  ],
+                                                                )
+                                                              : check.status ==
+                                                                          TrangThai
+                                                                              .wait ||
+                                                                      check.status ==
+                                                                          TrangThai
+                                                                              .reject
+                                                                  ? Text(check
+                                                                      .status!)
+                                                                  : null,
+                                                          onTap: () {
+                                                            JobRegisterModel
+                                                                loadRegis =
+                                                                JobRegisterModel();
+                                                            for (var d in firm
+                                                                .listRegis!) {
+                                                              if (d.userId ==
+                                                                  userId) {
+                                                                currentUser
+                                                                        .selectedJob
+                                                                        .value =
+                                                                    firm.listJob!.firstWhere((element) =>
                                                                         element
                                                                             .jobId ==
                                                                         d.jobId);
-                                                            loadRegis = d;
-                                                            currentUser
-                                                                    .traineeTime
-                                                                    .value =
-                                                                DateTimeRange(
-                                                              start: DateTime
-                                                                  .fromMicrosecondsSinceEpoch(d
-                                                                      .traineeStart!
-                                                                      .microsecondsSinceEpoch),
-                                                              end: DateTime
-                                                                  .fromMicrosecondsSinceEpoch(d
-                                                                      .traineeEnd!
-                                                                      .microsecondsSinceEpoch),
-                                                            );
-                                                          }
-                                                        }
-                                                        showDialog(
-                                                          context: context,
-                                                          barrierColor:
-                                                              Colors.black12,
-                                                          barrierDismissible:
-                                                              false,
-                                                          builder: (context) {
-                                                            return Padding(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .only(
-                                                                top:
-                                                                    screenHeight *
+                                                                loadRegis = d;
+                                                              }
+                                                            }
+                                                            showDialog(
+                                                              context: context,
+                                                              barrierColor:
+                                                                  Colors
+                                                                      .black12,
+                                                              barrierDismissible:
+                                                                  false,
+                                                              builder:
+                                                                  (context) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .only(
+                                                                    top: screenHeight *
                                                                         0.06,
-                                                                bottom:
-                                                                    screenHeight *
-                                                                        0.02,
-                                                                left:
-                                                                    screenWidth *
-                                                                        0.27,
-                                                                right:
-                                                                    screenWidth *
-                                                                        0.08,
-                                                              ),
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  AlertDialog(
-                                                                    scrollable:
-                                                                        true,
-                                                                    title:
-                                                                        Container(
-                                                                      color: Colors
-                                                                          .blue
-                                                                          .shade600,
-                                                                      height: screenHeight * 0.06,
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric( 
-                                                                          horizontal:
-                                                                              10),
-                                                                      child:
-                                                                          Row(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.center,
-                                                                        children: [
-                                                                          const SizedBox(
-                                                              width: 30,
-                                                            ),
-                                                                          const Expanded(
-                                                                            child: Text('Chi tiết tuyển dụng',
-                                                                                style: TextStyle(fontWeight: FontWeight.bold),
-                                                                                textAlign: TextAlign.center),
-                                                                          ),
-                                                                          SizedBox(width: 30,
-                                                                            child: IconButton(
-                                                                                padding: const EdgeInsets.only(bottom: 1),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                icon: const Icon(Icons.close)),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    titlePadding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    shape: Border.all(
-                                                                        width:
-                                                                            0.5),
-                                                                    content:
-                                                                        ConstrainedBox(
-                                                                      constraints:
-                                                                          BoxConstraints(
-                                                                              minWidth: screenWidth * 0.35),
-                                                                      child:
-                                                                          Form(
-                                                                        child:
-                                                                            Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: <Widget>[
-                                                                            Text('Tên công ty: ${firm.firmName!}'),
-                                                                            Text('Người đại diện: ${firm.owner!}'),
-                                                                            Text('Số điện thoại: ${firm.phone!}'),
-                                                                            Text('Email: ${firm.email!}'),
-                                                                            Text('Địa chỉ: ${firm.address!}'),
-                                                                            Text('Mô tả: ${firm.describe!}'),
-                                                                            if (loadRegis.status == TrangThai.wait ||
-                                                                                loadRegis.userId == null) ...[
-                                                                              const Text('Vị trí tuyển dụng:'),
-                                                                              for (var data in firm.listJob!)
-                                                                                Obx(
-                                                                                  () => CustomRadio(
-                                                                                    title: '${data.jobName} - SL còn lai: ${data.quantity}',
-                                                                                    onTap: () => currentUser.selectedJob.value = data,
-                                                                                    subtitle: '${data.describeJob}',
-                                                                                    selected: currentUser.selectedJob.value == data,
-                                                                                  ),
-                                                                                ),
-                                                                              const Text('Thời gian thưc tập:'),
-                                                                              const SizedBox(height: 10),
-                                                                              Obx(
-                                                                                () => Padding(
-                                                                                  padding: const EdgeInsets.symmetric(horizontal: 70),
-                                                                                  child: Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Expanded(
-                                                                                          child: ElevatedButton(
-                                                                                        onPressed: pickDateRange,
-                                                                                        child: Text(DateFormat('dd/MM/yyyy').format(currentUser.traineeTime.value.start)),
-                                                                                      )),
-                                                                                      const SizedBox(width: 25),
-                                                                                      Expanded(
-                                                                                          child: ElevatedButton(
-                                                                                        onPressed: pickDateRange,
-                                                                                        child: Text(DateFormat('dd/MM/yyyy').format(currentUser.traineeTime.value.end)),
-                                                                                      )),
-                                                                                    ],
-                                                                                  ),
+                                                                    bottom:
+                                                                        screenHeight *
+                                                                            0.02,
+                                                                    left:
+                                                                        screenWidth *
+                                                                            0.27,
+                                                                    right:
+                                                                        screenWidth *
+                                                                            0.08,
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      AlertDialog(
+                                                                        scrollable:
+                                                                            true,
+                                                                        title:
+                                                                            Container(
+                                                                          color: Colors
+                                                                              .blue
+                                                                              .shade600,
+                                                                          height:
+                                                                              screenHeight * 0.06,
+                                                                          padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                              horizontal: 10),
+                                                                          child:
+                                                                              Row(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            children: [
+                                                                              const SizedBox(
+                                                                                width: 30,
+                                                                              ),
+                                                                              const Expanded(
+                                                                                child: Text(
+                                                                                  'Chi tiết tuyển dụng',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                  textAlign: TextAlign.center,
                                                                                 ),
                                                                               ),
-                                                                              const SizedBox(width: 15),
-                                                                              if (isTrainee == true)
-                                                                                const Padding(
-                                                                                  padding: EdgeInsets.only(top: 15),
-                                                                                  child: Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Text(
-                                                                                        'Bạn đã có công ty thực tập không thể ứng tuyển được nữa.',
-                                                                                        style: TextStyle(
-                                                                                          fontSize: 12,
-                                                                                          color: Colors.red,
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                )
-                                                                            ] else ...[
-                                                                              Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
-                                                                              Text('Ngày bắt đầu: ${GV.readTimestamp(loadRegis.traineeStart!)} - Ngày kết thúc:  ${GV.readTimestamp(loadRegis.traineeEnd!)}'),
-                                                                              Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
-                                                                              Text('Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
-                                                                              if (isTrainee == false)
-                                                                                const SizedBox(width: 15),
-                                                                            ],
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    actions: loadRegis.status == TrangThai.wait &&
-                                                                            isTrainee ==
-                                                                                false
-                                                                        ? [
-                                                                            ElevatedButton(
-                                                                              child: const Text(
-                                                                                "Ứng tuyển",
-                                                                                style: TextStyle(
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  fontSize: 16,
-                                                                                ),
-                                                                              ),
-                                                                              onPressed: () async {
-                                                                                if (isRegistered == true) {
-                                                                                  if (firm.listRegis!.where((element) => element.userId == userId).isNotEmpty) {
-                                                                                    for (var d in firm.listRegis!) {
-                                                                                      if (d.userId == userId) {
-                                                                                        if (d.jobId == currentUser.selectedJob.value.jobId && d.traineeStart == Timestamp.fromDate(currentUser.traineeTime.value.start) && d.traineeEnd == Timestamp.fromDate(currentUser.traineeTime.value.end)) {
-                                                                                          GV.warning(context: context, message: 'Không có gì thay đổi.');
-                                                                                        } else if (currentUser.selectedJob.value.jobId == null) {
-                                                                                          GV.error(context: context, message: 'Vui lòng chọn vị trí ứng tuyển.');
-                                                                                        } else if (currentUser.traineeTime.value.start == currentUser.traineeTime.value.end) {
-                                                                                          GV.error(context: context, message: 'Vui lòng chọn thời gian phù hợp.');
-                                                                                        } else {
-                                                                                          var listRegis = firm.listRegis;
-                                                                                          for (int i = 0; i < listRegis!.length; i++) {
-                                                                                            if (listRegis[i].userId == currentUser.userId.value) {
-                                                                                              if (listRegis[i].jobId != currentUser.selectedJob.value.jobId) {
-                                                                                                listRegis[i].jobId = currentUser.selectedJob.value.jobId;
-                                                                                                listRegis[i].jobName = currentUser.selectedJob.value.jobName;
-                                                                                              }
-                                                                                              listRegis[i].traineeStart = Timestamp.fromDate(currentUser.traineeTime.value.start);
-                                                                                              listRegis[i].traineeEnd = Timestamp.fromDate(currentUser.traineeTime.value.end);
-                                                                                            }
-                                                                                          }
-                                                                                          firestore.collection('firms').doc(firm.firmId).update({
-                                                                                            'listRegis': listRegis.map((i) => i.toMap()).toList()
-                                                                                          });
-                                                                                          var loadListRegis = await firestore.collection('trainees').doc(userId).get();
-
-                                                                                          final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
-                                                                                          for (int i = 0; i < listUserRegis!.length; i++) {
-                                                                                            if (listUserRegis[i].firmId == firm.firmId) {
-                                                                                              if (listUserRegis[i].jobId != currentUser.selectedJob.value.jobId) {
-                                                                                                listUserRegis[i].jobId = currentUser.selectedJob.value.jobId;
-                                                                                                listUserRegis[i].jobName = currentUser.selectedJob.value.jobName;
-                                                                                              }
-
-                                                                                              listUserRegis[i].traineeStart = Timestamp.fromDate(currentUser.traineeTime.value.start);
-                                                                                              listUserRegis[i].traineeEnd = Timestamp.fromDate(currentUser.traineeTime.value.end);
-                                                                                            }
-                                                                                          }
-                                                                                          firestore.collection('trainees').doc(userId).update({
-                                                                                            'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
-                                                                                          });
-                                                                                          Navigator.pop(context);
-                                                                                          GV.success(context: context, message: 'Đã cập nhật thành công.');
-                                                                                        }
-                                                                                      }
-                                                                                    }
-                                                                                  } else {
-                                                                                    if (currentUser.selectedJob.value.jobId == null) {
-                                                                                      GV.error(context: context, message: 'Vui lòng chọn vị trí ứng tuyển.');
-                                                                                    } else if (currentUser.traineeTime.value.start == currentUser.traineeTime.value.end) {
-                                                                                      GV.error(context: context, message: 'Vui lòng chọn thời gian phù hợp.');
-                                                                                    } else {
-                                                                                      final regis = JobRegisterModel(
-                                                                                        userId: userId,
-                                                                                        jobId: currentUser.selectedJob.value.jobId,
-                                                                                        userName: currentUser.userName.value,
-                                                                                        jobName: currentUser.selectedJob.value.jobName,
-                                                                                        status: TrangThai.wait,
-                                                                                        createdAt: Timestamp.now(),
-                                                                                        traineeStart: Timestamp.fromDate(currentUser.traineeTime.value.start),
-                                                                                        traineeEnd: Timestamp.fromDate(currentUser.traineeTime.value.end),
-                                                                                      );
-                                                                                      var listRegis = firm.listRegis;
-                                                                                      listRegis!.add(regis);
-                                                                                      firestore.collection('firms').doc(firm.firmId).update({
-                                                                                        'listRegis': listRegis.map((i) => i.toMap()).toList()
-                                                                                      });
-                                                                                      final userRegis = UserRegisterModel(
-                                                                                        firmId: firm.firmId,
-                                                                                        jobId: regis.jobId,
-                                                                                        jobName: regis.jobName,
-                                                                                        status: TrangThai.wait,
-                                                                                        createdAt: Timestamp.now(),
-                                                                                        traineeStart: Timestamp.fromDate(currentUser.traineeTime.value.start),
-                                                                                        traineeEnd: Timestamp.fromDate(currentUser.traineeTime.value.end),
-                                                                                      );
-                                                                                      var loadListRegis = await firestore.collection('trainees').doc(userId).get();
-                                                                                      final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
-                                                                                      listUserRegis!.add(userRegis);
-                                                                                      firestore.collection('trainees').doc(userId).update({
-                                                                                        'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
-                                                                                      });
+                                                                              SizedBox(
+                                                                                width: 30,
+                                                                                child: IconButton(
+                                                                                    padding: const EdgeInsets.only(bottom: 1),
+                                                                                    onPressed: () {
                                                                                       Navigator.pop(context);
-                                                                                      GV.success(context: context, message: 'Đăng ký thành công.');
-                                                                                    }
-                                                                                  }
-                                                                                } else {
-                                                                                  GV.error(context: context, message: 'Bạn cần phải đăng ký thực tập trước khi ứng tuyển.');
-                                                                                }
-                                                                              },
+                                                                                    },
+                                                                                    icon: const Icon(Icons.close)),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        titlePadding:
+                                                                            EdgeInsets.zero,
+                                                                        shape: Border.all(
+                                                                            width:
+                                                                                0.5),
+                                                                        content:
+                                                                            ConstrainedBox(
+                                                                          constraints:
+                                                                              BoxConstraints(minWidth: screenWidth * 0.35),
+                                                                          child:
+                                                                              Form(
+                                                                            child:
+                                                                                Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: <Widget>[
+                                                                                Text('Tên công ty: ${firm.firmName!}'),
+                                                                                Text('Người đại diện: ${firm.owner!}'),
+                                                                                Text('Số điện thoại: ${firm.phone!}'),
+                                                                                Text('Email: ${firm.email!}'),
+                                                                                Text('Địa chỉ: ${firm.address!}'),
+                                                                                Text('Mô tả: ${firm.describe!}'),
+                                                                                if (isRegistered == false) ...[
+                                                                                  const Text('Vị trí tuyển dụng:'),
+                                                                                  for (var job in firm.listJob!)
+                                                                                    Padding(
+                                                                                      padding: const EdgeInsets.only(left: 25),
+                                                                                      child: ListTile(
+                                                                                        dense: true,
+                                                                                        contentPadding: EdgeInsets.zero,
+                                                                                        title: Text('${job.jobName} - SL: ${job.quantity}'),
+                                                                                        subtitle: Text('${job.describeJob}'),
+                                                                                      ),
+                                                                                    ),
+                                                                                  const Padding(
+                                                                                    padding: EdgeInsets.only(top: 15),
+                                                                                    child: Row(
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          'Bạn cần phải đăng ký thực tập thực tế trước khi ứng tuyển.',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: 12,
+                                                                                            color: Colors.red,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                                                                                  Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
+                                                                                  Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
+                                                                                  Text('Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
+                                                                                  Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                                                                                ] else if (isTrainee) ...[
+                                                                                  const Text('Vị trí tuyển dụng:'),
+                                                                                  for (var job in firm.listJob!)
+                                                                                    Padding(
+                                                                                      padding: const EdgeInsets.only(left: 25),
+                                                                                      child: ListTile(
+                                                                                        dense: true,
+                                                                                        contentPadding: EdgeInsets.zero,
+                                                                                        title: Text('${job.jobName} - SL: ${job.quantity}'),
+                                                                                        subtitle: Text('${job.describeJob}'),
+                                                                                      ),
+                                                                                    ),
+                                                                                  const Padding(
+                                                                                    padding: EdgeInsets.only(top: 15),
+                                                                                    child: Row(
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          'Bạn đã có công ty thực tập không thể ứng tuyển được nữa.',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: 12,
+                                                                                            color: Colors.red,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  )
+                                                                                ] else if (loadRegis.status == TrangThai.wait || loadRegis.userId == null) ...[
+                                                                                  const Text('Vị trí tuyển dụng:'),
+                                                                                  for (var data in firm.listJob!)
+                                                                                    Obx(
+                                                                                      () => CustomRadio(
+                                                                                        title: '${data.jobName} - SL còn lai: ${data.quantity}',
+                                                                                        onTap: () => currentUser.selectedJob.value = data,
+                                                                                        subtitle: '${data.describeJob}',
+                                                                                        selected: currentUser.selectedJob.value == data,
+                                                                                      ),
+                                                                                    ),
+                                                                                ],
+                                                                              ],
                                                                             ),
-                                                                          ]
-                                                                        : loadRegis.status == TrangThai.accept &&
-                                                                                loadRegis.isConfirmed == false &&
+                                                                          ),
+                                                                        ),
+                                                                        actions: (loadRegis.status == null || loadRegis.status == TrangThai.wait) &&
                                                                                 isTrainee == false
                                                                             ? [
                                                                                 ElevatedButton(
-                                                                                  onPressed: () async {
-                                                                                    var loadCBHD = await firestore.collection('users').doc(firm.firmId).get();
-
-                                                                                    final cbhdName = UserModel.fromMap(loadCBHD.data()!).userName;
-                                                                                    final plan = PlanWorkModel(
-                                                                                      cbhdId: firm.firmId,
-                                                                                      cbhdName: cbhdName,
-                                                                                      listWork: [],
-                                                                                      userId: userId,
-                                                                                    );
-                                                                                    var listRegis = firm.listRegis;
-                                                                                    for (int i = 0; i < listRegis!.length; i++) {
-                                                                                      if (listRegis[i].userId == currentUser.userId.value) {
-                                                                                        if (listRegis[i].jobId == currentUser.selectedJob.value.jobId) {
-                                                                                          listRegis[i].isConfirmed = true;
-                                                                                          plan.traineeStart = listRegis[i].traineeStart;
-                                                                                          plan.traineeEnd = listRegis[i].traineeEnd;
-                                                                                        }
-                                                                                      }
-                                                                                    }
-                                                                                    firestore.collection('plans').doc(userId).set(plan.toMap());
-                                                                                    firestore.collection('firms').doc(firm.firmId).update({
-                                                                                      'listRegis': listRegis.map((i) => i.toMap()).toList()
-                                                                                    });
-                                                                                    var loadListRegis = await GV.traineesCol.doc(userId).get();
-                                                                                    final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
-                                                                                    for (int i = 0; i < listUserRegis!.length; i++) {
-                                                                                      if (listUserRegis[i].firmId == firm.firmId) {
-                                                                                        if (listUserRegis[i].jobId == currentUser.selectedJob.value.jobId) {
-                                                                                          listUserRegis[i].isConfirmed = true;
-                                                                                        }
-                                                                                      }
-                                                                                    }
-                                                                                    firestore.collection('trainees').doc(userId).update({
-                                                                                      'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
-                                                                                    });
-                                                                                    Navigator.pop(context);
-                                                                                    GV.success(context: context, message: 'Đã xác nhận công ty thực tập');
-                                                                                  },
                                                                                   child: const Text(
-                                                                                    'Xác nhận',
+                                                                                    "Ứng tuyển",
                                                                                     style: TextStyle(
                                                                                       fontWeight: FontWeight.bold,
                                                                                       fontSize: 16,
                                                                                     ),
                                                                                   ),
-                                                                                ),
-                                                                                ElevatedButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.pop(context);
+                                                                                  onPressed: () async {
+                                                                                    if (isRegistered == true) {
+                                                                                      if (firm.listRegis!.where((element) => element.userId == userId).isNotEmpty) {
+                                                                                        for (var d in firm.listRegis!) {
+                                                                                          if (d.userId == userId) {
+                                                                                            if (d.jobId == currentUser.selectedJob.value.jobId) {
+                                                                                              GV.warning(context: context, message: 'Không có gì thay đổi.');
+                                                                                            } else if (currentUser.selectedJob.value.jobId == null) {
+                                                                                              GV.error(context: context, message: 'Vui lòng chọn vị trí ứng tuyển.');
+                                                                                            } else {
+                                                                                              var listRegis = firm.listRegis;
+                                                                                              for (int i = 0; i < listRegis!.length; i++) {
+                                                                                                if (listRegis[i].userId == currentUser.userId.value) {
+                                                                                                  if (listRegis[i].jobId != currentUser.selectedJob.value.jobId) {
+                                                                                                    listRegis[i].jobId = currentUser.selectedJob.value.jobId;
+                                                                                                    listRegis[i].jobName = currentUser.selectedJob.value.jobName;
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                              firestore.collection('firms').doc(firm.firmId).update({
+                                                                                                'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                                              });
+                                                                                              var loadListRegis = await firestore.collection('trainees').doc(userId).get();
+
+                                                                                              final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
+                                                                                              for (int i = 0; i < listUserRegis!.length; i++) {
+                                                                                                if (listUserRegis[i].firmId == firm.firmId) {
+                                                                                                  if (listUserRegis[i].jobId != currentUser.selectedJob.value.jobId) {
+                                                                                                    listUserRegis[i].jobId = currentUser.selectedJob.value.jobId;
+                                                                                                    listUserRegis[i].jobName = currentUser.selectedJob.value.jobName;
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                              firestore.collection('trainees').doc(userId).update({
+                                                                                                'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                              });
+                                                                                              await getFirmsSuggest();
+                                                                                              Navigator.pop(context);
+                                                                                              GV.success(context: context, message: 'Đã cập nhật thành công.');
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      } else {
+                                                                                        if (currentUser.selectedJob.value.jobId == null) {
+                                                                                          GV.error(context: context, message: 'Vui lòng chọn vị trí ứng tuyển.');
+                                                                                        } else {
+                                                                                          final regis = JobRegisterModel(
+                                                                                            userId: userId,
+                                                                                            jobId: currentUser.selectedJob.value.jobId,
+                                                                                            userName: currentUser.userName.value,
+                                                                                            jobName: currentUser.selectedJob.value.jobName,
+                                                                                            status: TrangThai.wait,
+                                                                                            createdAt: Timestamp.now(),
+                                                                                          );
+                                                                                          var listRegis = firm.listRegis;
+                                                                                          listRegis!.add(regis);
+                                                                                          firestore.collection('firms').doc(firm.firmId).update({
+                                                                                            'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                                          });
+                                                                                          final userRegis = UserRegisterModel(
+                                                                                            firmId: firm.firmId,
+                                                                                            jobId: regis.jobId,
+                                                                                            jobName: regis.jobName,
+                                                                                            status: TrangThai.wait,
+                                                                                            createdAt: Timestamp.now(),
+                                                                                          );
+                                                                                          var loadListRegis = await firestore.collection('trainees').doc(userId).get();
+                                                                                          final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
+                                                                                          listUserRegis!.add(userRegis);
+                                                                                          firestore.collection('trainees').doc(userId).update({
+                                                                                            'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                          });
+
+                                                                                          Navigator.pop(context);
+                                                                                          GV.success(context: context, message: 'Đăng ký thành công.');
+                                                                                        }
+                                                                                      }
+                                                                                    } else {
+                                                                                      GV.error(context: context, message: 'Bạn cần phải đăng ký thực tập trước khi ứng tuyển.');
+                                                                                    }
                                                                                   },
-                                                                                  child: const Text(
-                                                                                    'Để sau',
-                                                                                    style: TextStyle(
-                                                                                      color: Colors.red,
-                                                                                      fontSize: 16,
-                                                                                    ),
-                                                                                  ),
                                                                                 ),
                                                                               ]
-                                                                            : null,
+                                                                            : loadRegis.status == TrangThai.accept && loadRegis.isConfirmed == false && isTrainee == false
+                                                                                ? [
+                                                                                    ElevatedButton(
+                                                                                      onPressed: () async {
+                                                                                        var loadCBHD = await firestore.collection('users').doc(firm.firmId).get();
+                                                                                        final cbhdName = UserModel.fromMap(loadCBHD.data()!).userName;
+                                                                                        final plan = PlanWorkModel(
+                                                                                          cbhdId: firm.firmId,
+                                                                                          cbhdName: cbhdName,
+                                                                                          listWork: [],
+                                                                                          userId: userId,
+                                                                                        );
+                                                                                        var listRegis = firm.listRegis;
+                                                                                        for (int i = 0; i < listRegis!.length; i++) {
+                                                                                          if (listRegis[i].userId == currentUser.userId.value) {
+                                                                                            if (listRegis[i].jobId == currentUser.selectedJob.value.jobId) {
+                                                                                              listRegis[i].isConfirmed = true;
+                                                                                              plan.traineeStart = trainee.traineeStart;
+                                                                                              plan.traineeEnd = trainee.traineeEnd;
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                        firestore.collection('plans').doc(userId).set(plan.toMap());
+                                                                                        firestore.collection('firms').doc(firm.firmId).update({
+                                                                                          'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                                        });
+                                                                                        var loadListRegis = await GV.traineesCol.doc(userId).get();
+                                                                                        final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
+                                                                                        for (int i = 0; i < listUserRegis!.length; i++) {
+                                                                                          if (listUserRegis[i].firmId == firm.firmId) {
+                                                                                            if (listUserRegis[i].jobId == currentUser.selectedJob.value.jobId) {
+                                                                                              listUserRegis[i].isConfirmed = true;
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                        firestore.collection('trainees').doc(userId).update({
+                                                                                          'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                        });
+                                                                                        Navigator.pop(context);
+                                                                                        GV.success(context: context, message: 'Đã xác nhận công ty thực tập');
+                                                                                      },
+                                                                                      child: const Text(
+                                                                                        'Xác nhận',
+                                                                                        style: TextStyle(
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          fontSize: 16,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                    ElevatedButton(
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                      },
+                                                                                      child: const Text(
+                                                                                        'Để sau',
+                                                                                        style: TextStyle(
+                                                                                          color: Colors.red,
+                                                                                          fontSize: 16,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ]
+                                                                                : null,
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                                : const SizedBox.shrink();
-                                          },
-                                        ),
-                                      );
-                                    })
-                                : const Column(
-                                    children: [
-                                      Text(
-                                          'Chưa có công ty phù hợp với bạn, chuyển đến danh sách các công ty để tìm thêm cơ hội.'),
-                                    ],
-                                  ),
-                          ],
+                                                        ),
+                                                      )
+                                                    : const SizedBox.shrink();
+                                              },
+                                            ),
+                                          )
+                                        : currentUser.loadIn.isTrue
+                                            ? const Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 35),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                        'Chưa có công ty phù hợp với bạn, chuyển đến danh sách các công ty để tìm thêm cơ hội.'),
+                                                  ],
+                                                ),
+                                              )
+                                            : const Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 35),
+                                                child: Loading(),
+                                              );
+                                  })
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -766,34 +784,5 @@ class _MyCVState extends State<MyCV> {
                   child: Loading(),
                 );
         });
-  }
-
-  Future pickDateRange() async {
-    DateTimeRange? newDateRange = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2025),
-      builder: (context, child) {
-        double screenHeight = MediaQuery.of(context).size.height;
-        double screenWidth = MediaQuery.of(context).size.width;
-        return Padding(
-          padding: EdgeInsets.only(
-            top: screenHeight * 0.15,
-            bottom: screenHeight * 0.06,
-            left: screenWidth * 0.4,
-            right: screenWidth * 0.21,
-          ),
-          child: SizedBox(
-            height: 450,
-            width: 700,
-            child: child,
-          ),
-        );
-      },
-    );
-    if (newDateRange == null) return;
-    setState(() {
-      currentUser.traineeTime.value = newDateRange;
-    });
   }
 }

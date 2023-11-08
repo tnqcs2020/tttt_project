@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/plan_trainee_model.dart';
+import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/date_inputformatter.dart';
@@ -129,7 +130,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                       child: Column(
                         children: [
                           Container(
-                            height: screenHeight * 0.05,
+                            height: screenHeight * 0.06,
                             decoration: BoxDecoration(
                               color: Colors.blue.shade600,
                               borderRadius: const BorderRadius.only(
@@ -141,10 +142,12 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Quản lý các kế hoạc thực tập",
+                                  "Quản Lý Các Kế Hoạch Thực Tập",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ],
                             ),
@@ -432,7 +435,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                             return Container(
                                                               height:
                                                                   screenHeight *
-                                                                      0.04,
+                                                                      0.05,
                                                               color: index %
                                                                           2 ==
                                                                       0
@@ -564,7 +567,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                 return Container(
                                                                   height:
                                                                       screenHeight *
-                                                                          0.04,
+                                                                          0.05,
                                                                   color: index %
                                                                               2 ==
                                                                           0
@@ -621,7 +624,12 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                             ),
                                                                             IconButton(
                                                                               padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {},
+                                                                              onPressed: () async {
+                                                                                await deletePlanTrainee(
+                                                                                  context: context,
+                                                                                  planTrainee: dskh[index],
+                                                                                );
+                                                                              },
                                                                               icon: const Icon(
                                                                                 Icons.delete_rounded,
                                                                                 color: Colors.red,
@@ -1147,6 +1155,48 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         .collection('planTrainees')
                                         .doc(docId)
                                         .set(planTrainee.toMap());
+                                    final updateTimeTrainee = await firestore
+                                        .collection('trainees')
+                                        .where('term',
+                                            isEqualTo: _selectedHK.value)
+                                        .where('yearStart',
+                                            isEqualTo: _selectedNH.value.start)
+                                        .where('yearEnd',
+                                            isEqualTo: _selectedNH.value.end)
+                                        .get();
+
+                                    if (updateTimeTrainee.docs.isNotEmpty) {
+                                      List<RegisterTraineeModel>
+                                          traineeUpdates = [];
+                                      updateTimeTrainee.docs.forEach(
+                                          (element) => traineeUpdates.add(
+                                              RegisterTraineeModel.fromMap(
+                                                  element.data())));
+                                      if (dayStart[11].text.isNotEmpty &&
+                                          dayEnd[11].text.isNotEmpty) {
+                                        traineeUpdates.forEach((element) {
+                                          element.traineeStart = Timestamp
+                                              .fromDate(DateFormat('dd/MM/yyyy')
+                                                  .parse(dayStart[11].text));
+                                          element.traineeEnd =
+                                              Timestamp.fromDate(
+                                                  DateFormat('dd/MM/yyyy')
+                                                      .parse(dayEnd[11].text));
+                                        });
+                                      }
+                                      if (traineeUpdates.isNotEmpty) {
+                                        traineeUpdates.forEach((element) {
+                                          firestore
+                                              .collection('trainees')
+                                              .doc(element.userId)
+                                              .update({
+                                            'traineeStart':
+                                                element.traineeStart,
+                                            'traineeEnd': element.traineeEnd,
+                                          });
+                                        });
+                                      }
+                                    }
                                     Navigator.of(context).pop();
                                     GV.success(
                                         context: context,
@@ -1183,14 +1233,56 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                       term: _selectedHK.value,
                                       yearStart: _selectedNH.value.start,
                                       yearEnd: _selectedNH.value.end,
-                                      createdAt: Timestamp.now(),
                                       listContent: listContent,
                                       notice: noticeCtrl.text,
+                                      createdAt: planTrainee.createdAt,
                                     );
                                     firestore
                                         .collection('planTrainees')
                                         .doc(planTrainee.planTraineeId!)
                                         .update(planTraineeModel.toMap());
+                                    final updateTimeTrainee = await firestore
+                                        .collection('trainees')
+                                        .where('term',
+                                            isEqualTo: _selectedHK.value)
+                                        .where('yearStart',
+                                            isEqualTo: _selectedNH.value.start)
+                                        .where('yearEnd',
+                                            isEqualTo: _selectedNH.value.end)
+                                        .get();
+
+                                    if (updateTimeTrainee.docs.isNotEmpty) {
+                                      List<RegisterTraineeModel>
+                                          traineeUpdates = [];
+                                      updateTimeTrainee.docs.forEach(
+                                          (element) => traineeUpdates.add(
+                                              RegisterTraineeModel.fromMap(
+                                                  element.data())));
+                                      if (dayStart[11].text.isNotEmpty &&
+                                          dayEnd[11].text.isNotEmpty) {
+                                        traineeUpdates.forEach((element) {
+                                          element.traineeStart = Timestamp
+                                              .fromDate(DateFormat('dd/MM/yyyy')
+                                                  .parse(dayStart[11].text));
+                                          element.traineeEnd =
+                                              Timestamp.fromDate(
+                                                  DateFormat('dd/MM/yyyy')
+                                                      .parse(dayEnd[11].text));
+                                        });
+                                      }
+                                      if (traineeUpdates.isNotEmpty) {
+                                        traineeUpdates.forEach((element) {
+                                          firestore
+                                              .collection('trainees')
+                                              .doc(element.userId)
+                                              .update({
+                                            'traineeStart':
+                                                element.traineeStart,
+                                            'traineeEnd': element.traineeEnd,
+                                          });
+                                        });
+                                      }
+                                    }
                                     Navigator.of(context).pop();
                                     GV.success(
                                         context: context,
@@ -1210,7 +1302,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
 
   deletePlanTrainee({
     required BuildContext context,
-    // required AnnouncementModel announcement,
+    required PlanTraineeModel planTrainee,
   }) async {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -1238,7 +1330,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Xóa tài liệu',
+                          'Xóa Kế Hoạch',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
@@ -1248,7 +1340,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                   titlePadding: EdgeInsets.zero,
                   shape: Border.all(width: 0.5),
                   content:
-                      const Text("Bạn có chắc chắn muốn xóa thông báo này?"),
+                      const Text("Bạn có chắc chắn muốn xóa kế hoạch này?"),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -1263,16 +1355,15 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        // if (announcement.announcementId != null) {
-                        //   firestore
-                        //       .collection('announcements')
-                        //       .doc(announcement.announcementId!)
-                        //       .delete();
-                        //   Navigator.of(context).pop();
-                        //   GV.success(
-                        //       context: context,
-                        //       message: 'Tài liệu đã được xóa.');
-                        // }
+                        if (planTrainee.planTraineeId != null) {
+                          firestore
+                              .collection('planTrainees')
+                              .doc(planTrainee.planTraineeId!)
+                              .delete();
+                          Navigator.of(context).pop();
+                          GV.success(
+                              context: context, message: 'Đã xóa kế hoạch.');
+                        }
                       },
                       child: const Text(
                         "Đồng ý",

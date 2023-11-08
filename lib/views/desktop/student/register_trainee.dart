@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/credit_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
+import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
@@ -79,23 +80,42 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           await firestore.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
-
         user = loadUser;
         DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
             await firestore.collection('submits').doc(userId).get();
         if (isExitSubmit.data() != null) {
           final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
-
           files = loadSubmit.files ?? [];
         }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
-          final loadTrainee =
+          RegisterTraineeModel loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
-
+          if (loadTrainee.traineeStart == null &&
+              loadTrainee.traineeEnd == null) {
+            QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
+                await firestore
+                    .collection('planTrainees')
+                    .where('term', isEqualTo: loadTrainee.term)
+                    .where('yearStart', isEqualTo: loadTrainee.yearStart)
+                    .where('yearEnd', isEqualTo: loadTrainee.yearEnd)
+                    .get();
+            if (isExitPlanTrainee.docs.isNotEmpty) {
+              final planTrainee =
+                  PlanTraineeModel.fromMap(isExitPlanTrainee.docs.first.data());
+              if (planTrainee.listContent!.isNotEmpty) {
+                firestore.collection('trainees').doc(userId).update({
+                  'traineeStart': planTrainee.listContent![11].dayStart,
+                  'traineeEnd': planTrainee.listContent![11].dayEnd,
+                });
+                loadTrainee.traineeStart =
+                    planTrainee.listContent![11].dayStart;
+                loadTrainee.traineeEnd = planTrainee.listContent![11].dayEnd;
+              }
+            }
+          }
           trainee = loadTrainee;
-
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
@@ -116,6 +136,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             setCVClass: loadUser.cvClass,
             setReachedStep: loadTrainee.reachedStep,
           );
+          currentUser.selectedStep.value = loadTrainee.reachedStep!;
         } else {
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
@@ -186,7 +207,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         child: Column(
                           children: [
                             Container(
-                              height: 35,
+                              height: screenHeight * 0.06,
                               decoration: BoxDecoration(
                                 color: Colors.blue.shade600,
                                 borderRadius: const BorderRadius.only(
@@ -198,10 +219,12 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Quản lý thực tập thực tế",
+                                    "Quản Lý Thực Tập Thực Tế",
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -555,7 +578,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   selectedHP.name.isNotEmpty &&
                   selectedHK != HocKy.empty &&
                   selectedNH != NamHoc.empty) {
-                final registerTraineeModel = RegisterTraineeModel(
+                RegisterTraineeModel registerTraineeModel =
+                    RegisterTraineeModel(
                   creditId: selectedHP.id,
                   term: selectedHK,
                   creditName: selectedHP.name,
@@ -565,8 +589,24 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   course: currentUser.course.value,
                   studentName: currentUser.userName.value,
                   reachedStep: 0,
-                  listRegis: [],
                 );
+                QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
+                    await firestore
+                        .collection('planTrainees')
+                        .where('term', isEqualTo: selectedHK)
+                        .where('yearStart', isEqualTo: selectedNH.start)
+                        .where('yearEnd', isEqualTo: selectedNH.end)
+                        .get();
+                if (isExitPlanTrainee.docs.isNotEmpty) {
+                  final planTrainee = PlanTraineeModel.fromMap(
+                      isExitPlanTrainee.docs.first.data());
+                  if (planTrainee.listContent!.isNotEmpty) {
+                    registerTraineeModel.traineeStart =
+                        planTrainee.listContent![11].dayStart;
+                    registerTraineeModel.traineeEnd =
+                        planTrainee.listContent![11].dayEnd;
+                  }
+                }
                 currentUser.reachedStep.value = 0;
                 final docRegister = firestore
                     .collection('trainees')
@@ -575,6 +615,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                 await docRegister.set(json);
                 GV.success(context: context, message: 'Đã đăng ký!');
                 _nextStep(StepEnabling.sequential);
+                setState(() {
+                  trainee = registerTraineeModel;
+                });
               } else {
                 GV.error(context: context, message: 'Chọn đầy đủ thông tin!');
               }
@@ -609,6 +652,10 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                 Text('Học kỳ: ${loadTrainee.term}'),
                 Text(
                     'Năm học: ${loadTrainee.yearStart} - ${loadTrainee.yearEnd}'),
+                if (loadTrainee.traineeStart != null &&
+                    loadTrainee.traineeEnd != null)
+                  Text(
+                      'Thời gian thực tập: ${GV.readTimestamp(loadTrainee.traineeStart!)} - ${GV.readTimestamp(loadTrainee.traineeEnd!)}'),
               ],
             ),
           ),
@@ -667,7 +714,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                               ),
                               const SizedBox(height: 15),
                               SizedBox(
-                                width: screenWidth * 0.25,
+                                width: screenWidth * 0.35,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -843,7 +890,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                         Text(
                                                                             'Vị trí ứng tuyển: ${listAccepted[index].jobName} '),
                                                                         Text(
-                                                                            'Ngày bắt đầu: ${GV.readTimestamp(listAccepted[index].traineeStart!)} - Ngày kết thúc:  ${GV.readTimestamp(listAccepted[index].traineeEnd!)}'),
+                                                                            'Ngày bắt đầu: ${GV.readTimestamp(trainee.traineeStart!)} - Ngày kết thúc:  ${GV.readTimestamp(trainee.traineeEnd!)}'),
                                                                         Text(
                                                                             'Ngày ứng tuyển: ${GV.readTimestamp(listAccepted[index].createdAt!)}'),
                                                                         Text(
@@ -886,9 +933,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                                           listRegis[i].isConfirmed =
                                                                               true;
                                                                           plan.traineeStart =
-                                                                              listRegis[i].traineeStart;
+                                                                              trainee.traineeStart;
                                                                           plan.traineeEnd =
-                                                                              listRegis[i].traineeEnd;
+                                                                              trainee.traineeEnd;
                                                                         }
                                                                       }
                                                                       firestore

@@ -198,10 +198,19 @@ List<String> dsndAll = [
 ];
 
 class TrangThai {
+  static const String empty = "";
   static const String wait = "Chờ duyệt";
   static const String accept = "Đã duyệt";
   static const String reject = "Từ chối";
+  static const String tatca = 'Tất cả';
 }
+
+List<String> dsttAll = [
+  TrangThai.tatca,
+  TrangThai.wait,
+  TrangThai.accept,
+  TrangThai.reject,
+];
 
 class NamHoc {
   final String start;

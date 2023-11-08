@@ -192,7 +192,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             child: Container(
                                                               height:
                                                                   screenHeight *
-                                                                      0.04,
+                                                                      0.05,
                                                               color: index %
                                                                           2 ==
                                                                       0
@@ -219,8 +219,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                   Expanded(
                                                                     flex: 3,
                                                                     child: Text(
-                                                                        GV.readTimestamp(listAnnouncement[index]
-                                                                            .createdAt!),
+                                                                        'Ngày đăng: ${GV.readTimestamp(listAnnouncement[index].createdAt!)}',
                                                                         textAlign:
                                                                             TextAlign.center),
                                                                   ),
@@ -485,15 +484,17 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                vertical: 30, horizontal: 50),
+                                                vertical: 30, horizontal: 70),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
                                                 Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
-                                                      'Tiêu đề: ${readAnnouncement.value.title} - ${GV.readTimestamp(readAnnouncement.value.createdAt!)}',
+                                                      '${readAnnouncement.value.title} - ${GV.readTimestamp(readAnnouncement.value.createdAt!)}',
                                                       style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.w500,
@@ -502,6 +503,10 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                     ),
                                                   ],
                                                 ),
+                                                SizedBox(
+                                                    width: screenWidth * 0.35,
+                                                    child: Divider()),
+                                                const SizedBox(height: 15),
                                                 Row(
                                                   children: [
                                                     Expanded(
@@ -517,15 +522,19 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                     ),
                                                   ],
                                                 ),
+                                                const SizedBox(height: 10),
                                                 Row(
                                                   children: [
-                                                    const Text(
-                                                      'Tệp đính kèm: ',
-                                                      style: TextStyle(
-                                                        fontSize: 18,
+                                                    SizedBox(
+                                                      width: screenWidth * 0.1,
+                                                      child: const Text(
+                                                        'Tệp đính kèm: ',
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                        ),
+                                                        overflow:
+                                                            TextOverflow.clip,
                                                       ),
-                                                      overflow:
-                                                          TextOverflow.clip,
                                                     ),
                                                     Expanded(
                                                       child: Column(

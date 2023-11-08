@@ -116,7 +116,7 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      height: 35,
+                                      height: screenHeight * 0.06,
                                       decoration: BoxDecoration(
                                         color: Colors.blue.shade600,
                                         borderRadius: const BorderRadius.only(
@@ -129,10 +129,12 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Quản lý",
+                                            "Quản Lý Thông Tin",
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ],
                                       ),
