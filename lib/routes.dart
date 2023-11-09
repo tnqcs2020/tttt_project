@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tttt_project/views/desktop/admin/add_user_screen.dart';
 import 'package:tttt_project/views/desktop/admin/list_trainee_screen.dart';
-import 'package:tttt_project/views/desktop/admin/list_user.dart'; 
+import 'package:tttt_project/views/desktop/admin/list_user.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_info_canbo.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_trainee.dart';
+import 'package:tttt_project/views/desktop/covan/info_covan.dart';
+import 'package:tttt_project/views/desktop/covan/manage_list_student.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_announcement.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_credit_screen.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_time.dart';
@@ -29,6 +31,8 @@ class RouteGenerator {
   static const String dsNguoiDung = '/ds-nguoi-dung';
   static const String manageAnnouncement = '/ql-thong-bao';
   static const String manageTime = '/ql-thoi-gian';
+  static const String infoCV = '/thong-tin-cv';
+  static const String dssv = '/ds-sinh-vien';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -102,10 +106,20 @@ class RouteGenerator {
           settings: routeSettings,
           builder: (_) => const ManageAnnouncementScreen(),
         );
-        case manageTime:
+      case manageTime:
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const ManageTimeScreen(),
+        );
+      case infoCV:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const InfoCV(),
+        );
+      case dssv:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ManageListStudent(),
         );
       default:
         return MaterialPageRoute(

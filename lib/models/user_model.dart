@@ -111,6 +111,9 @@ class ClassModel {
     this.yearEnd,
   });
 
+  static ClassModel empty = ClassModel(classId: '');
+  static ClassModel tatca = ClassModel(classId: 'Tất cả');
+
   Map<String, dynamic> toMap() {
     return {
       'className': className,

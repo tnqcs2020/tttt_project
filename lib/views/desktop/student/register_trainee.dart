@@ -588,6 +588,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   yearEnd: selectedNH.end,
                   course: currentUser.course.value,
                   studentName: currentUser.userName.value,
+                  classId: currentUser.classId.value,
                   reachedStep: 0,
                 );
                 QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =

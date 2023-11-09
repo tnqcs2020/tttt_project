@@ -160,16 +160,14 @@ List<String> pageGiaoVu = [
 ];
 
 List<String> menuCoVan = [
-  'Trang chu',
+  'Trang chủ',
   "Thông tin",
-  "Công ty liên kết",
-  "Đánh giá",
+  "Quản lý sinh viên",
 ];
 List<String> pageCoVan = [
   RouteGenerator.home,
-  RouteGenerator.info,
-  RouteGenerator.register,
-  RouteGenerator.firm,
+  RouteGenerator.infoCV,
+  RouteGenerator.dssv,
 ];
 
 class NguoiDung {

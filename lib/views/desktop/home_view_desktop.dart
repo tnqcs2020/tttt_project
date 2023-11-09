@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/announcement_model.dart';
+import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
@@ -138,7 +139,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        "Tin Giáo Vụ Khoa",
+                                                        "Tin Tức Giáo Vụ & Việc Làm",
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
@@ -154,8 +155,6 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                           StreamBuilder(
                                             stream: firestore
                                                 .collection('announcements')
-                                                .where('type',
-                                                    isEqualTo: 'Tin giáo vụ')
                                                 .snapshots(),
                                             builder: (context, snapshot) {
                                               final List<AnnouncementModel>
@@ -213,6 +212,14 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                     child: Text(
                                                                         listAnnouncement[index]
                                                                             .title!,
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                        listAnnouncement[index]
+                                                                            .type!,
                                                                         textAlign:
                                                                             TextAlign.center),
                                                                   ),
@@ -285,7 +292,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        "Tin Việc Làm",
+                                                        "Kế Hoạch Thực Tập",
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
@@ -300,39 +307,37 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                           ),
                                           StreamBuilder(
                                             stream: firestore
-                                                .collection('announcements')
-                                                .where('type',
-                                                    isEqualTo: 'Tin việc làm')
+                                                .collection('planTrainees')
                                                 .snapshots(),
                                             builder: (context, snapshot) {
-                                              final List<AnnouncementModel>
-                                                  listAnnouncement = [];
+                                              final List<PlanTraineeModel>
+                                                  listPlanTrainee = [];
                                               if (snapshot.hasData &&
                                                   snapshot.connectionState ==
                                                       ConnectionState.active) {
                                                 snapshot.data?.docs
                                                     .forEach((element) {
-                                                  listAnnouncement.add(
-                                                      AnnouncementModel.fromMap(
+                                                  listPlanTrainee.add(
+                                                      PlanTraineeModel.fromMap(
                                                           element.data()));
                                                 });
-                                                return listAnnouncement
+                                                return listPlanTrainee
                                                         .isNotEmpty
                                                     ? ListView.builder(
                                                         itemCount:
-                                                            listAnnouncement
+                                                            listPlanTrainee
                                                                 .length,
                                                         shrinkWrap: true,
                                                         itemBuilder:
                                                             (context, index) {
                                                           return InkWell(
                                                             onTap: () {
-                                                              setState(() {
-                                                                readAnnouncement
-                                                                        .value =
-                                                                    listAnnouncement[
-                                                                        index];
-                                                              });
+                                                              // setState(() {
+                                                              //   readAnnouncement
+                                                              //           .value =
+                                                              //       listPlanTrainee[
+                                                              //           index];
+                                                              // });
                                                             },
                                                             child: Container(
                                                               height:
@@ -356,7 +361,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                   Expanded(
                                                                     flex: 5,
                                                                     child: Text(
-                                                                        listAnnouncement[index]
+                                                                        listPlanTrainee[index]
                                                                             .title!,
                                                                         textAlign:
                                                                             TextAlign.center),
@@ -364,7 +369,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                   Expanded(
                                                                     flex: 3,
                                                                     child: Text(
-                                                                        GV.readTimestamp(listAnnouncement[index]
+                                                                        GV.readTimestamp(listPlanTrainee[index]
                                                                             .createdAt!),
                                                                         textAlign:
                                                                             TextAlign.center),

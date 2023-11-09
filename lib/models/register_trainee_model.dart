@@ -10,7 +10,8 @@ class RegisterTraineeModel {
       yearEnd,
       userId,
       course,
-      studentName;
+      studentName,
+      classId;
   int? reachedStep;
   List<UserRegisterModel>? listRegis;
   Timestamp? traineeStart, traineeEnd;
@@ -28,6 +29,7 @@ class RegisterTraineeModel {
     this.listRegis,
     this.traineeStart,
     this.traineeEnd,
+    this.classId,
   });
 
   Map<String, dynamic> toMap() {
@@ -45,6 +47,7 @@ class RegisterTraineeModel {
           listRegis != null ? listRegis!.map((i) => i.toMap()).toList() : [],
       'traineeStart': traineeStart,
       'traineeEnd': traineeEnd,
+      'classId': classId,
     };
   }
 
@@ -64,6 +67,7 @@ class RegisterTraineeModel {
           .toList(),
       traineeStart: map['traineeStart'],
       traineeEnd: map['traineeEnd'],
+      classId: map['classId'] ?? '',
     );
   }
 
