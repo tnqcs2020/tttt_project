@@ -34,6 +34,7 @@ class UserController extends GetxController {
   RxInt selected = 999.obs;
   RxString selectedString = ''.obs;
   RxList<FileModel> selectedFiles = RxList();
+  RxDouble finalTotal = 0.0.obs;
 
   setCurrentUser({
     String? setUid,

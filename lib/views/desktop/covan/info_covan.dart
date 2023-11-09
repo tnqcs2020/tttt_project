@@ -8,7 +8,7 @@ import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
-import 'package:tttt_project/widgets/line_detail.dart'; 
+import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
@@ -140,7 +140,7 @@ class _InfoCVState extends State<InfoCV> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Quản Lý Thông Tin",
+                                  "Quản lý thông tin",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

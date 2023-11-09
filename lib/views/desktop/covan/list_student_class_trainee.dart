@@ -4,15 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:tttt_project/models/appreciate_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
-import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
@@ -32,11 +34,15 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
   String selectedHK = HocKy.empty;
   NamHoc selectedNH = NamHoc.empty;
   ValueNotifier<bool> isViewed = ValueNotifier(false);
-  List<FirmModel> firms = [];
+  // List<FirmModel> firms = [];
+  List<AppreciateModel> appreciateCB = [];
   String myClass = '';
   List<TextEditingController> points = [];
   final _formKey = GlobalKey<FormState>();
-
+  ValueNotifier<double> total = ValueNotifier(0);
+  ValueNotifier<double> finalTotal = ValueNotifier(0);
+  List<SubmitModel> submits = [];
+  List<AppreciateCVModel> appCV = [];
   @override
   void initState() {
     getData();
@@ -52,12 +58,35 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
           )
           .toString();
     });
-    var loadFirm = await firestore.collection('firms').get();
-    if (loadFirm.docs.isNotEmpty) {
+    // var loadFirm = await firestore.collection('firms').get();
+    // if (loadFirm.docs.isNotEmpty) {
+    //   setState(() {
+    //     firms = loadFirm.docs.map((e) => FirmModel.fromMap(e.data())).toList();
+    //   });
+    // }
+    var loadAppreciateCB = await firestore.collection('appreciates').get();
+    if (loadAppreciateCB.docs.isNotEmpty) {
       setState(() {
-        firms = loadFirm.docs.map((e) => FirmModel.fromMap(e.data())).toList();
+        appreciateCB = loadAppreciateCB.docs
+            .map((e) => AppreciateModel.fromMap(e.data()))
+            .toList();
       });
     }
+    var loadSubmit = await firestore.collection('submits').get();
+    if (loadSubmit.docs.isNotEmpty) {
+      setState(() {
+        submits =
+            loadSubmit.docs.map((e) => SubmitModel.fromMap(e.data())).toList();
+      });
+    }
+    // var loadAppCV = await firestore.collection('appreciatesCV').get();
+    // if (loadAppCV.docs.isNotEmpty) {
+    //   setState(() {
+    //     appCV = loadAppCV.docs
+    //         .map((e) => AppreciateCVModel.fromMap(e.data()))
+    //         .toList();
+    //   });
+    // }
     var loadUser = await firestore.collection('users').get();
     if (loadUser.docs.isNotEmpty) {
       setState(() {
@@ -74,7 +103,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
               .collection('users')
               .doc(userId)
               .get();
-
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
         setState(() {
@@ -101,6 +129,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
         );
       }
     }
+
     currentUser.loadIn.value = true;
   }
 
@@ -232,11 +261,11 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 35),
+                    const SizedBox(width: 55),
                     CustomButton(
                         text: 'Xem',
                         width: 100,
-                        height: 45,
+                        height: 40,
                         onTap: () {
                           if (selectedHK != HocKy.empty &&
                               selectedNH != NamHoc.empty) {
@@ -245,22 +274,22 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                             });
                             currentUser.isCompleted.value = true;
                           }
-                        })
+                        }),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15),
+                padding: const EdgeInsets.only(top: 15, bottom: 35),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
-                  width: screenWidth * 0.55,
+                  width: screenWidth * 0.6,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         color: Colors.green,
-                        height: screenHeight * 0.035,
+                        height: screenHeight * 0.04,
                         child: const Row(
                           children: [
                             Expanded(
@@ -287,9 +316,17 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                               ),
                             ),
                             Expanded(
-                              flex: 5,
+                              flex: 2,
                               child: Text(
-                                'Công ty thực tập',
+                                'Đã nộp báo cáo',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Cán bộ chấm điểm',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
@@ -330,7 +367,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                             element.data())));
                                           }
                                           load.forEach((e) {
-                                            //                 trainees.forEach((e2) {
                                             if (selectedHK == HocKy.tatca &&
                                                 selectedNH == NamHoc.tatca) {
                                               traineeClass.add(e);
@@ -350,7 +386,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                     selectedNH.start) {
                                               traineeClass.add(e);
                                             }
-                                            //                 });
                                           });
                                           return traineeClass.isNotEmpty
                                               ? ListView.builder(
@@ -359,19 +394,47 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                   shrinkWrap: true,
                                                   itemBuilder:
                                                       (context, indexTrain) {
-                                                    FirmModel firm =
-                                                        FirmModel();
+                                                    UserRegisterModel
+                                                        userRegister =
+                                                        UserRegisterModel();
                                                     traineeClass[indexTrain]
                                                         .listRegis!
                                                         .forEach((e1) {
                                                       if (e1.isConfirmed ==
                                                           true) {
-                                                        firms.forEach((e2) {
-                                                          if (e1.firmId ==
-                                                              e2.firmId) {
-                                                            firm = e2;
-                                                          }
-                                                        });
+                                                        userRegister = e1;
+                                                      }
+                                                    });
+                                                    UserModel user =
+                                                        UserModel();
+                                                    users.forEach((e) {
+                                                      if (e.userId ==
+                                                          traineeClass[
+                                                                  indexTrain]
+                                                              .userId) {
+                                                        user = e;
+                                                      }
+                                                    });
+                                                    bool isApCB = false;
+                                                    AppreciateModel appreciate =
+                                                        AppreciateModel();
+                                                    appreciateCB
+                                                        .forEach((element) {
+                                                      if (element.userId ==
+                                                          traineeClass[
+                                                                  indexTrain]
+                                                              .userId) {
+                                                        isApCB = true;
+                                                        appreciate = element;
+                                                      }
+                                                    });
+                                                    bool isSubmit = false;
+                                                    submits.forEach((element) {
+                                                      if (element.userId ==
+                                                          traineeClass[
+                                                                  indexTrain]
+                                                              .userId) {
+                                                        isSubmit = true;
                                                       }
                                                     });
                                                     return Container(
@@ -396,7 +459,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                     .toUpperCase(),
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify),
                                                           ),
                                                           Expanded(
                                                             flex: 3,
@@ -404,15 +467,31 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                 '${traineeClass[indexTrain].studentName}',
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify),
                                                           ),
                                                           Expanded(
-                                                            flex: 5,
-                                                            child: Text(
-                                                                '${firm.firmName}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center),
+                                                            flex: 2,
+                                                            child: isSubmit
+                                                                ? const Icon(
+                                                                    Icons
+                                                                        .check_circle,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : const Icon(Icons
+                                                                    .not_interested),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: isApCB
+                                                                ? const Icon(
+                                                                    Icons
+                                                                        .check_circle,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : const Icon(Icons
+                                                                    .not_interested),
                                                           ),
                                                           Expanded(
                                                               flex: 2,
@@ -423,41 +502,130 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                 children: [
                                                                   IconButton(
                                                                       tooltip:
-                                                                          'Thông tin sinh viên',
+                                                                          'Thông tin sinh viên và bảng phân công công việc',
                                                                       padding: const EdgeInsets
                                                                           .only(
                                                                           bottom:
                                                                               1),
                                                                       onPressed:
-                                                                          () {},
+                                                                          () {
+                                                                        showInfo(
+                                                                            context:
+                                                                                context,
+                                                                            user:
+                                                                                user,
+                                                                            trainee:
+                                                                                traineeClass[indexTrain],
+                                                                            userRegister: userRegister);
+                                                                      },
+                                                                      icon:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .info,
+                                                                        size:
+                                                                            22,
+                                                                        color: Colors
+                                                                            .grey,
+                                                                      )),
+                                                                  IconButton(
+                                                                      tooltip:
+                                                                          'Kết quả của cán bộ hướng dẫn',
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          bottom:
+                                                                              1),
+                                                                      onPressed:
+                                                                          () {
+                                                                        showAppreciateCB(
+                                                                            context:
+                                                                                context,
+                                                                            user:
+                                                                                user,
+                                                                            appreciate:
+                                                                                appreciate);
+                                                                      },
                                                                       icon:
                                                                           Icon(
                                                                         Icons
-                                                                            .info,
+                                                                            .my_library_books,
                                                                         size:
                                                                             22,
                                                                         color: Colors
                                                                             .blue
                                                                             .shade800,
                                                                       )),
-                                                                  IconButton(
-                                                                      tooltip:
-                                                                          'Đánh giá',
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          bottom:
-                                                                              1),
-                                                                      onPressed:
-                                                                          () {},
-                                                                      icon:
-                                                                          const Icon(
-                                                                        CupertinoIcons
-                                                                            .pencil_ellipsis_rectangle,
-                                                                        size:
-                                                                            22,
-                                                                        color: Colors
-                                                                            .red,
-                                                                      ))
+                                                                  StreamBuilder(
+                                                                      stream: firestore
+                                                                          .collection(
+                                                                              'appreciatesCV')
+                                                                          .snapshots(),
+                                                                      builder:
+                                                                          (context,
+                                                                              snapshot) {
+                                                                        if (snapshot
+                                                                            .hasData) {
+                                                                          appCV = snapshot
+                                                                              .data!
+                                                                              .docs
+                                                                              .map((e) => AppreciateCVModel.fromMap(e.data()))
+                                                                              .toList();
+                                                                        }
+                                                                        return IconButton(
+                                                                            tooltip:
+                                                                                'Đánh giá',
+                                                                            padding:
+                                                                                const EdgeInsets.only(bottom: 1),
+                                                                            onPressed: () {
+                                                                              points = [];
+                                                                              double pointCB = 0;
+                                                                              appreciateCB.forEach((element) {
+                                                                                if (element.userId == traineeClass[indexTrain].userId) {
+                                                                                  double totalPoint = 0;
+                                                                                  bool isOnl = false;
+                                                                                  for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                    if (i < 3 && element.listContent![i].point == 0) {
+                                                                                      isOnl = true;
+                                                                                    }
+                                                                                  }
+                                                                                  if (isOnl) {
+                                                                                    for (var i = 3; i < element.listContent!.length; i++) {
+                                                                                      totalPoint += element.listContent![i].point!;
+                                                                                    }
+                                                                                  } else {
+                                                                                    for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                      totalPoint += element.listContent![i].point!;
+                                                                                    }
+                                                                                  }
+                                                                                  if (isOnl) {
+                                                                                    pointCB = (totalPoint / 70) * 5;
+                                                                                  } else {
+                                                                                    pointCB = (totalPoint / 100) * 5;
+                                                                                  }
+                                                                                }
+                                                                              });
+                                                                              for (int i = 0; i < 11; i++) {
+                                                                                if (i == 3) {
+                                                                                  points.add(TextEditingController(text: pointCB.toStringAsFixed(2)));
+                                                                                } else {
+                                                                                  points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                                }
+                                                                              }
+                                                                              double temp = 0;
+                                                                              for (var i = 0; i < 10; i++) {
+                                                                                temp += double.parse(points[i].text);
+                                                                              }
+                                                                              setState(() {
+                                                                                total.value = double.parse(temp.toStringAsFixed(2));
+                                                                                finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(2));
+                                                                              });
+                                                                              showAppreciate(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
+                                                                            },
+                                                                            icon: const Icon(
+                                                                              CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                              size: 22,
+                                                                              color: Colors.red,
+                                                                            ));
+                                                                      })
                                                                 ],
                                                               )),
                                                         ],
@@ -518,8 +686,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                       shrinkWrap: true,
                                                       itemBuilder: (context,
                                                           indexTrain) {
-                                                        FirmModel firm =
-                                                            FirmModel();
                                                         UserRegisterModel
                                                             userRegister =
                                                             UserRegisterModel();
@@ -528,12 +694,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                             .forEach((e1) {
                                                           if (e1.isConfirmed ==
                                                               true) {
-                                                            firms.forEach((e2) {
-                                                              if (e1.firmId ==
-                                                                  e2.firmId) {
-                                                                firm = e2;
-                                                              }
-                                                            });
                                                             userRegister = e1;
                                                           }
                                                         });
@@ -545,6 +705,31 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                       indexTrain]
                                                                   .userId) {
                                                             user = e;
+                                                          }
+                                                        });
+                                                        bool isApCB = false;
+                                                        AppreciateModel
+                                                            appreciate =
+                                                            AppreciateModel();
+                                                        appreciateCB
+                                                            .forEach((element) {
+                                                          if (element.userId ==
+                                                              traineeClass[
+                                                                      indexTrain]
+                                                                  .userId) {
+                                                            isApCB = true;
+                                                            appreciate =
+                                                                element;
+                                                          }
+                                                        });
+                                                        bool isSubmit = false;
+                                                        submits
+                                                            .forEach((element) {
+                                                          if (element.userId ==
+                                                              traineeClass[
+                                                                      indexTrain]
+                                                                  .userId) {
+                                                            isSubmit = true;
                                                           }
                                                         });
                                                         return Container(
@@ -572,7 +757,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                         .toUpperCase(),
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center),
+                                                                            .justify),
                                                               ),
                                                               Expanded(
                                                                 flex: 3,
@@ -580,19 +765,33 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                     '${traineeClass[indexTrain].studentName}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center),
+                                                                            .justify),
                                                               ),
                                                               Expanded(
-                                                                flex: 5,
-                                                                child: Text(
-                                                                  '${firm.firmName}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
+                                                                flex: 2,
+                                                                child: isSubmit
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .check_circle,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : const Icon(
+                                                                        Icons
+                                                                            .not_interested),
+                                                              ),
+                                                              Expanded(
+                                                                flex: 2,
+                                                                child: isApCB
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .check_circle,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : const Icon(
+                                                                        Icons
+                                                                            .not_interested),
                                                               ),
                                                               Expanded(
                                                                   flex: 2,
@@ -603,7 +802,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                     children: [
                                                                       IconButton(
                                                                           tooltip:
-                                                                              'Thông tin sinh viên',
+                                                                              'Thông tin sinh viên và bảng phân công công việc',
                                                                           padding: const EdgeInsets
                                                                               .only(
                                                                               bottom:
@@ -617,37 +816,126 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                 userRegister: userRegister);
                                                                           },
                                                                           icon:
-                                                                              Icon(
+                                                                              const Icon(
                                                                             Icons.info,
                                                                             size:
                                                                                 22,
                                                                             color:
-                                                                                Colors.blue.shade800,
+                                                                                Colors.grey,
                                                                           )),
                                                                       IconButton(
                                                                           tooltip:
-                                                                              'Đánh giá',
+                                                                              'Kết quả của cán bộ hướng dẫn',
                                                                           padding: const EdgeInsets
                                                                               .only(
                                                                               bottom:
                                                                                   1),
                                                                           onPressed:
                                                                               () {
-                                                                            showAppreciate(
+                                                                            showAppreciateCB(
                                                                                 context: context,
                                                                                 user: user,
-                                                                                trainee: traineeClass[indexTrain],
-                                                                                userRegister: userRegister,
-                                                                                firms: firms);
+                                                                                appreciate: appreciate);
                                                                           },
                                                                           icon:
-                                                                              const Icon(
-                                                                            CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                              Icon(
+                                                                            Icons.my_library_books,
                                                                             size:
                                                                                 22,
                                                                             color:
-                                                                                Colors.red,
-                                                                          ))
+                                                                                Colors.blue.shade800,
+                                                                          )),
+                                                                      StreamBuilder(
+                                                                          stream: firestore
+                                                                              .collection(
+                                                                                  'appreciatesCV')
+                                                                              .snapshots(),
+                                                                          builder:
+                                                                              (context, snapshot) {
+                                                                            if (snapshot.hasData) {
+                                                                              appCV = snapshot.data!.docs.map((e) => AppreciateCVModel.fromMap(e.data())).toList();
+                                                                            }
+                                                                            return IconButton(
+                                                                                tooltip: 'Đánh giá',
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () {
+                                                                                  points = [];
+                                                                                  double pointCB = 0;
+                                                                                  appreciateCB.forEach((element) {
+                                                                                    if (element.userId == traineeClass[indexTrain].userId) {
+                                                                                      double totalPoint = 0;
+                                                                                      bool isOnl = false;
+                                                                                      for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                        if (i < 3 && element.listContent![i].point == 0) {
+                                                                                          isOnl = true;
+                                                                                        }
+                                                                                      }
+                                                                                      if (isOnl) {
+                                                                                        for (var i = 3; i < element.listContent!.length; i++) {
+                                                                                          totalPoint += element.listContent![i].point!;
+                                                                                        }
+                                                                                      } else {
+                                                                                        for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                          totalPoint += element.listContent![i].point!;
+                                                                                        }
+                                                                                      }
+                                                                                      if (isOnl) {
+                                                                                        pointCB = (totalPoint / 70) * 5;
+                                                                                      } else {
+                                                                                        pointCB = (totalPoint / 100) * 5;
+                                                                                      }
+                                                                                    }
+                                                                                  });
+                                                                                  bool isAppCV = false;
+                                                                                  appCV.forEach((element) {
+                                                                                    if (element.userId == user.userId) {
+                                                                                      isAppCV = true;
+                                                                                    }
+                                                                                  });
+                                                                                  if (isAppCV) {
+                                                                                    appCV.forEach((element) {
+                                                                                      if (element.userId == user.userId) {
+                                                                                        for (int i = 0; i < 10; i++) {
+                                                                                          points.add(TextEditingController(text: element.listPoint![i].toString()));
+                                                                                        }
+                                                                                        points.add(TextEditingController(text: element.subPoint.toString()));
+                                                                                        setState(() {
+                                                                                          total.value = element.total!;
+                                                                                          finalTotal.value = element.finalTotal!;
+                                                                                        });
+                                                                                      }
+                                                                                    });
+                                                                                  } else {
+                                                                                    for (int i = 0; i < 11; i++) {
+                                                                                      if (i == 3) {
+                                                                                        points.add(TextEditingController(text: pointCB.toStringAsFixed(2)));
+                                                                                      } else {
+                                                                                        points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                                      }
+                                                                                    }
+                                                                                    double temp = 0;
+                                                                                    for (var i = 0; i < 10; i++) {
+                                                                                      temp += double.parse(points[i].text);
+                                                                                    }
+                                                                                    setState(() {
+                                                                                      total.value = double.parse(temp.toStringAsFixed(2));
+                                                                                      finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(2));
+                                                                                    });
+                                                                                  }
+
+                                                                                  showAppreciate(
+                                                                                    context: context,
+                                                                                    user: user,
+                                                                                    trainee: traineeClass[indexTrain],
+                                                                                    userRegister: userRegister,
+                                                                                  );
+                                                                                },
+                                                                                icon: const Icon(
+                                                                                  CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                                  size: 22,
+                                                                                  color: Colors.red,
+                                                                                ));
+                                                                          })
                                                                     ],
                                                                   )),
                                                             ],
@@ -683,6 +971,25 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 35),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomButton(
+                        text: 'Khóa điểm',
+                        width: 100,
+                        height: 40,
+                        onTap: () {}),
+                    const SizedBox(width: 15),
+                    CustomButton(
+                        text: 'Xuất điểm',
+                        width: 100,
+                        height: 40,
+                        onTap: () {}),
+                  ],
+                ),
+              )
             ],
           );
         });
@@ -712,7 +1019,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AlertDialog(
-                scrollable: true,
                 title: Container(
                   color: Colors.blue.shade600,
                   height: screenHeight * 0.06,
@@ -741,27 +1047,251 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                   ),
                 ),
                 titlePadding: EdgeInsets.zero,
+                contentPadding: EdgeInsets.zero,
                 shape: Border.all(width: 0.5),
-                content: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: screenWidth * 0.35),
-                  child: Form(
+                content: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: screenWidth * 0.35),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('Mã sinh viên: ${user.userId!.toUpperCase()}'),
-                        Text('Họ tên: ${user.userName}'),
-                        Text('Ngành: ${user.major}'),
-                        Text('Email: ${user.email}'),
-                        Text('Số điện thoại: ${user.phone}'),
-                        Text('Học kỳ thực tập: ${trainee.term}'),
-                        Text(
-                            'Năm học: ${trainee.yearStart} -  ${trainee.yearEnd}'),
-                        Text('Tại: ${userRegister.firmName}'),
-                        Text('Vị trí thực tập: ${userRegister.jobName}'),
-                        Text(
-                            'Ngày ứng tuyển: ${GV.readTimestamp(userRegister.createdAt!)}'),
-                        Text(
-                            'Thời gian thực tập: Từ ngày: ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                        Table(
+                          columnWidths: Map.from({
+                            0: const FlexColumnWidth(3),
+                            1: const FlexColumnWidth(2),
+                          }),
+                          children: [
+                            TableRow(children: [
+                              Text(
+                                  'Mã sinh viên: ${user.userId!.toUpperCase()}'),
+                              Text('Học kỳ thực tập: ${trainee.term}'),
+                            ]),
+                            TableRow(children: [
+                              Text('Họ tên: ${user.userName}'),
+                              Text(
+                                  'Năm học: ${trainee.yearStart} -  ${trainee.yearEnd}'),
+                            ]),
+                            TableRow(children: [
+                              Text(
+                                  'Thời gian thực tập: Từ ngày: ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                              Text(
+                                  'Ngày ứng tuyển: ${GV.readTimestamp(userRegister.createdAt!)}'),
+                            ]),
+                            TableRow(children: [
+                              Text('Tại: ${userRegister.firmName}'),
+                              Text('Vị trí thực tập: ${userRegister.jobName}'),
+                            ]),
+                          ],
+                        ),
+                        StreamBuilder(
+                            stream: firestore
+                                .collection('plans')
+                                .doc(user.userId)
+                                .snapshots(),
+                            builder: (context, snapshotPlan) {
+                              if (snapshotPlan.hasData &&
+                                  snapshotPlan.data != null &&
+                                  snapshotPlan.connectionState ==
+                                      ConnectionState.active) {
+                                final plan = PlanWorkModel.fromMap(
+                                    snapshotPlan.data!.data()!);
+                                return SizedBox(
+                                  width: screenWidth * 0.55,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Table(
+                                        columnWidths: Map.from({
+                                          0: const FlexColumnWidth(3),
+                                          1: const FlexColumnWidth(2),
+                                        }),
+                                        children: [
+                                          TableRow(children: [
+                                            Text(
+                                                'Cán bộ hướng dẫn: ${plan.cbhdName}'),
+                                            Text(
+                                                'Ngày phân công:  ${GV.readTimestamp(plan.createdAt!)}'),
+                                          ]),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Table(
+                                          border: TableBorder.all(),
+                                          columnWidths: Map.from({
+                                            0: const FlexColumnWidth(1),
+                                            1: const FlexColumnWidth(3),
+                                            2: const FlexColumnWidth(1),
+                                            3: const FlexColumnWidth(1)
+                                          }),
+                                          children: [
+                                            TableRow(
+                                              children: [
+                                                Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: const Text(
+                                                      'Tuần',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    )),
+                                                Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: const Text(
+                                                      'Nội dung công việc',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    )),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: const Text(
+                                                    'Số buổi',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: const Text(
+                                                    'Nhận xét',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            for (int i = 0;
+                                                i < plan.listWork!.length;
+                                                i++)
+                                              TableRow(
+                                                children: [
+                                                  TableCell(
+                                                    verticalAlignment:
+                                                        TableCellVerticalAlignment
+                                                            .middle,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            GV.readTimestamp(
+                                                                plan
+                                                                    .listWork![
+                                                                        i]
+                                                                    .dayStart!),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          Text(
+                                                            '${i + 1}',
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                          Text(
+                                                            GV.readTimestamp(
+                                                                plan
+                                                                    .listWork![
+                                                                        i]
+                                                                    .dayEnd!),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TableCell(
+                                                    verticalAlignment:
+                                                        TableCellVerticalAlignment
+                                                            .middle,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            plan.listWork![i]
+                                                                .content!,
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TableCell(
+                                                    verticalAlignment:
+                                                        TableCellVerticalAlignment
+                                                            .middle,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Text(
+                                                        '${plan.listWork![i].totalDay}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TableCell(
+                                                    verticalAlignment:
+                                                        TableCellVerticalAlignment
+                                                            .middle,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Text(
+                                                        '${plan.listWork![i].comment}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
                       ],
                     ),
                   ),
@@ -779,7 +1309,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
     required UserModel user,
     required RegisterTraineeModel trainee,
     required UserRegisterModel userRegister,
-    required List<FirmModel> firms,
   }) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -844,104 +1373,296 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Họ tên: ${user.userName}'),
-                            Text('Mã số: ${user.userId}'),
+                            Text('Mã số: ${user.userId!.toUpperCase()}'),
                             Text('Vị trí thực tập: ${userRegister.jobName}'),
                             Text('Vị trí thực tập: ${userRegister.firmName}'),
                             Text(
                                 'Thời gian thực tập: Từ ngày: ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                            // Padding(
-                            //   padding: const EdgeInsets.only(top: 10),
-                            //   child: Table(
-                            //     border: TableBorder.all(),
-                            //     columnWidths: Map.from({
-                            //       0: const FlexColumnWidth(11),
-                            //       1: const FlexColumnWidth(3),
-                            //     }),
-                            //     children: [
-                            //       TableRow(
-                            //         children: [
-                            //           Container(
-                            //               padding: const EdgeInsets.all(10),
-                            //               child: const Text(
-                            //                 'Nội dung đánh giá',
-                            //                 textAlign: TextAlign.center,
-                            //                 style: TextStyle(
-                            //                   fontWeight: FontWeight.bold,
-                            //                 ),
-                            //               )),
-                            //           Container(
-                            //             padding: const EdgeInsets.all(10),
-                            //             child: const Text(
-                            //               'Điểm chấm (từ 1-10)',
-                            //               textAlign: TextAlign.center,
-                            //               style: TextStyle(
-                            //                 fontWeight: FontWeight.bold,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content: 'I. Tinh thần kỷ luật',
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'I.1. Thực hiện nội quy của cơ quan (nếu thực tập online thì không chẩm điểm)',
-                            //         point: points[0],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'I.2. Chấp hành giờ giấc làm việc (nếu thực tập online thì không chẩm điểm)',
-                            //         point: points[1],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'I.3. Thái độ giao tiếp với cán bộ trong đơn vị (nếu thực lập online thì không chấm điểm)',
-                            //         point: points[2],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content: 'I.4. Tích cực trong công việc',
-                            //         point: points[3],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'II. Khả năng chuyên môn, nghiệp vụ',
-                            //       ),
-                            //       rowAppreciate(
-                            //         content: 'II.1. Đáp ứng yêu cầu công việc',
-                            //         point: points[4],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'II.2. Tinh thần học hỏi, nâng cao trình độ chuyên môn, nghiệp vụ',
-                            //         point: points[5],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'II.3. Có đề xuất, sáng kiến, năng động trong công việc',
-                            //         point: points[6],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content: 'III. Kết quả công tác',
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'III.1. Báo cáo tiến độ công việc cho cán bộ hướng dẫn mỗi tuần 1 lần',
-                            //         point: points[7],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'III.2. Hoàn thành công việc được giao',
-                            //         point: points[8],
-                            //       ),
-                            //       rowAppreciate(
-                            //         content:
-                            //             'III.3. Kết quả công việc có đóng góp cho cơ quan nơi thực tập',
-                            //         point: points[9],
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Table(
+                                border: TableBorder.all(),
+                                columnWidths: Map.from({
+                                  0: const FlexColumnWidth(11),
+                                  1: const FlexColumnWidth(2),
+                                  2: const FlexColumnWidth(2),
+                                }),
+                                children: [
+                                  TableRow(
+                                    children: [
+                                      Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: const Text(
+                                            'Nội dung đánh giá',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )),
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: const Text(
+                                          'Điểm tối đa',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: const Text(
+                                          'Điểm chấm',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[0],
+                                    pointMax: pointAppreciateCV[0].toString(),
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[1],
+                                    pointMax: pointAppreciateCV[1].toString(),
+                                    point: points[0],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[2],
+                                    pointMax: pointAppreciateCV[2].toString(),
+                                    point: points[1],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[3],
+                                    pointMax: pointAppreciateCV[3].toString(),
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[4],
+                                    pointMax: pointAppreciateCV[4].toString(),
+                                    point: points[2],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[5],
+                                    pointMax: pointAppreciateCV[5].toString(),
+                                    point: points[3],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[6],
+                                    pointMax: pointAppreciateCV[6].toString(),
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[7],
+                                    pointMax: pointAppreciateCV[7].toString(),
+                                    point: points[4],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[8],
+                                    pointMax: pointAppreciateCV[8].toString(),
+                                    point: points[5],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[9],
+                                    pointMax: pointAppreciateCV[9].toString(),
+                                    point: points[6],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[10],
+                                    pointMax: pointAppreciateCV[10].toString(),
+                                    point: points[7],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[11],
+                                    pointMax: pointAppreciateCV[11].toString(),
+                                    point: points[8],
+                                  ),
+                                  rowAppreciate(
+                                    content: appreciateCV[12],
+                                    pointMax: pointAppreciateCV[12].toString(),
+                                    point: points[9],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    appreciateCV[13],
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    overflow: TextOverflow.clip,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                      const TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "10",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  textAlign: TextAlign.center,
+                                                  overflow: TextOverflow.clip,
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: ValueListenableBuilder(
+                                              valueListenable: total,
+                                              builder: (context, val, child) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          total.value
+                                                              .toString(),
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                          overflow:
+                                                              TextOverflow.clip,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              })),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    appreciateCV[14],
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    overflow: TextOverflow.clip,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                      const SizedBox.shrink(),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: TextFormField(
+                                          controller: points[10],
+                                          minLines: 1,
+                                          style: const TextStyle(fontSize: 13),
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                          ),
+                                          onChanged: (value) {
+                                            double temp = 0;
+                                            for (var i = 0; i < 10; i++) {
+                                              temp +=
+                                                  double.parse(points[i].text);
+                                            }
+                                            setState(() {
+                                              total.value = double.parse(
+                                                  temp.toStringAsFixed(2));
+                                              finalTotal.value = double.parse(
+                                                  (temp -
+                                                          double.parse(
+                                                              points[10].text))
+                                                      .toStringAsFixed(2));
+                                            });
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    appreciateCV[15],
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    textAlign:
+                                                        TextAlign.justify,
+                                                    overflow: TextOverflow.clip,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                      const SizedBox.shrink(),
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: ValueListenableBuilder(
+                                              valueListenable: finalTotal,
+                                              builder: (context, val, child) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        finalTotal.value
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        overflow:
+                                                            TextOverflow.clip,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              })),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -954,48 +1675,65 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                // if (_formKey.currentState!.validate()) {
-                                //   List<ContentAppreciateModel>
-                                //       contentAppreciates = [];
-                                //   for (var index = 0; index < 10; index++) {
-                                //     contentAppreciates.add(
-                                //       ContentAppreciateModel(
-                                //         content: contentAppreciate[index],
-                                //         title: index < 4
-                                //             ? 'I. Tinh thần kỷ luật'
-                                //             : index < 7
-                                //                 ? 'II. Khả năng chuyên môn, nghiệp vụ'
-                                //                 : 'III. Kết quả công tác',
-                                //         point: double.parse(points[index].text),
-                                //       ),
-                                //     );
-                                //   }
-                                //   final appreciate = AppreciateModel(
-                                //     cbhdId: plan.cbhdId,
-                                //     cbhdName: plan.cbhdName,
-                                //     jobName: jobRegister.jobName,
-                                //     commentCTDT: commentCTDT.text,
-                                //     commentSV: commentSV.text,
-                                //     createdAt: Timestamp.now(),
-                                //     traineeEnd: plan.traineeEnd,
-                                //     traineeStart: plan.traineeStart,
-                                //     userId: jobRegister.userId,
-                                //     appreciateCTDT: appreciateCTDT,
-                                //     listContent: contentAppreciates,
-                                //     firmName: firms
-                                //         .firstWhere((element) =>
-                                //             element.firmId == userId)
-                                //         .firmName,
-                                //     jobId: jobRegister.jobId,
-                                //   );
-                                //   firestore
-                                //       .collection('appreciates')
-                                //       .doc(appreciate.userId)
-                                //       .set(appreciate.toMap());
-                                //   GV.success(
-                                //       context: context,
-                                //       message: 'Cập nhật thành công.');
-                                // }
+                                if (_formKey.currentState!.validate()) {
+                                  List<double> list = [];
+                                  for (int i = 0; i < 10; i++) {
+                                    list.add(double.parse(points[i].text));
+                                  }
+                                  String pointChar = '';
+                                  if (finalTotal.value >= 9.0) {
+                                    pointChar = 'A';
+                                  } else if (finalTotal.value >= 8.0) {
+                                    pointChar = 'B+';
+                                  } else if (finalTotal.value >= 7.0) {
+                                    pointChar = 'B';
+                                  } else if (finalTotal.value >= 6.5) {
+                                    pointChar = 'C+';
+                                  } else if (finalTotal.value >= 5.5) {
+                                    pointChar = 'C';
+                                  } else if (finalTotal.value >= 5.0) {
+                                    pointChar = 'D+';
+                                  } else if (finalTotal.value >= 4.0) {
+                                    pointChar = 'D';
+                                  } else {
+                                    pointChar = 'F';
+                                  }
+                                  AppreciateCVModel appreciateModel =
+                                      AppreciateCVModel(
+                                    cbhdId: userRegister.firmId,
+                                    firmName: userRegister.firmName,
+                                    jobName: userRegister.jobName,
+                                    userId: user.userId,
+                                    userName: user.userName,
+                                    traineeStart: trainee.traineeStart,
+                                    traineeEnd: trainee.traineeEnd,
+                                    createdAt: Timestamp.now(),
+                                    total: total.value,
+                                    finalTotal: finalTotal.value,
+                                    subPoint: double.parse(points[10].text),
+                                    listPoint: list,
+                                    term: trainee.term,
+                                    yearStart: trainee.yearStart,
+                                    yearEnd: trainee.yearEnd,
+                                    pointChar: pointChar,
+                                  );
+                                  appCV.forEach((element) {
+                                    if (element.userId ==
+                                        appreciateModel.userId) {
+                                      setState(() {
+                                        element = appreciateModel;
+                                      });
+                                    }
+                                  });
+                                  firestore
+                                      .collection('appreciatesCV')
+                                      .doc(appreciateModel.userId)
+                                      .set(appreciateModel.toMap());
+                                  Navigator.of(context).pop();
+                                  GV.success(
+                                      context: context,
+                                      message: 'Cập nhật thành công.');
+                                }
                               },
                               style: const ButtonStyle(
                                   elevation: MaterialStatePropertyAll(5)),
@@ -1020,6 +1758,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
 
   TableRow rowAppreciate({
     required String content,
+    required String pointMax,
     TextEditingController? point,
   }) {
     return TableRow(
@@ -1030,10 +1769,319 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
+                  Expanded(
+                    child: Text(
+                      content,
+                      textAlign: TextAlign.justify,
+                      style: point == null
+                          ? const TextStyle(fontWeight: FontWeight.bold)
+                          : null,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+        TableCell(
+            verticalAlignment: TableCellVerticalAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Text(
+                    pointMax == '0' ? '' : pointMax,
+                    textAlign: TextAlign.center,
+                    style: point == null
+                        ? const TextStyle(fontWeight: FontWeight.bold)
+                        : null,
+                    overflow: TextOverflow.clip,
+                  ),
+                ],
+              ),
+            )),
+        point != null
+            ? TableCell(
+                verticalAlignment: TableCellVerticalAlignment.middle,
+                child: TextFormField(
+                  controller: point,
+                  minLines: 1,
+                  style: const TextStyle(fontSize: 13),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    double temp = 0;
+                    for (var i = 0; i < 10; i++) {
+                      temp += double.parse(points[i].text);
+                    }
+                    setState(() {
+                      total.value = double.parse(temp.toStringAsFixed(2));
+                      finalTotal.value = double.parse(
+                          (temp - double.parse(points[10].text))
+                              .toStringAsFixed(2));
+                    });
+                  },
+                  validator: (value) =>
+                      double.parse(value!) > double.parse(pointMax)
+                          ? "Bé hơn hoặc bằng ${double.parse(pointMax)}"
+                          : null,
+                ),
+              )
+            : const SizedBox.shrink(),
+      ],
+    );
+  }
+
+  showAppreciateCB({
+    required BuildContext context,
+    required UserModel user,
+    required AppreciateModel appreciate,
+  }) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double totalPoint = 0;
+    bool isOnl = false;
+    for (var i = 0; i < appreciate.listContent!.length; i++) {
+      if (i < 3 && appreciate.listContent![i].point == 0) {
+        isOnl = true;
+      }
+    }
+    if (isOnl) {
+      for (var i = 3; i < appreciate.listContent!.length; i++) {
+        totalPoint += appreciate.listContent![i].point!;
+      }
+    } else {
+      for (var i = 0; i < appreciate.listContent!.length; i++) {
+        totalPoint += appreciate.listContent![i].point!;
+      }
+    }
+    showDialog(
+        context: context,
+        barrierColor: Colors.black12,
+        barrierDismissible: false,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+              top: screenHeight * 0.06,
+              bottom: screenHeight * 0.02,
+              left: screenWidth * 0.2,
+              right: screenWidth * 0.01,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AlertDialog(
+                  title: Container(
+                    color: Colors.blue.shade600,
+                    height: screenHeight * 0.06,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        const Expanded(
+                          child: Text(
+                            'Đánh giá thực tập',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30,
+                          child: IconButton(
+                              padding: const EdgeInsets.only(bottom: 1),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close)),
+                        )
+                      ],
+                    ),
+                  ),
+                  titlePadding: EdgeInsets.zero,
+                  shape: Border.all(width: 0.5),
+                  contentPadding: EdgeInsets.zero,
+                  actionsPadding: EdgeInsets.zero,
+                  content: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Container(
+                      constraints: BoxConstraints(minWidth: screenWidth * 0.55),
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Họ tên cán bộ hướng dẫn: ${appreciate.cbhdName}'),
+                          Text('Họ tên sinh viên: ${user.userName}'),
+                          Text('Mã số: ${user.userId!.toUpperCase()}'),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Table(
+                              border: TableBorder.all(),
+                              columnWidths: Map.from({
+                                0: const FlexColumnWidth(11),
+                                1: const FlexColumnWidth(3),
+                              }),
+                              children: [
+                                TableRow(
+                                  children: [
+                                    Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: const Text(
+                                          'Nội dung đánh giá',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        )),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      child: const Text(
+                                        'Điểm chấm (từ 1-10)',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                rowAppreciateCB(
+                                  content: 'I. Tinh thần kỷ luật',
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'I.1. Thực hiện nội quy của cơ quan (nếu thực tập online thì không chẩm điểm)',
+                                  point: appreciate.listContent?[0].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'I.2. Chấp hành giờ giấc làm việc (nếu thực tập online thì không chẩm điểm)',
+                                  point: appreciate.listContent?[1].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'I.3. Thái độ giao tiếp với cán bộ trong đơn vị (nếu thực lập online thì không chấm điểm)',
+                                  point: appreciate.listContent?[2].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content: 'I.4. Tích cực trong công việc',
+                                  point: appreciate.listContent?[3].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content: 'II. Khả năng chuyên môn, nghiệp vụ',
+                                ),
+                                rowAppreciateCB(
+                                  content: 'II.1. Đáp ứng yêu cầu công việc',
+                                  point: appreciate.listContent?[4].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'II.2. Tinh thần học hỏi, nâng cao trình độ chuyên môn, nghiệp vụ',
+                                  point: appreciate.listContent?[5].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'II.3. Có đề xuất, sáng kiến, năng động trong công việc',
+                                  point: appreciate.listContent?[6].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content: 'III. Kết quả công tác',
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'III.1. Báo cáo tiến độ công việc cho cán bộ hướng dẫn mỗi tuần 1 lần',
+                                  point: appreciate.listContent?[7].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'III.2. Hoàn thành công việc được giao',
+                                  point: appreciate.listContent?[8].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content:
+                                      'III.3. Kết quả công việc có đóng góp cho cơ quan nơi thực tập',
+                                  point: appreciate.listContent?[9].point!,
+                                ),
+                                rowAppreciateCB(
+                                  content: 'CỘNG',
+                                  point: totalPoint,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          SizedBox(
+                            width: screenWidth * 0.45,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text('Nhận xét khác về sinh viên:'),
+                                Expanded(
+                                    child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Text(appreciate.commentSV!),
+                                )),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                              'Đánh giá của cơ quan về chương trình đào tạo (CTDT): ${appreciate.appreciateCTDT}'),
+                          const SizedBox(height: 15),
+                          SizedBox(
+                            width: screenWidth * 0.45,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                    'Đề xuất góp ý của cơ quan về CTDT:'),
+                                Expanded(
+                                    child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Text(appreciate.commentCTDT!),
+                                )),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  TableRow rowAppreciateCB({
+    required String content,
+    double? point,
+  }) {
+    return TableRow(
+      children: [
+        TableCell(
+            verticalAlignment: TableCellVerticalAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: content == 'CỘNG'
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
+                children: [
                   Text(
                     content,
                     textAlign: TextAlign.center,
-                    style: point == null
+                    style: point == null || content == 'CỘNG'
                         ? const TextStyle(fontWeight: FontWeight.bold)
                         : null,
                     overflow: TextOverflow.visible,
@@ -1044,21 +2092,13 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
         point != null
             ? TableCell(
                 verticalAlignment: TableCellVerticalAlignment.middle,
-                child: TextFormField(
-                  controller: point,
-                  maxLines: 1,
-                  style: const TextStyle(fontSize: 13),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  validator: (value) =>
-                      double.parse(value!) > 10 ? "Bé hơn hoặc bằng 10" : null,
-                ),
+                child: Center(
+                    child: Text(
+                  point.toString(),
+                  style: content == 'CỘNG'
+                      ? TextStyle(fontWeight: FontWeight.bold)
+                      : null,
+                )),
               )
             : const SizedBox.shrink(),
       ],

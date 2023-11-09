@@ -79,7 +79,7 @@ class _AnnouncementState extends State<Announcement> {
                                 return InkWell(
                                   onTap: () {},
                                   child: Container(
-                                    height: screenHeight * 0.035,
+                                    height: screenHeight * 0.04,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 5, horizontal: 10),
                                     child: Row(
@@ -136,7 +136,7 @@ class _AnnouncementState extends State<Announcement> {
                                 return InkWell(
                                   onTap: () {},
                                   child: Container(
-                                    height: screenHeight * 0.035,
+                                    height: screenHeight * 0.04,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 5, horizontal: 10),
                                     child: Row(

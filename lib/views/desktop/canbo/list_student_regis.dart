@@ -383,7 +383,13 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                             child: Text(
                                                 'Chưa có sinh viên đăng ký.'));
                                   } else {
-                                    return const Loading();
+                                    return const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Loading(),
+                                      ],
+                                    );
                                   }
                                 },
                               ),
@@ -537,7 +543,13 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                 child: Text(
                                                     'Chưa có sinh viên đăng ký.'));
                                       } else {
-                                        return const Loading();
+                                        return const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Loading(),
+                                      ],
+                                    );
                                       }
                                     },
                                   ),

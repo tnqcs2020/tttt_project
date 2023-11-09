@@ -609,11 +609,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                             for (var i = 0;
                                                                                 i < 10;
                                                                                 i++) {
-                                                                              if (i < 3) {
-                                                                                points.add(TextEditingController(text: '0'));
-                                                                              } else {
-                                                                                points.add(TextEditingController(text: '10'));
-                                                                              }
+                                                                              points.add(TextEditingController(text: '10'));
                                                                             }
                                                                             currentUser.selected.value =
                                                                                 5;
@@ -653,7 +649,15 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                             child: Text(
                                                 'Chưa có sinh viên thực tập.'));
                                   } else {
-                                    return const Loading();
+                                    return const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Loading(),
+                                      ],
+                                    );
                                   }
                                 },
                               ),
@@ -894,11 +898,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                 commentSV.text = appreciate.commentSV!;
                                                                               } else {
                                                                                 for (var i = 0; i < 10; i++) {
-                                                                                  if (i < 3) {
-                                                                                    points.add(TextEditingController(text: '0'));
-                                                                                  } else {
-                                                                                    points.add(TextEditingController(text: '10'));
-                                                                                  }
+                                                                                  points.add(TextEditingController(text: '10'));
                                                                                 }
                                                                                 currentUser.selected.value = 5;
                                                                               }
@@ -930,7 +930,15 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                     'Chưa có sinh viên thực tập.'),
                                               );
                                       } else {
-                                        return const Loading();
+                                        return const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Loading(),
+                                          ],
+                                        );
                                       }
                                     },
                                   ),

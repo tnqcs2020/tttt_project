@@ -587,16 +587,10 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                   );
                                 },
                               )
-                            : const Padding(
-                                padding: EdgeInsets.only(top: 200),
-                                child: Center(
-                                    child: Text('Bạn chưa đăng ký công ty.')),
-                              );
+                            : const Center(
+                                child: Text('Bạn chưa đăng ký công ty.'));
                       } else {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 200),
-                          child: Loading(),
-                        );
+                        return const Loading();
                       }
                     },
                   ),

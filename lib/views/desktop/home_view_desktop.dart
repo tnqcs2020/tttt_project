@@ -139,7 +139,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        "Tin Tức Giáo Vụ & Việc Làm",
+                                                        "Tin tức giáo vụ và việc làm",
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
@@ -213,7 +213,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                         listAnnouncement[index]
                                                                             .title!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 2,
@@ -221,7 +221,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                         listAnnouncement[index]
                                                                             .type!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 3,
@@ -292,7 +292,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        "Kế Hoạch Thực Tập",
+                                                        "Kế hoạch thực tập",
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontWeight:
@@ -364,7 +364,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                         listPlanTrainee[index]
                                                                             .title!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 3,
@@ -467,7 +467,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
                                                                   .center,
                                                           children: [
                                                             Text(
-                                                              "Chi Tiết Tin",
+                                                              "Chi tiết tin",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .white,

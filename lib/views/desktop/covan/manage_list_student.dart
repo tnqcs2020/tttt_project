@@ -25,7 +25,7 @@ class _ListUserScreenState extends State<ManageListStudent> {
   final currentUser = Get.put(UserController());
   ValueNotifier<String> selectedND = ValueNotifier<String>(NguoiDung.empty);
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
-  ValueNotifier selectedMenu = ValueNotifier(0);
+  ValueNotifier selectedMenu = ValueNotifier(1);
   List manageClass = [
     'Danh sách lớp',
     'Danh sách thực tập',
@@ -129,7 +129,7 @@ class _ListUserScreenState extends State<ManageListStudent> {
                           return Column(
                             children: [
                               Container(
-                                height: 35,
+                                height: screenHeight * 0.06,
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade600,
                                   borderRadius: const BorderRadius.only(
@@ -141,10 +141,11 @@ class _ListUserScreenState extends State<ManageListStudent> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Danh sách người dùng",
+                                      "Quản lý sinh viên",
                                       style: TextStyle(
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
                                     ),
                                   ],
                                 ),

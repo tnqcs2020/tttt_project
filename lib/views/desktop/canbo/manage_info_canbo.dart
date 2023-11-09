@@ -129,7 +129,7 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Quản Lý Thông Tin",
+                                            "Quản lý thông tin",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -212,7 +212,15 @@ class _ManageInfoCBState extends State<ManageInfoCB> {
                       const Footer(),
                     ],
                   )
-                : const Loading()),
+                : SizedBox(
+                    height: screenHeight,
+                    width: screenWidth,
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Loading(),
+                      ],
+                    ))),
       ),
     );
   }

@@ -139,7 +139,7 @@ class _ManageTraineeState extends State<ManageTrainee> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            "Quản Lý Thực Tập",
+                                            "Quản lý thực tập",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -225,7 +225,15 @@ class _ManageTraineeState extends State<ManageTrainee> {
                       const Footer(),
                     ],
                   )
-                : const Loading()),
+                : SizedBox(
+                    height: screenHeight,
+                    width: screenWidth,
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Loading(),
+                      ],
+                    ))),
       ),
     );
   }

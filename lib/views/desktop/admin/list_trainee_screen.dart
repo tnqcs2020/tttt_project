@@ -372,13 +372,6 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                           ? StreamBuilder(
                                               stream: firestore
                                                   .collection('trainees')
-                                                  .where('term',
-                                                      isEqualTo: selectedHK)
-                                                  .where('yearStart',
-                                                      isEqualTo:
-                                                          selectedNH.start)
-                                                  .where('yearEnd',
-                                                      isEqualTo: selectedNH.end)
                                                   .snapshots(),
                                               builder: (context, snapshot) {
                                                 List<RegisterTraineeModel>

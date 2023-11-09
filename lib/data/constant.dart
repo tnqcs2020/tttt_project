@@ -310,6 +310,57 @@ Lớp trưởng có thể nhận và phát cho các bạn trong giờ sinh hoạ
   "Giáo viên chấm và nhập điểm TTTT.",
 ];
 
+List<String> appreciateCV = [
+  'I. Hình thức trình bày',
+  '''I.1 Đúng format của khoa (Trang bìa, trang lời cảm ơn, trang đánh giá thực tập của khoa, trang mục lục và các nội dung báo cáo). Sử dụng đúng mã và font tiếng Việt (Unicode Times New Roman, Size 13) ''',
+  'I.2 Trình bày mạch lạc, súc tích, không có lỗi chính tả',
+  'II. Phiếu theo dõi',
+  'II.1 Có lịch làm việc đầy đủ cho 8 tuần',
+  '''II.2 Hoàn thành tốt kế hoạch công tác ghi trong lịch làm việc. Cách tính điểm = (Điểm cộng của cán bộ hướng dẫn/100) x 5''',
+  'III. Nội dung thực tập (quyển báo cáo)',
+  'III.1 Có được sự hiểu biết tốt về cơ quan nơi thực tập',
+  'III.2 Phương pháp thực hiện phù hợp với nội dung công việc được giao',
+  'III.3 Kết quả cùng cố lý thuyết',
+  'III.4 Kết quả rèn luyện kỹ năng thực hành',
+  'III.5 Kinh nghiêm thực tiễn thu nhận được',
+  'III.6 Kết quả công việc có đóng góp cho cơ quan nơi thực tập',
+  'TỔNG CỘNG',
+  'Điểm trừ',
+  'Điểm còn lại',
+];
+
+List<double> pointAppreciateCV = [
+  1.0,
+  0.5,
+  0.5,
+  6.0,
+  1.0,
+  5.0,
+  3.0,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  10,
+  0,
+  0,
+];
+List<double> initPoint = [
+  0.5,
+  0.5,
+  1.0,
+  5.0,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.0,
+];
+
 class HocPhan {
   final String maHP;
   final String tenHP;
