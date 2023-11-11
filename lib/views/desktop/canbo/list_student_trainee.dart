@@ -11,8 +11,10 @@ import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/appreciate_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
+import 'package:tttt_project/views/desktop/student/register_trainee.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
@@ -49,6 +51,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   TextEditingController commentCTDT = TextEditingController();
   String? appreciateCTDT;
   final _formKey = GlobalKey<FormState>();
+  SettingTraineeModel setting = SettingTraineeModel();
+
   @override
   void initState() {
     getData();
@@ -67,6 +71,23 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
       trainees = loadTrainee.docs
           .map((e) => RegisterTraineeModel.fromMap(e.data()))
           .toList();
+    }
+    DocumentSnapshot<Map<String, dynamic>> atMoment =
+        await firestore.collection('atMoment').doc('now').get();
+    if (atMoment.data() != null) {
+      QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
+          await firestore
+              .collection('settingTrainees')
+              .where('term', isEqualTo: atMoment.data()!['term'])
+              .where('yearStart', isEqualTo: atMoment.data()!['yearStart'])
+              .get();
+      if (isExistSettingTrainee.docs.isNotEmpty) {
+        final settingTrainee = SettingTraineeModel.fromMap(
+            isExistSettingTrainee.docs.first.data());
+        setState(() {
+          setting = settingTrainee;
+        });
+      }
     }
     var loadData = await GV.usersCol.get();
     if (loadData.docs.isNotEmpty) {
@@ -567,63 +588,56 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                 1),
                                                                         onPressed:
                                                                             () async {
-                                                                          points =
-                                                                              [];
-                                                                          loadUsers
-                                                                              .forEach((element) {
-                                                                            if (element.userId ==
-                                                                                listRegis[indexRegis].userId) {
-                                                                              user = element;
-                                                                            }
-                                                                          });
-                                                                          var loadAppeciate = await firestore
-                                                                              .collection('appreciates')
-                                                                              .where('userId', isEqualTo: user.userId)
-                                                                              .get();
-                                                                          if (loadAppeciate
-                                                                              .docs
-                                                                              .isNotEmpty) {
-                                                                            var appreciates =
-                                                                                loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
-                                                                            var appreciate = appreciates.firstWhere((element) =>
-                                                                                element.userId ==
-                                                                                listRegis[indexRegis].userId);
-                                                                            for (var i = 0;
-                                                                                i < appreciate.listContent!.length;
-                                                                                i++) {
-                                                                              points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
-                                                                            }
-                                                                            for (var i = 0;
-                                                                                i < appreciatesCTDT.length;
-                                                                                i++) {
-                                                                              if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
-                                                                                appreciateCTDT = appreciate.appreciateCTDT!;
-                                                                                currentUser.selected.value = i;
-                                                                              }
-                                                                            }
-                                                                            commentCTDT.text =
-                                                                                appreciate.commentCTDT!;
-                                                                            commentSV.text =
-                                                                                appreciate.commentSV!;
-                                                                          } else {
-                                                                            for (var i = 0;
-                                                                                i < 10;
-                                                                                i++) {
-                                                                              points.add(TextEditingController(text: '10'));
-                                                                            }
-                                                                            currentUser.selected.value =
-                                                                                5;
+                                                                          if (DateTime.now().isBeforeTimestamp(setting
+                                                                              .traineeEnd!)) {
+                                                                            GV.error(
+                                                                                context: context,
+                                                                                message: 'Chưa đến thời gian chấm điểm.');
+                                                                          } else if (DateTime.now()
+                                                                              .isAfterTimestamp(setting.pointCBEnd!)) {
+                                                                            GV.error(
+                                                                                context: context,
+                                                                                message: 'Đã quá thơi gian chấm điểm.');
                                                                           }
-                                                                          showAppreciate(
-                                                                            context:
-                                                                                context,
-                                                                            plan:
-                                                                                plan,
-                                                                            jobRegister:
-                                                                                listRegis[indexRegis],
-                                                                            firms:
-                                                                                loadFirms,
-                                                                          );
+                                                                          if (DateTime.now().isBetweenEqual(
+                                                                              from: setting.traineeEnd!,
+                                                                              to: setting.pointCBEnd!)) {
+                                                                            points =
+                                                                                [];
+                                                                            loadUsers.forEach((element) {
+                                                                              if (element.userId == listRegis[indexRegis].userId) {
+                                                                                user = element;
+                                                                              }
+                                                                            });
+                                                                            var loadAppeciate =
+                                                                                await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
+                                                                            if (loadAppeciate.docs.isNotEmpty) {
+                                                                              var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
+                                                                              var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                              for (var i = 0; i < appreciate.listContent!.length; i++) {
+                                                                                points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                              }
+                                                                              for (var i = 0; i < appreciatesCTDT.length; i++) {
+                                                                                if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
+                                                                                  appreciateCTDT = appreciate.appreciateCTDT!;
+                                                                                  currentUser.selected.value = i;
+                                                                                }
+                                                                              }
+                                                                              commentCTDT.text = appreciate.commentCTDT!;
+                                                                              commentSV.text = appreciate.commentSV!;
+                                                                            } else {
+                                                                              for (var i = 0; i < 10; i++) {
+                                                                                points.add(TextEditingController(text: '10'));
+                                                                              }
+                                                                              currentUser.selected.value = 5;
+                                                                            }
+                                                                            showAppreciate(
+                                                                              context: context,
+                                                                              plan: plan,
+                                                                              jobRegister: listRegis[indexRegis],
+                                                                              firms: loadFirms,
+                                                                            );
+                                                                          }
                                                                         },
                                                                         icon:
                                                                             const Icon(
@@ -875,39 +889,46 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                             padding:
                                                                                 const EdgeInsets.only(bottom: 1),
                                                                             onPressed: () async {
-                                                                              points = [];
-                                                                              loadUsers.forEach((element) {
-                                                                                if (element.userId == listRegis[indexRegis].userId) {
-                                                                                  user = element;
-                                                                                }
-                                                                              });
-                                                                              var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
-                                                                              if (loadAppeciate.docs.isNotEmpty) {
-                                                                                var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
-                                                                                var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
-                                                                                for (var i = 0; i < appreciate.listContent!.length; i++) {
-                                                                                  points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
-                                                                                }
-                                                                                for (var i = 0; i < appreciatesCTDT.length; i++) {
-                                                                                  if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
-                                                                                    appreciateCTDT = appreciate.appreciateCTDT!;
-                                                                                    currentUser.selected.value = i;
-                                                                                  }
-                                                                                }
-                                                                                commentCTDT.text = appreciate.commentCTDT!;
-                                                                                commentSV.text = appreciate.commentSV!;
-                                                                              } else {
-                                                                                for (var i = 0; i < 10; i++) {
-                                                                                  points.add(TextEditingController(text: '10'));
-                                                                                }
-                                                                                currentUser.selected.value = 5;
+                                                                              if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
+                                                                                GV.error(context: context, message: 'Chưa đến thời gian chấm điểm.');
+                                                                              } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
+                                                                                GV.error(context: context, message: 'Đã quá thơi gian chấm điểm.');
                                                                               }
-                                                                              showAppreciate(
-                                                                                context: context,
-                                                                                plan: plan,
-                                                                                jobRegister: listRegis[indexRegis],
-                                                                                firms: loadFirms,
-                                                                              );
+                                                                              if (DateTime.now().isBetweenEqual(from: setting.traineeEnd!, to: setting.pointCBEnd!)) {
+                                                                                points = [];
+                                                                                loadUsers.forEach((element) {
+                                                                                  if (element.userId == listRegis[indexRegis].userId) {
+                                                                                    user = element;
+                                                                                  }
+                                                                                });
+                                                                                var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
+                                                                                if (loadAppeciate.docs.isNotEmpty) {
+                                                                                  var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
+                                                                                  var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                                  for (var i = 0; i < appreciate.listContent!.length; i++) {
+                                                                                    points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                                  }
+                                                                                  for (var i = 0; i < appreciatesCTDT.length; i++) {
+                                                                                    if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
+                                                                                      appreciateCTDT = appreciate.appreciateCTDT!;
+                                                                                      currentUser.selected.value = i;
+                                                                                    }
+                                                                                  }
+                                                                                  commentCTDT.text = appreciate.commentCTDT!;
+                                                                                  commentSV.text = appreciate.commentSV!;
+                                                                                } else {
+                                                                                  for (var i = 0; i < 10; i++) {
+                                                                                    points.add(TextEditingController(text: '10'));
+                                                                                  }
+                                                                                  currentUser.selected.value = 5;
+                                                                                }
+                                                                                showAppreciate(
+                                                                                  context: context,
+                                                                                  plan: plan,
+                                                                                  jobRegister: listRegis[indexRegis],
+                                                                                  firms: loadFirms,
+                                                                                );
+                                                                              }
                                                                             },
                                                                             icon: const Icon(
                                                                               CupertinoIcons.pencil_ellipsis_rectangle,

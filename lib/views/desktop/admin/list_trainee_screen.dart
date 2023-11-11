@@ -130,7 +130,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Danh Sách Sinh Viên Đăng Ký Thực Tập",
+                                      "Danh sách sinh viên đăng ký thực tập",
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -154,7 +154,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                               MainAxisAlignment.start,
                                           children: [
                                             const Text(
-                                              "Học Kỳ",
+                                              "Học kỳ",
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w900,
@@ -222,7 +222,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                               MainAxisAlignment.start,
                                           children: [
                                             const Text(
-                                              "Năm Học",
+                                              "Năm học",
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w900,
@@ -462,7 +462,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                             .userId!
                                                                             .toUpperCase(),
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 4,
@@ -470,14 +470,19 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                         dstttt[index]
                                                                             .studentName!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 5,
                                                                     child: Text(
-                                                                        '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                        textAlign:
-                                                                            TextAlign.center),
+                                                                      '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 1,
@@ -497,8 +502,14 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                               'Chưa có sinh viên đăng ký.'),
                                                         );
                                                 } else {
-                                                  return const Center(
-                                                      child: Loading());
+                                                  return const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Loading(),
+                                                        ],
+                                                      );
                                                 }
                                               },
                                             )
@@ -565,22 +576,28 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                                 .userId!
                                                                                 .toUpperCase(),
                                                                             textAlign:
-                                                                                TextAlign.center),
+                                                                                TextAlign.justify),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 4,
-                                                                        child: Text(
-                                                                            dstttt[index]
-                                                                                .studentName!,
-                                                                            textAlign:
-                                                                                TextAlign.center),
+                                                                        child:
+                                                                            Text(
+                                                                          dstttt[index]
+                                                                              .studentName!,
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                        ),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 5,
-                                                                        child: Text(
-                                                                            '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                            textAlign:
-                                                                                TextAlign.center),
+                                                                        child:
+                                                                            Text(
+                                                                          '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 1,
@@ -600,8 +617,14 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                   'Chưa có sinh viên đăng ký.'),
                                                             );
                                                     } else {
-                                                      return const Center(
-                                                          child: Loading());
+                                                      return const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Loading(),
+                                                        ],
+                                                      );
                                                     }
                                                   },
                                                 )

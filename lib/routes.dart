@@ -8,9 +8,9 @@ import 'package:tttt_project/views/desktop/covan/info_covan.dart';
 import 'package:tttt_project/views/desktop/covan/manage_list_student.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_announcement.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_credit_screen.dart';
+import 'package:tttt_project/views/desktop/giaovu/manage_setting_trainee.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_time.dart';
 import 'package:tttt_project/views/desktop/home_view_desktop.dart';
-import 'package:tttt_project/views/desktop/student/cv_screen.dart';
 import 'package:tttt_project/views/desktop/student/regisFirm/firm_link.dart';
 import 'package:tttt_project/views/desktop/student/information.dart';
 import 'package:tttt_project/views/desktop/student/register_trainee.dart';
@@ -22,7 +22,6 @@ class RouteGenerator {
   static const String register = '/dky-tttt';
   static const String firm = '/cong-ty';
   static const String home = '/trang-chu';
-  static const String cv = '/ho-so';
   static const String addUser = '/tao-tk';
   static const String dstttt = '/ds-tttt';
   static const String manageCredit = '/ql-hoc-phan';
@@ -30,9 +29,10 @@ class RouteGenerator {
   static const String manageTraineeCB = '/ql-thuc-tap';
   static const String dsNguoiDung = '/ds-nguoi-dung';
   static const String manageAnnouncement = '/ql-thong-bao';
-  static const String manageTime = '/ql-thoi-gian';
+  static const String managePlan = '/ql-ke-hoach';
   static const String infoCV = '/thong-tin-cv';
   static const String dssv = '/ds-sinh-vien';
+  static const String settingTrainee = '/ql-thoi-gian';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -65,11 +65,6 @@ class RouteGenerator {
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const InfoScreen(),
-        );
-      case cv:
-        return MaterialPageRoute(
-          settings: routeSettings,
-          builder: (_) => const CVScreen(),
         );
       case addUser:
         return MaterialPageRoute(
@@ -106,7 +101,7 @@ class RouteGenerator {
           settings: routeSettings,
           builder: (_) => const ManageAnnouncementScreen(),
         );
-      case manageTime:
+      case managePlan:
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const ManageTimeScreen(),
@@ -120,6 +115,11 @@ class RouteGenerator {
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const ManageListStudent(),
+        );
+      case settingTrainee:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const SettingTraineeScreen(),
         );
       default:
         return MaterialPageRoute(

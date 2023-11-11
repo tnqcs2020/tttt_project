@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tttt_project/data/constant.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart';
-import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/plan_trainee_model.dart'; 
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/date_inputformatter.dart';
@@ -142,7 +141,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Quản Lý Các Kế Hoạch Thực Tập",
+                                  "Quản lý các kế hoạch thực tập",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -163,7 +162,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      "Học Kỳ",
+                                      "Học kỳ",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -221,7 +220,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      "Năm Học",
+                                      "Năm học",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -457,7 +456,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                         dskh[index]
                                                                             .title!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 2,
@@ -475,16 +474,18 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                               .center,
                                                                       children: [
                                                                         IconButton(
+                                                                          tooltip:
+                                                                              'Chỉnh sửa kế hoạch',
                                                                           padding: const EdgeInsets
                                                                               .only(
                                                                               bottom: 1),
                                                                           onPressed:
                                                                               () async {
-                                                                            // await editAnnouncement(
-                                                                            //   context: context,
-                                                                            //   announcement: listAnnouncement[index],
-                                                                            //   isCreate: false,
-                                                                            // );
+                                                                            await editPlanTrainee(
+                                                                              context: context,
+                                                                              planTrainee: dskh[index],
+                                                                              isCreate: false,
+                                                                            );
                                                                           },
                                                                           icon:
                                                                               Icon(
@@ -496,11 +497,18 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                           ),
                                                                         ),
                                                                         IconButton(
+                                                                          tooltip:
+                                                                              'Xóa kế hoạch',
                                                                           padding: const EdgeInsets
                                                                               .only(
                                                                               bottom: 1),
                                                                           onPressed:
-                                                                              () {},
+                                                                              () async {
+                                                                            await deletePlanTrainee(
+                                                                              context: context,
+                                                                              planTrainee: dskh[index],
+                                                                            );
+                                                                          },
                                                                           icon:
                                                                               const Icon(
                                                                             Icons.delete_rounded,
@@ -590,7 +598,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                             dskh[index]
                                                                                 .title!,
                                                                             textAlign:
-                                                                                TextAlign.center),
+                                                                                TextAlign.justify),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 2,
@@ -608,6 +616,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                               MainAxisAlignment.center,
                                                                           children: [
                                                                             IconButton(
+                                                                              tooltip: 'Chỉnh sửa kế hoạch',
                                                                               padding: const EdgeInsets.only(bottom: 1),
                                                                               onPressed: () async {
                                                                                 await editPlanTrainee(
@@ -623,6 +632,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                               ),
                                                                             ),
                                                                             IconButton(
+                                                                              tooltip: 'Xóa kế hoạch',
                                                                               padding: const EdgeInsets.only(bottom: 1),
                                                                               onPressed: () async {
                                                                                 await deletePlanTrainee(
@@ -662,6 +672,19 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                               ],
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomButton(
+                                text: 'Thiết lập thời gian thực tập',
+                                width: screenWidth * 0.07,
+                                height: screenHeight * 0.06,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 35),
                         ],
                       ),
                     ),
@@ -674,6 +697,84 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
         ),
       ),
     );
+  }
+
+  showSetTime({
+    required BuildContext context,
+    required String creditId,
+  }) async {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    showDialog(
+        context: context,
+        barrierColor: Colors.black12,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+              top: screenHeight * 0.06,
+              bottom: screenHeight * 0.02,
+              left: screenWidth * 0.27,
+              right: screenWidth * 0.08,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AlertDialog(
+                  title: Container(
+                    color: Colors.blue.shade600,
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Thiết lập thời gian thực tập',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                  titlePadding: EdgeInsets.zero,
+                  shape: Border.all(width: 0.5),
+                  content:
+                      const Text("Bạn có chắc chắn muốn xóa kế hoạch này?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        "Hủy",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        firestore
+                            .collection('planTrainees')
+                            .doc(creditId)
+                            .delete();
+                        Navigator.of(context).pop();
+                        GV.success(
+                            context: context, message: 'Đã xóa kế hoạch.');
+                      },
+                      child: const Text(
+                        "Đồng ý",
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   editPlanTrainee({
@@ -739,8 +840,8 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
             padding: EdgeInsets.only(
               top: screenHeight * 0.06,
               bottom: screenHeight * 0.02,
-              left: screenWidth * 0.27,
-              right: screenWidth * 0.08,
+              left: screenWidth * 0.25,
+              right: screenWidth * 0.06,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -757,7 +858,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                           width: 30,
                         ),
                         const Expanded(
-                          child: Text('Chi Tiết Kế Hoạch',
+                          child: Text('Chi tiết kế hoạch',
                               style: TextStyle(fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center),
                         ),
@@ -779,7 +880,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                   content: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Container(
-                      constraints: BoxConstraints(minWidth: screenWidth * 0.55),
+                      constraints: BoxConstraints(minWidth: screenWidth * 0.6),
                       padding: const EdgeInsets.only(
                           top: 15, bottom: 15, left: 20, right: 20),
                       child: Form(
@@ -931,97 +1032,86 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                               validator: (p0) =>
                                   p0!.isEmpty ? 'Không được để trống.' : null,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15),
-                              child: Table(
-                                border: TableBorder.all(),
-                                columnWidths: Map.from({
-                                  0: const FlexColumnWidth(11),
-                                  1: const FlexColumnWidth(5),
-                                }),
-                                children: [
-                                  TableRow(
-                                    children: [
-                                      Container(
-                                          padding: const EdgeInsets.all(10),
-                                          child: const Text(
-                                            'Nội Dung',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          )),
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        child: const Text(
-                                          'Thời Gian',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  for (var i = 0; i < totalContent.value; i++)
-                                    TableRow(
+                            ValueListenableBuilder(
+                                valueListenable: totalContent,
+                                builder: (context, val, child) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: Table(
+                                      border: TableBorder.all(),
+                                      columnWidths: Map.from({
+                                        0: const FlexColumnWidth(6),
+                                        1: const FlexColumnWidth(3),
+                                        2: const FlexColumnWidth(1)
+                                      }),
                                       children: [
-                                        TableCell(
-                                          verticalAlignment:
-                                              TableCellVerticalAlignment.middle,
-                                          child: TextFormField(
-                                            controller: contents[i],
-                                            minLines: 1,
-                                            maxLines: 10,
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                            decoration: const InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide.none,
+                                        TableRow(
+                                          children: [
+                                            Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: const Text(
+                                                  'Nội Dung',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )),
+                                            Container(
+                                              padding: const EdgeInsets.all(10),
+                                              child: const Text(
+                                                'Thời Gian',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                            const SizedBox.shrink(),
+                                          ],
                                         ),
-                                        TableCell(
-                                          verticalAlignment:
-                                              TableCellVerticalAlignment.middle,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Column(
-                                              children: [
-                                                TextFormField(
-                                                  controller: timeNotes[i],
+                                        for (var i = 0;
+                                            i < totalContent.value;
+                                            i++)
+                                          TableRow(
+                                            children: [
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: TextFormField(
+                                                  controller: contents[i],
                                                   minLines: 1,
                                                   maxLines: 10,
+                                                  style: const TextStyle(
+                                                      fontSize: 15),
                                                   decoration:
                                                       const InputDecoration(
-                                                    hintText:
-                                                        'Ghi chú (nếu có)',
-                                                    isDense: true,
-                                                    contentPadding:
-                                                        EdgeInsets.all(5),
                                                     border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(5),
-                                                      ),
+                                                      borderSide:
+                                                          BorderSide.none,
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(height: 10),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 5,
-                                                      child: TextFormField(
-                                                        controller: dayStart[i],
+                                              ),
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: Column(
+                                                    children: [
+                                                      TextFormField(
+                                                        controller:
+                                                            timeNotes[i],
+                                                        minLines: 1,
+                                                        maxLines: 10,
                                                         decoration:
                                                             const InputDecoration(
                                                           hintText:
-                                                              'DD/MM/YYYY',
+                                                              'Ghi chú (nếu có)',
                                                           isDense: true,
                                                           contentPadding:
                                                               EdgeInsets.all(5),
@@ -1035,67 +1125,170 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                             ),
                                                           ),
                                                         ),
-                                                        validator: (value) =>
-                                                            value!.isNotEmpty &&
-                                                                    value.length <
-                                                                        10
-                                                                ? "Sai định dạng"
-                                                                : null,
-                                                        inputFormatters: [
-                                                          FilteringTextInputFormatter
-                                                              .allow(RegExp(
-                                                                  "[0-9/]")),
-                                                          LengthLimitingTextInputFormatter(
-                                                              10),
-                                                          DateFormatter(),
-                                                        ],
                                                       ),
-                                                    ),
-                                                    const Expanded(
-                                                        child: Center(
-                                                            child: Text('-'))),
-                                                    Expanded(
-                                                      flex: 5,
-                                                      child: TextFormField(
-                                                        controller: dayEnd[i],
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          hintText:
-                                                              'DD/MM/YYYY',
-                                                          isDense: true,
-                                                          contentPadding:
-                                                              EdgeInsets.all(5),
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(
-                                                              Radius.circular(
-                                                                  5),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 5,
+                                                            child:
+                                                                TextFormField(
+                                                              controller:
+                                                                  dayStart[i],
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                hintText:
+                                                                    'DD/MM/YYYY',
+                                                                isDense: true,
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .all(5),
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius
+                                                                        .circular(
+                                                                            5),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              validator: (value) =>
+                                                                  value!.isNotEmpty &&
+                                                                          value.length <
+                                                                              10
+                                                                      ? "Sai định dạng"
+                                                                      : null,
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter
+                                                                    .allow(RegExp(
+                                                                        "[0-9/]")),
+                                                                LengthLimitingTextInputFormatter(
+                                                                    10),
+                                                                DateFormatter(),
+                                                              ],
                                                             ),
                                                           ),
-                                                        ),
-                                                        inputFormatters: [
-                                                          FilteringTextInputFormatter
-                                                              .allow(RegExp(
-                                                                  "[0-9/]")),
-                                                          LengthLimitingTextInputFormatter(
-                                                              10),
-                                                          DateFormatter(),
+                                                          const Expanded(
+                                                              child: Center(
+                                                                  child: Text(
+                                                                      '-'))),
+                                                          Expanded(
+                                                            flex: 5,
+                                                            child:
+                                                                TextFormField(
+                                                              controller:
+                                                                  dayEnd[i],
+                                                              decoration:
+                                                                  const InputDecoration(
+                                                                hintText:
+                                                                    'DD/MM/YYYY',
+                                                                isDense: true,
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .all(5),
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius
+                                                                        .circular(
+                                                                            5),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              validator: (value) =>
+                                                                  value!.isNotEmpty &&
+                                                                          value.length <
+                                                                              10
+                                                                      ? "Sai định dạng"
+                                                                      : null,
+                                                              inputFormatters: [
+                                                                FilteringTextInputFormatter
+                                                                    .allow(RegExp(
+                                                                        "[0-9/]")),
+                                                                LengthLimitingTextInputFormatter(
+                                                                    10),
+                                                                DateFormatter(),
+                                                              ],
+                                                            ),
+                                                          ),
                                                         ],
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              TableCell(
+                                                  verticalAlignment:
+                                                      TableCellVerticalAlignment
+                                                          .middle,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            contents
+                                                                .removeAt(i);
+                                                            timeNotes
+                                                                .removeAt(i);
+                                                            dayStart
+                                                                .removeAt(i);
+                                                            dayEnd.removeAt(i);
+                                                            totalContent
+                                                                .value--;
+                                                          });
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.remove_circle,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            contents.insertAll(
+                                                                i + 1, [
+                                                              TextEditingController()
+                                                            ]);
+                                                            timeNotes.insertAll(
+                                                                i + 1, [
+                                                              TextEditingController()
+                                                            ]);
+                                                            dayStart.insertAll(
+                                                                i + 1, [
+                                                              TextEditingController()
+                                                            ]);
+                                                            dayEnd.insertAll(
+                                                                i + 1, [
+                                                              TextEditingController()
+                                                            ]);
+                                                            totalContent
+                                                                .value++;
+                                                          });
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.add_circle,
+                                                          color: Colors.green,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ))
+                                            ],
                                           ),
-                                        ),
                                       ],
                                     ),
-                                ],
-                              ),
-                            ),
+                                  );
+                                }),
                             const SizedBox(height: 15),
                             LineDetail(
                               field: 'Ghi chú',
@@ -1155,48 +1348,6 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         .collection('planTrainees')
                                         .doc(docId)
                                         .set(planTrainee.toMap());
-                                    final updateTimeTrainee = await firestore
-                                        .collection('trainees')
-                                        .where('term',
-                                            isEqualTo: _selectedHK.value)
-                                        .where('yearStart',
-                                            isEqualTo: _selectedNH.value.start)
-                                        .where('yearEnd',
-                                            isEqualTo: _selectedNH.value.end)
-                                        .get();
-
-                                    if (updateTimeTrainee.docs.isNotEmpty) {
-                                      List<RegisterTraineeModel>
-                                          traineeUpdates = [];
-                                      updateTimeTrainee.docs.forEach(
-                                          (element) => traineeUpdates.add(
-                                              RegisterTraineeModel.fromMap(
-                                                  element.data())));
-                                      if (dayStart[11].text.isNotEmpty &&
-                                          dayEnd[11].text.isNotEmpty) {
-                                        traineeUpdates.forEach((element) {
-                                          element.traineeStart = Timestamp
-                                              .fromDate(DateFormat('dd/MM/yyyy')
-                                                  .parse(dayStart[11].text));
-                                          element.traineeEnd =
-                                              Timestamp.fromDate(
-                                                  DateFormat('dd/MM/yyyy')
-                                                      .parse(dayEnd[11].text));
-                                        });
-                                      }
-                                      if (traineeUpdates.isNotEmpty) {
-                                        traineeUpdates.forEach((element) {
-                                          firestore
-                                              .collection('trainees')
-                                              .doc(element.userId)
-                                              .update({
-                                            'traineeStart':
-                                                element.traineeStart,
-                                            'traineeEnd': element.traineeEnd,
-                                          });
-                                        });
-                                      }
-                                    }
                                     Navigator.of(context).pop();
                                     GV.success(
                                         context: context,
@@ -1241,48 +1392,6 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         .collection('planTrainees')
                                         .doc(planTrainee.planTraineeId!)
                                         .update(planTraineeModel.toMap());
-                                    final updateTimeTrainee = await firestore
-                                        .collection('trainees')
-                                        .where('term',
-                                            isEqualTo: _selectedHK.value)
-                                        .where('yearStart',
-                                            isEqualTo: _selectedNH.value.start)
-                                        .where('yearEnd',
-                                            isEqualTo: _selectedNH.value.end)
-                                        .get();
-
-                                    if (updateTimeTrainee.docs.isNotEmpty) {
-                                      List<RegisterTraineeModel>
-                                          traineeUpdates = [];
-                                      updateTimeTrainee.docs.forEach(
-                                          (element) => traineeUpdates.add(
-                                              RegisterTraineeModel.fromMap(
-                                                  element.data())));
-                                      if (dayStart[11].text.isNotEmpty &&
-                                          dayEnd[11].text.isNotEmpty) {
-                                        traineeUpdates.forEach((element) {
-                                          element.traineeStart = Timestamp
-                                              .fromDate(DateFormat('dd/MM/yyyy')
-                                                  .parse(dayStart[11].text));
-                                          element.traineeEnd =
-                                              Timestamp.fromDate(
-                                                  DateFormat('dd/MM/yyyy')
-                                                      .parse(dayEnd[11].text));
-                                        });
-                                      }
-                                      if (traineeUpdates.isNotEmpty) {
-                                        traineeUpdates.forEach((element) {
-                                          firestore
-                                              .collection('trainees')
-                                              .doc(element.userId)
-                                              .update({
-                                            'traineeStart':
-                                                element.traineeStart,
-                                            'traineeEnd': element.traineeEnd,
-                                          });
-                                        });
-                                      }
-                                    }
                                     Navigator.of(context).pop();
                                     GV.success(
                                         context: context,

@@ -2,14 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/data/pdf.dart';
 import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:tttt_project/models/appreciate_model.dart';
-import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/submit_bodel.dart';
@@ -983,10 +981,40 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                         onTap: () {}),
                     const SizedBox(width: 15),
                     CustomButton(
-                        text: 'Xuất điểm',
-                        width: 100,
-                        height: 40,
-                        onTap: () {}),
+                      text: 'Xuất điểm',
+                      width: 100,
+                      height: 40,
+                      onTap: () async {
+                        if (selectedHK != HocKy.empty &&
+                            selectedNH != NamHoc.empty) {
+                          List<AppreciateCVModel> list = [];
+                          appCV.forEach((element) {
+                            if (selectedHK == HocKy.tatca &&
+                                selectedNH == NamHoc.tatca) {
+                              list.add(element);
+                            } else if (selectedHK == HocKy.tatca) {
+                              if (element.yearStart == selectedNH.start) {
+                                list.add(element);
+                              }
+                            } else if (selectedNH == NamHoc.tatca) {
+                              if (element.term == selectedHK) {
+                                list.add(element);
+                              }
+                            } else if (element.term == selectedHK &&
+                                element.yearStart == selectedNH.start) {
+                              list.add(element);
+                            }
+                          });
+                          await exportPDF(
+                              myClass, selectedHK, selectedNH, list);
+                        } else {
+                          GV.error(
+                              context: context,
+                              message:
+                                  'Vui lòng chọn học kỳ, năm học và kiểm tra lại danh sách trước khi xuất file.');
+                        }
+                      },
+                    ),
                   ],
                 ),
               )

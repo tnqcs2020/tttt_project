@@ -278,67 +278,43 @@ class _InfoFirmState extends State<InfoFirm> {
                                         ctrl: describes[index],
                                       ),
                                       SizedBox(width: screenWidth * 0.015),
-                                      if (index == vTotalJob - 1) ...[
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 15),
-                                          child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  totalJob.value--;
-                                                  quantities.removeAt(index);
-                                                  positions.removeAt(index);
-                                                  describes.removeAt(index);
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.remove_circle_outlined,
-                                                size: 30,
-                                                color: Colors.red,
-                                              )),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 15),
-                                          child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  totalJob.value++;
-                                                  quantities.add(
-                                                      TextEditingController());
-                                                  positions.add(
-                                                      TextEditingController());
-                                                  describes.add(
-                                                      TextEditingController());
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.add_circle_outlined,
-                                                size: 30,
-                                                color: Colors.green,
-                                              )),
-                                        ),
-                                      ] else ...[
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 15),
-                                          child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  totalJob.value--;
-                                                  quantities.removeAt(index);
-                                                  positions.removeAt(index);
-                                                  describes.removeAt(index);
-                                                });
-                                              },
-                                              icon: const Icon(
-                                                Icons.remove_circle_outlined,
-                                                size: 30,
-                                                color: Colors.red,
-                                              )),
-                                        ),
-                                        const SizedBox(width: 50),
-                                      ]
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                totalJob.value--;
+                                                quantities.removeAt(index);
+                                                positions.removeAt(index);
+                                                describes.removeAt(index);
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.remove_circle_outlined,
+                                              size: 30,
+                                              color: Colors.red,
+                                            )),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 15),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                totalJob.value++;
+                                                quantities.insert(index + 1,
+                                                    TextEditingController());
+                                                positions.insert(index + 1,
+                                                    TextEditingController());
+                                                describes.insert(index + 1,
+                                                    TextEditingController());
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.add_circle_outlined,
+                                              size: 30,
+                                              color: Colors.green,
+                                            )),
+                                      ),
                                     ],
                                   );
                                 });

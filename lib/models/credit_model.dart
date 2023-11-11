@@ -1,23 +1,35 @@
 import 'dart:convert';
 
 class CreditModel {
-  String id, name, course;
+  String creditId, creditName, course, major;
 
   CreditModel({
-    required this.id,
-    required this.name,
+    required this.creditId,
+    required this.creditName,
     required this.course,
+    required this.major,
   });
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'name': name, 'course': course};
+    return {
+      'creditId': creditId,
+      'creditName': creditName,
+      'course': course,
+      'major': major,
+    };
   }
 
+  static CreditModel empty =
+      CreditModel(creditId: '', creditName: '', course: '', major: '');
+  static CreditModel tatca =
+      CreditModel(creditId: 'Tất cả', creditName: '', course: '', major: '');
+      
   factory CreditModel.fromMap(Map<String, dynamic> map) {
     return CreditModel(
-      id: map['id'] ?? '',
-      name: map['name'] ?? '',
+      creditId: map['creditId'] ?? '',
+      creditName: map['creditName'] ?? '',
       course: map['course'] ?? '',
+      major: map['major'] ?? '',
     );
   }
 
@@ -25,16 +37,4 @@ class CreditModel {
 
   factory CreditModel.fromJson(String source) =>
       CreditModel.fromMap(json.decode(source));
-
-  CreditModel copyWith({
-    String? id,
-    String? name,
-    String? course,
-  }) {
-    return CreditModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      course: course ?? this.course,
-    );
-  }
 }

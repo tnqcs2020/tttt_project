@@ -7,13 +7,13 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
+import 'package:tttt_project/views/desktop/student/register_trainee.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
-import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
 
 class ListFirm extends StatefulWidget {
@@ -33,11 +33,19 @@ class _ListFirmState extends State<ListFirm> {
   final currentUser = Get.put(UserController());
   bool isRegistered = false;
   RegisterTraineeModel trainee = RegisterTraineeModel();
+  SettingTraineeModel setting = SettingTraineeModel();
 
   @override
   void initState() {
     getJobPosition();
     super.initState();
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 
   getJobPosition() async {
@@ -56,6 +64,23 @@ class _ListFirmState extends State<ListFirm> {
           await firestore.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
+        DocumentSnapshot<Map<String, dynamic>> atMoment =
+            await firestore.collection('atMoment').doc('now').get();
+        if (atMoment.data() != null) {
+          QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
+              await firestore
+                  .collection('settingTrainees')
+                  .where('term', isEqualTo: atMoment.data()!['term'])
+                  .where('yearStart', isEqualTo: atMoment.data()!['yearStart'])
+                  .get();
+          if (isExistSettingTrainee.docs.isNotEmpty) {
+            final settingTrainee = SettingTraineeModel.fromMap(
+                isExistSettingTrainee.docs.first.data());
+            setState(() {
+              setting = settingTrainee;
+            });
+          }
+        }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
         if (isExitTrainee.data() != null) {
@@ -66,28 +91,29 @@ class _ListFirmState extends State<ListFirm> {
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
           if (loadTrainee.traineeStart == null &&
               loadTrainee.traineeEnd == null) {
-            QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
+            QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
                 await firestore
-                    .collection('planTrainees')
+                    .collection('settingTrainees')
                     .where('term', isEqualTo: loadTrainee.term)
                     .where('yearStart', isEqualTo: loadTrainee.yearStart)
                     .where('yearEnd', isEqualTo: loadTrainee.yearEnd)
                     .get();
-            if (isExitPlanTrainee.docs.isNotEmpty) {
-              final planTrainee =
-                  PlanTraineeModel.fromMap(isExitPlanTrainee.docs.first.data());
-              if (planTrainee.listContent!.isNotEmpty) {
-                firestore.collection('trainees').doc(userId).update({
-                  'traineeStart': planTrainee.listContent![11].dayStart,
-                  'traineeEnd': planTrainee.listContent![11].dayEnd,
-                });
-                loadTrainee.traineeStart =
-                    planTrainee.listContent![11].dayStart;
-                loadTrainee.traineeEnd = planTrainee.listContent![11].dayEnd;
-              }
+            if (isExistSettingTrainee.docs.isNotEmpty) {
+              final setting = SettingTraineeModel.fromMap(
+                  isExistSettingTrainee.docs.first.data());
+              firestore.collection('trainees').doc(userId).update({
+                'traineeStart': setting.traineeStart,
+                'traineeEnd': setting.traineeEnd,
+              });
+              setState(() {
+                loadTrainee.traineeStart = setting.traineeStart;
+                loadTrainee.traineeEnd = setting.traineeEnd;
+              });
             }
           }
-          trainee = loadTrainee;
+          setState(() {
+            trainee = loadTrainee;
+          });
         }
         currentUser.setCurrentUser(
           setUid: loadUser.uid,
@@ -110,7 +136,6 @@ class _ListFirmState extends State<ListFirm> {
         );
       }
     }
-    currentUser.loadIn.value = true;
   }
 
   @override
@@ -405,36 +430,55 @@ class _ListFirmState extends State<ListFirm> {
                                                                               1),
                                                                   onPressed:
                                                                       () {
-                                                                    JobRegisterModel
-                                                                        loadRegis =
-                                                                        JobRegisterModel();
-                                                                    for (var d in firmResult[
-                                                                            indexFirm]
-                                                                        .listRegis!) {
-                                                                      if (d.userId ==
-                                                                          userId) {
-                                                                        currentUser
-                                                                            .selectedJob
-                                                                            .value = firmResult[
-                                                                                indexFirm]
-                                                                            .listJob!
-                                                                            .firstWhere((element) =>
-                                                                                element.jobId ==
-                                                                                d.jobId);
-                                                                        loadRegis =
-                                                                            d;
+                                                                    if (setting.settingId !=
+                                                                            null &&
+                                                                        setting.term !=
+                                                                            trainee
+                                                                                .term &&
+                                                                        setting.traineeStart !=
+                                                                            trainee
+                                                                                .traineeStart) {
+                                                                      GV.error(
+                                                                          context:
+                                                                              context,
+                                                                          message:
+                                                                              'Bạn không đăng ký thực tập trong học kỳ này không thể đăng ký');
+                                                                    } else if (setting.settingId !=
+                                                                            null &&
+                                                                        DateTime.now()
+                                                                            .isBeforeTimestamp(setting.traineeStart!)) {
+                                                                      JobRegisterModel
+                                                                          loadRegis =
+                                                                          JobRegisterModel();
+                                                                      for (var d
+                                                                          in firmResult[indexFirm]
+                                                                              .listRegis!) {
+                                                                        if (d.userId ==
+                                                                            userId) {
+                                                                          currentUser.selectedJob.value = firmResult[indexFirm].listJob!.firstWhere((element) =>
+                                                                              element.jobId ==
+                                                                              d.jobId);
+                                                                          loadRegis =
+                                                                              d;
+                                                                        }
                                                                       }
+                                                                      regisFirm(
+                                                                        context:
+                                                                            context,
+                                                                        firm: firmResult[
+                                                                            indexFirm],
+                                                                        loadRegis:
+                                                                            loadRegis,
+                                                                        isTrainee:
+                                                                            isTrainee,
+                                                                      );
+                                                                    } else {
+                                                                      GV.error(
+                                                                          context:
+                                                                              context,
+                                                                          message:
+                                                                              'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển');
                                                                     }
-                                                                    regisFirm(
-                                                                      context:
-                                                                          context,
-                                                                      firm: firmResult[
-                                                                          indexFirm],
-                                                                      loadRegis:
-                                                                          loadRegis,
-                                                                      isTrainee:
-                                                                          isTrainee,
-                                                                    );
                                                                   },
                                                                   icon:
                                                                       const Icon(
@@ -597,35 +641,63 @@ class _ListFirmState extends State<ListFirm> {
                                                                   .only(
                                                                   bottom: 1),
                                                           onPressed: () {
-                                                            JobRegisterModel
-                                                                loadRegis =
-                                                                JobRegisterModel();
-                                                            for (var d in firms[
-                                                                    indexFirm]
-                                                                .listRegis!) {
-                                                              if (d.userId ==
-                                                                  userId) {
-                                                                currentUser
-                                                                    .selectedJob
-                                                                    .value = firms[
-                                                                        indexFirm]
-                                                                    .listJob!
-                                                                    .firstWhere((element) =>
-                                                                        element
-                                                                            .jobId ==
-                                                                        d.jobId);
-                                                                loadRegis = d;
+                                                            if (setting.settingId !=
+                                                                    null &&
+                                                                setting.term !=
+                                                                    trainee
+                                                                        .term &&
+                                                                setting.traineeStart !=
+                                                                    trainee
+                                                                        .traineeStart) {
+                                                              GV.error(
+                                                                  context:
+                                                                      context,
+                                                                  message:
+                                                                      'Bạn không đăng ký thực tập trong học kỳ này không thể đăng ký');
+                                                            } else if (setting
+                                                                        .settingId !=
+                                                                    null &&
+                                                                DateTime.now()
+                                                                    .isBeforeTimestamp(
+                                                                        setting
+                                                                            .traineeStart!)) {
+                                                              JobRegisterModel
+                                                                  loadRegis =
+                                                                  JobRegisterModel();
+                                                              for (var d in firms[
+                                                                      indexFirm]
+                                                                  .listRegis!) {
+                                                                if (d.userId ==
+                                                                    userId) {
+                                                                  currentUser
+                                                                      .selectedJob
+                                                                      .value = firms[
+                                                                          indexFirm]
+                                                                      .listJob!
+                                                                      .firstWhere((element) =>
+                                                                          element
+                                                                              .jobId ==
+                                                                          d.jobId);
+                                                                  loadRegis = d;
+                                                                }
                                                               }
+                                                              regisFirm(
+                                                                context:
+                                                                    context,
+                                                                firm: firms[
+                                                                    indexFirm],
+                                                                loadRegis:
+                                                                    loadRegis,
+                                                                isTrainee:
+                                                                    isTrainee,
+                                                              );
+                                                            } else {
+                                                              GV.error(
+                                                                  context:
+                                                                      context,
+                                                                  message:
+                                                                      'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển');
                                                             }
-                                                            regisFirm(
-                                                              context: context,
-                                                              firm: firms[
-                                                                  indexFirm],
-                                                              loadRegis:
-                                                                  loadRegis,
-                                                              isTrainee:
-                                                                  isTrainee,
-                                                            );
                                                           },
                                                           icon: const Icon(
                                                             CupertinoIcons

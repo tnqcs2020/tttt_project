@@ -35,7 +35,9 @@ class UserController extends GetxController {
   RxString selectedString = ''.obs;
   RxList<FileModel> selectedFiles = RxList();
   RxDouble finalTotal = 0.0.obs;
-
+  RxString selectedCourse = ''.obs;
+  RxString selectedMajor = ''.obs;
+  
   setCurrentUser({
     String? setUid,
     String? setUserName,

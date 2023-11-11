@@ -36,6 +36,13 @@ class _InfoScreenState extends State<InfoScreen> {
     super.initState();
   }
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   getUserData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     String? userId = sharedPref
@@ -85,7 +92,6 @@ class _InfoScreenState extends State<InfoScreen> {
     } else {
       currentUser.selected.value = 2;
     }
-    currentUser.loadIn.value = true;
   }
 
   @override
@@ -145,7 +151,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Thông Tin Sinh Viên",
+                                      "Thông tin sinh viên",
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -156,7 +162,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                 ),
                               ),
                               SizedBox(
-                                width: screenWidth * 0.5,
+                                width: screenWidth * 0.55,
                                 child: Form(
                                   key: updateInfoFormKey,
                                   child: Column(
@@ -178,7 +184,8 @@ class _InfoScreenState extends State<InfoScreen> {
                                                 field: "Mã số",
                                                 display: currentUser
                                                     .userId.value
-                                                    .toUpperCase()),
+                                                    .toUpperCase(),
+                                                widthForm: 0.19),
                                           ],
                                         ),
                                       ),
@@ -203,7 +210,8 @@ class _InfoScreenState extends State<InfoScreen> {
                                             LineDetail(
                                                 field: "Ngành",
                                                 display:
-                                                    currentUser.major.value),
+                                                    currentUser.major.value,
+                                                widthForm: 0.19),
                                           ],
                                         ),
                                       ),
@@ -227,8 +235,9 @@ class _InfoScreenState extends State<InfoScreen> {
                                                     currentUser.classId.value),
                                             LineDetail(
                                                 field: "Lớp",
-                                                display: currentUser
-                                                    .className.value),
+                                                display:
+                                                    currentUser.className.value,
+                                                widthForm: 0.19),
                                           ],
                                         ),
                                       ),
@@ -306,7 +315,8 @@ class _InfoScreenState extends State<InfoScreen> {
                                             LineDetail(
                                                 field: "Email",
                                                 display:
-                                                    currentUser.email.value),
+                                                    currentUser.email.value,
+                                                widthForm: 0.19),
                                           ],
                                         ),
                                       ),
@@ -380,16 +390,16 @@ class _InfoScreenState extends State<InfoScreen> {
                                                   : null,
                                             ),
                                             LineDetail(
-                                              ctrl: phoneCtrl,
-                                              field: "Điện thoại",
-                                              textFormat: <TextInputFormatter>[
-                                                FilteringTextInputFormatter
-                                                    .digitsOnly
-                                              ],
-                                              validator: (p0) => p0!.isEmpty
-                                                  ? 'Không được để trống'
-                                                  : null,
-                                            ),
+                                                ctrl: phoneCtrl,
+                                                field: "Điện thoại",
+                                                textFormat: <TextInputFormatter>[
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly
+                                                ],
+                                                validator: (p0) => p0!.isEmpty
+                                                    ? 'Không được để trống'
+                                                    : null,
+                                                widthForm: 0.19),
                                           ],
                                         ),
                                       ),

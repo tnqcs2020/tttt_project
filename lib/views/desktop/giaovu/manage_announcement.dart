@@ -153,7 +153,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "Quản Lý Thông Báo",
+                                        "Quản lý thông báo",
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -307,7 +307,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                               ),
                                             ),
                                             Expanded(
-                                              flex: 2,
+                                              flex: 3,
                                               child: Text(
                                                 'Ngày đăng',
                                                 textAlign: TextAlign.center,
@@ -401,10 +401,16 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                                   Expanded(
                                                                     flex: 5,
                                                                     child: Text(
-                                                                        listAnnouncement[index]
-                                                                            .title!,
-                                                                        textAlign:
-                                                                            TextAlign.center),
+                                                                      listAnnouncement[
+                                                                              index]
+                                                                          .title!,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 3,
@@ -544,11 +550,15 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                                       ),
                                                                       Expanded(
                                                                         flex: 5,
-                                                                        child: Text(
-                                                                            listAnnouncement[index]
-                                                                                .title!,
-                                                                            textAlign:
-                                                                                TextAlign.center),
+                                                                        child:
+                                                                            Text(
+                                                                          listAnnouncement[index]
+                                                                              .title!,
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 3,

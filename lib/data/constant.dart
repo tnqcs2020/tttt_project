@@ -92,7 +92,7 @@ class GV {
         message,
         style: const TextStyle(fontSize: 12),
       ),
-      toastDuration: const Duration(milliseconds: 1500),
+      toastDuration: const Duration(milliseconds: 2000),
       animationType: AnimationType.fromLeft,
       padding: EdgeInsets.only(
         left: screenWidth * 0.6,
@@ -147,15 +147,17 @@ List<String> pageCanBo = [
 List<String> menuGiaoVu = [
   "Trang chủ",
   "Quản lý thông báo",
-  "Quản lý kế hoạch thực tập",
   "Quản lý học phần",
+  "Quản lý kế hoạch thực tập",
+  "Quản lý các mốc thời gian thực tập",
   "Danh sách thực tập",
 ];
 List<String> pageGiaoVu = [
   RouteGenerator.home,
   RouteGenerator.manageAnnouncement,
-  RouteGenerator.manageTime,
   RouteGenerator.manageCredit,
+  RouteGenerator.managePlan,
+  RouteGenerator.settingTrainee,
   RouteGenerator.dstttt
 ];
 
@@ -211,8 +213,8 @@ List<String> dsttAll = [
 ];
 
 class NamHoc {
-  final String start;
-  final String end;
+  String start;
+  String end;
   NamHoc({
     required this.start,
     required this.end,
@@ -370,6 +372,50 @@ class HocPhan {
   });
 }
 
+List<String> majors = [
+  'An toàn thông tin',
+  'Công nghệ thông tin',
+  'Công nghệ thông tin (chất lượng cao)',
+  'Hệ thống thông tin',
+  'Mạng máy tính và truyền thông dữ liệu',
+  'Kỹ thuật phần mềm',
+  'Kỹ thuật phần mềm (chất lượng cao)',
+  'Khoa học máy tính',
+  'Tin học ứng dụng',
+  'Truyền thông đa phương tiện',
+];
+
+List<String> majorsAll = [
+  'Tất cả',
+  'An toàn thông tin',
+  'Công nghệ thông tin',
+  'Công nghệ thông tin (chất lượng cao)',
+  'Hệ thống thông tin',
+  'Mạng máy tính và truyền thông dữ liệu',
+  'Kỹ thuật phần mềm',
+  'Kỹ thuật phần mềm (chất lượng cao)',
+  'Khoa học máy tính',
+  'Tin học ứng dụng',
+  'Truyền thông đa phương tiện',
+];
+
+List<String> courses = [
+  '45',
+  '46',
+  '47',
+  '48',
+  '49',
+  '50',
+];
+List<String> coursesAll = [
+  'Tất cả',
+  '45',
+  '46',
+  '47',
+  '48',
+  '49',
+  '50',
+];
 // class DSHocPhan45 {
 //   static HocPhan ct215h =
 //       HocPhan(maHP: "CT215H", tenHP: "Thực tập thực tế (CLC)");

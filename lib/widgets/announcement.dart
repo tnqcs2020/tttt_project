@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/data/constant.dart';
 import 'package:tttt_project/models/announcement_model.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart';
-import 'package:tttt_project/widgets/loading.dart';
+import 'package:tttt_project/models/plan_trainee_model.dart'; 
 import 'package:tttt_project/widgets/user_controller.dart';
 import 'dart:html' as html;
 

@@ -10,10 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:tttt_project/models/credit_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/submit_bodel.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
@@ -21,6 +22,7 @@ import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
+import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/widgets/user_controller.dart';
@@ -35,28 +37,20 @@ class RegisterTrainee extends StatefulWidget {
 class _RegisterTraineeState extends State<RegisterTrainee> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
-  List<CreditModel> dshp = [];
-  List<CreditModel> ds = [
-    CreditModel(
-        id: 'CT215H', name: 'Thực tập thực tế - CNTT (CLC)', course: '45'),
-    CreditModel(id: "CT471", name: "Thực tập thực tế - CNTT", course: '45'),
-    CreditModel(id: "CT472", name: "Thực tập thực tế - HTTT", course: '45'),
-    CreditModel(id: 'CT473', name: 'Thực tập thực tế - KHMT', course: '45'),
-    CreditModel(id: "CT474", name: "Thực tập thực tế - KTPM", course: '45'),
-    CreditModel(id: "CT475", name: "Thực tập thực tế - THUD", course: '45'),
-    CreditModel(id: "CT476", name: "Thực tập thực tế - TT&MMT", course: '45'),
-  ];
-  CreditModel selectedHP = CreditModel(id: '', name: '', course: '');
+  CreditModel selectedHP = CreditModel.empty;
   String selectedHK = HocKy.empty;
   NamHoc selectedNH = NamHoc.empty;
   int upperBound = 4;
   Set<int> reachedSteps = <int>{0, 1, 2, 3, 4};
-  String? userId;
+  String userId = '';
   UserModel user = UserModel();
   RegisterTraineeModel trainee = RegisterTraineeModel();
   List<PlatformFile> fileSelect = [];
   List<FileModel> submits = [];
   List<FileModel> files = [];
+  SettingTraineeModel setting = SettingTraineeModel();
+  List<CreditModel> credits = [];
+  AppreciateCVModel appreciate = AppreciateCVModel();
 
   @override
   void initState() {
@@ -64,14 +58,23 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     super.initState();
   }
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   getData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
-    userId = sharedPref
-        .getString(
-          'userId',
-        )
-        .toString();
+    setState(() {
+      userId = sharedPref
+          .getString(
+            'userId',
+          )
+          .toString();
+    });
     if (isLoggedIn == true) {
       currentUser.setCurrentUser(
         setMenuSelected: sharedPref.getInt('menuSelected'),
@@ -80,12 +83,45 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           await firestore.collection('users').doc(userId).get();
       if (isExistUser.data() != null) {
         final loadUser = UserModel.fromMap(isExistUser.data()!);
-        user = loadUser;
-        DocumentSnapshot<Map<String, dynamic>> isExitSubmit =
+        setState(() {
+          user = loadUser;
+        });
+        DocumentSnapshot<Map<String, dynamic>> atMoment =
+            await firestore.collection('atMoment').doc('now').get();
+        if (atMoment.data() != null) {
+          QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
+              await firestore
+                  .collection('settingTrainees')
+                  .where('term', isEqualTo: atMoment.data()!['term'])
+                  .where('yearStart', isEqualTo: atMoment.data()!['yearStart'])
+                  .get();
+          if (isExistSettingTrainee.docs.isNotEmpty) {
+            final settingTrainee = SettingTraineeModel.fromMap(
+                isExistSettingTrainee.docs.first.data());
+            setState(() {
+              setting = settingTrainee;
+            });
+          }
+        }
+        DocumentSnapshot<Map<String, dynamic>> isExistSubmit =
             await firestore.collection('submits').doc(userId).get();
-        if (isExitSubmit.data() != null) {
-          final loadSubmit = SubmitModel.fromMap(isExitSubmit.data()!);
-          files = loadSubmit.files ?? [];
+        if (isExistSubmit.data() != null) {
+          final loadSubmit = SubmitModel.fromMap(isExistSubmit.data()!);
+          setState(() {
+            files = loadSubmit.files ?? [];
+          });
+        }
+        QuerySnapshot<Map<String, dynamic>> isExistCredit = await firestore
+            .collection('credits')
+            .where('course', isEqualTo: user.course)
+            .get();
+        if (isExistCredit.docs.isNotEmpty) {
+          isExistCredit.docs.forEach((element) {
+            var temp = CreditModel.fromMap(element.data());
+            setState(() {
+              credits.add(temp);
+            });
+          });
         }
         DocumentSnapshot<Map<String, dynamic>> isExitTrainee =
             await firestore.collection('trainees').doc(userId).get();
@@ -94,28 +130,54 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
           if (loadTrainee.traineeStart == null &&
               loadTrainee.traineeEnd == null) {
-            QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
+            QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
                 await firestore
-                    .collection('planTrainees')
+                    .collection('settingTrainees')
                     .where('term', isEqualTo: loadTrainee.term)
                     .where('yearStart', isEqualTo: loadTrainee.yearStart)
                     .where('yearEnd', isEqualTo: loadTrainee.yearEnd)
                     .get();
-            if (isExitPlanTrainee.docs.isNotEmpty) {
-              final planTrainee =
-                  PlanTraineeModel.fromMap(isExitPlanTrainee.docs.first.data());
-              if (planTrainee.listContent!.isNotEmpty) {
-                firestore.collection('trainees').doc(userId).update({
-                  'traineeStart': planTrainee.listContent![11].dayStart,
-                  'traineeEnd': planTrainee.listContent![11].dayEnd,
-                });
-                loadTrainee.traineeStart =
-                    planTrainee.listContent![11].dayStart;
-                loadTrainee.traineeEnd = planTrainee.listContent![11].dayEnd;
+            if (isExistSettingTrainee.docs.isNotEmpty) {
+              final settingTrainee = SettingTraineeModel.fromMap(
+                  isExistSettingTrainee.docs.first.data());
+              firestore.collection('trainees').doc(userId).update({
+                'traineeStart': settingTrainee.traineeStart,
+                'traineeEnd': settingTrainee.traineeEnd,
+              });
+              loadTrainee.traineeStart = settingTrainee.traineeStart;
+              loadTrainee.traineeEnd = settingTrainee.traineeEnd;
+              if (DateTime.now().isAfterTimestamp(settingTrainee.traineeEnd) &&
+                  DateTime.now().isAfterTimestamp(loadTrainee.traineeEnd)) {
+                if (DateTime.now()
+                        .isAfterTimestamp(settingTrainee.traineeEnd) &&
+                    DateTime.now().isBeforeOrEqual(settingTrainee.submitEnd)) {
+                  loadTrainee.reachedStep = 3;
+                  final isExist =
+                      await firestore.collection('trainees').doc(userId).get();
+                  if (isExist.data() != null) {
+                    firestore
+                        .collection('trainees')
+                        .doc(userId)
+                        .update({'reachedStep': 3});
+                  }
+                } else if (DateTime.now()
+                    .isAfterTimestamp(settingTrainee.submitEnd)) {
+                  loadTrainee.reachedStep = 4;
+                  final isExist =
+                      await firestore.collection('trainees').doc(userId).get();
+                  if (isExist.data() != null) {
+                    firestore
+                        .collection('trainees')
+                        .doc(userId)
+                        .update({'reachedStep': 4});
+                  }
+                }
               }
             }
           }
-          trainee = loadTrainee;
+          setState(() {
+            trainee = loadTrainee;
+          });
           currentUser.setCurrentUser(
             setUid: loadUser.uid,
             setUserId: loadUser.userId,
@@ -160,6 +222,13 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         }
       }
     }
+    final isExistApp =
+        await firestore.collection('appreciatesCV').doc(userId).get();
+    if (isExistApp.data() != null) {
+      setState(() {
+        appreciate = AppreciateCVModel.fromMap(isExistApp.data()!);
+      });
+    }
     currentUser.loadIn.value = true;
   }
 
@@ -194,214 +263,224 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     SizedBox(width: screenWidth * 0.03),
                     Obx(
                       () => Expanded(
-                          child: Container(
-                        constraints:
-                            BoxConstraints(minHeight: screenHeight * 0.70),
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            border: Border.all(
-                              style: BorderStyle.solid,
-                              width: 0.1,
-                            ),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: screenHeight * 0.06,
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade600,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(5.0),
-                                  topRight: Radius.circular(5.0),
+                        child: Container(
+                          constraints:
+                              BoxConstraints(minHeight: screenHeight * 0.70),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              border: Border.all(
+                                style: BorderStyle.solid,
+                                width: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Column(
+                            children: [
+                              Container(
+                                height: screenHeight * 0.06,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade600,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(5.0),
+                                    topRight: Radius.circular(5.0),
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Quản Lý Thực Tập Thực Tế",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Quản Lý Thực Tập Thực Tế",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            currentUser.loadIn.isTrue
-                                ? Column(
-                                    children: [
-                                      EasyStepper(
-                                        activeStep:
-                                            currentUser.selectedStep.value,
-                                        maxReachedStep:
-                                            currentUser.reachedStep.value,
-                                        lineStyle: const LineStyle(
-                                          lineLength: 100,
-                                          lineThickness: 1,
-                                          lineSpace: 5,
+                              currentUser.loadIn.isTrue
+                                  ? Column(
+                                      children: [
+                                        EasyStepper(
+                                          activeStep:
+                                              currentUser.selectedStep.value,
+                                          maxReachedStep:
+                                              currentUser.reachedStep.value,
+                                          lineStyle: const LineStyle(
+                                            lineLength: 100,
+                                            lineThickness: 1,
+                                            lineSpace: 5,
+                                          ),
+                                          stepRadius: 20,
+                                          unreachedStepIconColor:
+                                              Colors.black87,
+                                          unreachedStepBorderColor:
+                                              Colors.black54,
+                                          unreachedStepTextColor: Colors.black,
+                                          showLoadingAnimation: false,
+                                          steps: [
+                                            EasyStep(
+                                              icon:
+                                                  const Icon(Icons.edit_square),
+                                              customTitle: Text(
+                                                'Đăng ký',
+                                                style: TextStyle(
+                                                    color: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            0
+                                                        ? Colors.black
+                                                        : Colors.blue.shade900,
+                                                    fontWeight: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            0
+                                                        ? FontWeight.bold
+                                                        : null),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              enabled: _allowTabStepping(
+                                                  0, StepEnabling.sequential),
+                                            ),
+                                            EasyStep(
+                                              icon: const Icon(
+                                                  CupertinoIcons.house_fill),
+                                              customTitle: Text(
+                                                'Công ty',
+                                                style: TextStyle(
+                                                    color: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            1
+                                                        ? Colors.black
+                                                        : Colors.blue.shade900,
+                                                    fontWeight: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            1
+                                                        ? FontWeight.bold
+                                                        : null),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              enabled: _allowTabStepping(
+                                                  1, StepEnabling.sequential),
+                                            ),
+                                            EasyStep(
+                                              icon: const Icon(CupertinoIcons
+                                                  .desktopcomputer),
+                                              customTitle: Text(
+                                                'Thực tập',
+                                                style: TextStyle(
+                                                    color: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            2
+                                                        ? Colors.black
+                                                        : Colors.blue.shade900,
+                                                    fontWeight: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            2
+                                                        ? FontWeight.bold
+                                                        : null),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              enabled: _allowTabStepping(
+                                                  2, StepEnabling.sequential),
+                                            ),
+                                            EasyStep(
+                                              icon: const Icon(
+                                                  CupertinoIcons.doc_fill),
+                                              customTitle: Text(
+                                                'Nộp tài liệu',
+                                                style: TextStyle(
+                                                    color: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            3
+                                                        ? Colors.black
+                                                        : Colors.blue.shade900,
+                                                    fontWeight: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            3
+                                                        ? FontWeight.bold
+                                                        : null),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              enabled: _allowTabStepping(
+                                                  3, StepEnabling.sequential),
+                                            ),
+                                            EasyStep(
+                                              icon: const Icon(
+                                                CupertinoIcons
+                                                    .checkmark_seal_fill,
+                                                grade: 5,
+                                              ),
+                                              customTitle: Text(
+                                                'Kết quả',
+                                                style: TextStyle(
+                                                    color: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            4
+                                                        ? Colors.black
+                                                        : Colors.blue.shade900,
+                                                    fontWeight: currentUser
+                                                                .selectedStep
+                                                                .value ==
+                                                            4
+                                                        ? FontWeight.bold
+                                                        : null),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              enabled: _allowTabStepping(
+                                                  4, StepEnabling.sequential),
+                                            ),
+                                          ],
+                                          onStepReached: (index) async {
+                                            currentUser.selectedStep.value =
+                                                index;
+                                            final isExist = await firestore
+                                                .collection('trainees')
+                                                .doc(userId)
+                                                .get();
+                                            if (isExist.data() != null) {
+                                              firestore
+                                                  .collection('trainees')
+                                                  .doc(userId)
+                                                  .update({
+                                                'reachedStep': currentUser
+                                                    .reachedStep.value
+                                              });
+                                            }
+                                          },
                                         ),
-                                        stepRadius: 20,
-                                        unreachedStepIconColor: Colors.black87,
-                                        unreachedStepBorderColor:
-                                            Colors.black54,
-                                        unreachedStepTextColor: Colors.black,
-                                        showLoadingAnimation: false,
-                                        steps: [
-                                          EasyStep(
-                                            icon: const Icon(Icons.edit_square),
-                                            customTitle: Text(
-                                              'Đăng ký',
-                                              style: TextStyle(
-                                                  color: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          0
-                                                      ? Colors.black
-                                                      : Colors.blue.shade900,
-                                                  fontWeight: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          0
-                                                      ? FontWeight.bold
-                                                      : null),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            enabled: _allowTabStepping(
-                                                0, StepEnabling.sequential),
-                                          ),
-                                          EasyStep(
-                                            icon: const Icon(
-                                                CupertinoIcons.house_fill),
-                                            customTitle: Text(
-                                              'Công ty',
-                                              style: TextStyle(
-                                                  color: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          1
-                                                      ? Colors.black
-                                                      : Colors.blue.shade900,
-                                                  fontWeight: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          1
-                                                      ? FontWeight.bold
-                                                      : null),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            enabled: _allowTabStepping(
-                                                1, StepEnabling.sequential),
-                                          ),
-                                          EasyStep(
-                                            icon: const Icon(
-                                                CupertinoIcons.desktopcomputer),
-                                            customTitle: Text(
-                                              'Thực tập',
-                                              style: TextStyle(
-                                                  color: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          2
-                                                      ? Colors.black
-                                                      : Colors.blue.shade900,
-                                                  fontWeight: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          2
-                                                      ? FontWeight.bold
-                                                      : null),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            enabled: _allowTabStepping(
-                                                2, StepEnabling.sequential),
-                                          ),
-                                          EasyStep(
-                                            icon: const Icon(
-                                                CupertinoIcons.doc_fill),
-                                            customTitle: Text(
-                                              'Nộp tài liệu',
-                                              style: TextStyle(
-                                                  color: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          3
-                                                      ? Colors.black
-                                                      : Colors.blue.shade900,
-                                                  fontWeight: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          3
-                                                      ? FontWeight.bold
-                                                      : null),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            enabled: _allowTabStepping(
-                                                3, StepEnabling.sequential),
-                                          ),
-                                          EasyStep(
-                                            icon: const Icon(
-                                              CupertinoIcons
-                                                  .checkmark_seal_fill,
-                                              grade: 5,
-                                            ),
-                                            customTitle: Text(
-                                              'Kết quả',
-                                              style: TextStyle(
-                                                  color: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          4
-                                                      ? Colors.black
-                                                      : Colors.blue.shade900,
-                                                  fontWeight: currentUser
-                                                              .selectedStep
-                                                              .value ==
-                                                          4
-                                                      ? FontWeight.bold
-                                                      : null),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            enabled: _allowTabStepping(
-                                                4, StepEnabling.sequential),
-                                          ),
-                                        ],
-                                        onStepReached: (index) {
-                                          setState(() => currentUser
-                                              .selectedStep.value = index);
-                                          firestore
-                                              .collection('trainees')
-                                              .doc(userId)
-                                              .update({
-                                            'reachedStep':
-                                                currentUser.reachedStep.value
-                                          });
+                                        const Divider(
+                                          thickness: 0.1,
+                                          height: 0,
+                                          color: Colors.black,
+                                        ),
+                                        switch (
+                                            currentUser.selectedStep.value) {
+                                          1 => _regisFirm(),
+                                          2 => _trainee(),
+                                          3 => _submit(),
+                                          4 => _completed(),
+                                          _ => trainee.userId != null
+                                              ? _infoCredit(trainee)
+                                              : _regisCredit(),
                                         },
-                                      ),
-                                      const Divider(
-                                        thickness: 0.1,
-                                        height: 0,
-                                        color: Colors.black,
-                                      ),
-                                      switch (currentUser.selectedStep.value) {
-                                        1 => _regisFirm(),
-                                        2 => _trainee(),
-                                        3 => _submit(),
-                                        4 => _completed(),
-                                        _ => trainee.userId != null
-                                            ? _infoCredit(trainee)
-                                            : _regisCredit(),
-                                      },
-                                    ],
-                                  )
-                                : const Padding(
-                                    padding: EdgeInsets.only(top: 200),
-                                    child: Loading(),
-                                  ),
-                          ],
+                                      ],
+                                    )
+                                  : const Padding(
+                                      padding: EdgeInsets.only(top: 200),
+                                      child: Loading(),
+                                    ),
+                            ],
+                          ),
                         ),
-                      )),
+                      ),
                     ),
                   ],
                 ),
@@ -415,218 +494,306 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   Widget _regisCredit() {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return Container(
-      padding: const EdgeInsets.only(left: 50, right: 50, top: 15),
-      color: Colors.grey.shade400,
-      constraints: BoxConstraints(
-          minHeight: screenHeight * 0.5, maxWidth: screenWidth * 0.5),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: screenWidth * 0.07,
-                child: const Text(
-                  "Học Phần",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
+    return DateTime.now()
+            .isBetweenEqual(from: setting.regisStart, to: setting.regisEnd)
+        ? Container(
+            padding: const EdgeInsets.only(left: 50, right: 50, top: 25),
+            constraints: BoxConstraints(
+                minHeight: screenHeight * 0.5, maxWidth: screenWidth * 0.5),
+            child: Column(
+              children: [
+                if (setting.regisStart != null && setting.regisEnd != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          'Thời gian đăng ký từ ngày ${GV.readTimestamp(setting.regisStart!)} đến ngày ${GV.readTimestamp(setting.regisEnd!)}'),
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton2<CreditModel>(
-                  isExpanded: true,
-                  hint: Center(
-                    child: Text(
-                      'Chọn',
-                      style: DropdownStyle.hintStyle,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.07,
+                      child: const Text(
+                        "Học Phần",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  items: ds
-                      .map((CreditModel hp) => DropdownMenuItem<CreditModel>(
-                            value: hp,
-                            child: Text(
-                              "${hp.id} - ${hp.name}",
-                              style: DropdownStyle.itemStyle,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ))
-                      .toList(),
-                  value: selectedHP.id.isNotEmpty ? selectedHP : null,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedHP = value!;
-                    });
-                  },
-                  buttonStyleData: DropdownStyle.buttonStyleLong,
-                  iconStyleData: DropdownStyle.iconStyleData,
-                  dropdownStyleData: DropdownStyle.dropdownStyleLong,
-                  menuItemStyleData: DropdownStyle.menuItemStyleData,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              SizedBox(
-                width: screenWidth * 0.07,
-                child: const Text(
-                  "Học Kỳ",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton2<String>(
-                  isExpanded: true,
-                  hint: Center(
-                    child: Text(
-                      'Chọn',
-                      style: DropdownStyle.hintStyle,
-                      overflow: TextOverflow.ellipsis,
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton2<CreditModel>(
+                        isExpanded: true,
+                        hint: Center(
+                          child: Text(
+                            'Chọn',
+                            style: DropdownStyle.hintStyle,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        items: credits
+                            .map((CreditModel hp) =>
+                                DropdownMenuItem<CreditModel>(
+                                  value: hp,
+                                  child: Text(
+                                    "${hp.creditId} - ${hp.creditName}",
+                                    style: DropdownStyle.itemStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        value:
+                            selectedHP != CreditModel.empty ? selectedHP : null,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedHP = value!;
+                          });
+                        },
+                        buttonStyleData: DropdownStyle.buttonStyleLong,
+                        iconStyleData: DropdownStyle.iconStyleData,
+                        dropdownStyleData: DropdownStyle.dropdownStyleLong,
+                        menuItemStyleData: DropdownStyle.menuItemStyleData,
+                      ),
                     ),
-                  ),
-                  items: dshk
-                      .map((String hk) => DropdownMenuItem<String>(
-                            value: hk,
-                            child: Text(
-                              hk,
-                              style: DropdownStyle.itemStyle,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ))
-                      .toList(),
-                  value: selectedHK != HocKy.empty ? selectedHK : null,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedHK = value!;
-                    });
-                  },
-                  buttonStyleData: DropdownStyle.buttonStyleShort,
-                  iconStyleData: DropdownStyle.iconStyleData,
-                  dropdownStyleData: DropdownStyle.dropdownStyleShort,
-                  menuItemStyleData: DropdownStyle.menuItemStyleData,
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              SizedBox(
-                width: screenWidth * 0.07,
-                child: const Text(
-                  "Năm Học",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton2<NamHoc>(
-                  isExpanded: true,
-                  hint: Center(
-                    child: Text(
-                      "Chọn",
-                      style: DropdownStyle.hintStyle,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.07,
+                      child: const Text(
+                        "Học Kỳ",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  items: dsnh
-                      .map((NamHoc nh) => DropdownMenuItem<NamHoc>(
-                            value: nh,
-                            child: Text(
-                              "${nh.start} - ${nh.end}",
-                              style: DropdownStyle.itemStyle,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ))
-                      .toList(),
-                  value: selectedNH != NamHoc.empty ? selectedNH : null,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedNH = value!;
-                    });
-                  },
-                  buttonStyleData: DropdownStyle.buttonStyleMedium,
-                  iconStyleData: DropdownStyle.iconStyleData,
-                  dropdownStyleData: DropdownStyle.dropdownStyleMedium,
-                  menuItemStyleData: DropdownStyle.menuItemStyleData,
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton2<String>(
+                        isExpanded: true,
+                        hint: Center(
+                          child: Text(
+                            'Chọn',
+                            style: DropdownStyle.hintStyle,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        items: dshk
+                            .map((String hk) => DropdownMenuItem<String>(
+                                  value: hk,
+                                  child: Text(
+                                    hk,
+                                    style: DropdownStyle.itemStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        value: selectedHK != HocKy.empty ? selectedHK : null,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedHK = value!;
+                          });
+                        },
+                        buttonStyleData: DropdownStyle.buttonStyleShort,
+                        iconStyleData: DropdownStyle.iconStyleData,
+                        dropdownStyleData: DropdownStyle.dropdownStyleShort,
+                        menuItemStyleData: DropdownStyle.menuItemStyleData,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 55),
-          CustomButton(
-            text: "Đăng Ký",
-            width: screenWidth * 0.1,
-            height: screenHeight * 0.07,
-            onTap: () async {
-              if (selectedHP.id.isNotEmpty &&
-                  selectedHP.name.isNotEmpty &&
-                  selectedHK != HocKy.empty &&
-                  selectedNH != NamHoc.empty) {
-                RegisterTraineeModel registerTraineeModel =
-                    RegisterTraineeModel(
-                  creditId: selectedHP.id,
-                  term: selectedHK,
-                  creditName: selectedHP.name,
-                  yearStart: selectedNH.start,
-                  userId: userId ?? '',
-                  yearEnd: selectedNH.end,
-                  course: currentUser.course.value,
-                  studentName: currentUser.userName.value,
-                  classId: currentUser.classId.value,
-                  reachedStep: 0,
-                );
-                QuerySnapshot<Map<String, dynamic>> isExitPlanTrainee =
-                    await firestore
-                        .collection('planTrainees')
-                        .where('term', isEqualTo: selectedHK)
-                        .where('yearStart', isEqualTo: selectedNH.start)
-                        .where('yearEnd', isEqualTo: selectedNH.end)
-                        .get();
-                if (isExitPlanTrainee.docs.isNotEmpty) {
-                  final planTrainee = PlanTraineeModel.fromMap(
-                      isExitPlanTrainee.docs.first.data());
-                  if (planTrainee.listContent!.isNotEmpty) {
-                    registerTraineeModel.traineeStart =
-                        planTrainee.listContent![11].dayStart;
-                    registerTraineeModel.traineeEnd =
-                        planTrainee.listContent![11].dayEnd;
-                  }
-                }
-                currentUser.reachedStep.value = 0;
-                final docRegister = firestore
-                    .collection('trainees')
-                    .doc(registerTraineeModel.userId);
-                final json = registerTraineeModel.toMap();
-                await docRegister.set(json);
-                GV.success(context: context, message: 'Đã đăng ký!');
-                _nextStep(StepEnabling.sequential);
-                setState(() {
-                  trainee = registerTraineeModel;
-                });
-              } else {
-                GV.error(context: context, message: 'Chọn đầy đủ thông tin!');
-              }
-            },
-          ),
-        ],
-      ),
-    );
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: screenWidth * 0.07,
+                      child: const Text(
+                        "Năm Học",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton2<NamHoc>(
+                        isExpanded: true,
+                        hint: Center(
+                          child: Text(
+                            "Chọn",
+                            style: DropdownStyle.hintStyle,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        items: dsnh
+                            .map((NamHoc nh) => DropdownMenuItem<NamHoc>(
+                                  value: nh,
+                                  child: Text(
+                                    "${nh.start} - ${nh.end}",
+                                    style: DropdownStyle.itemStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        value: selectedNH != NamHoc.empty ? selectedNH : null,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedNH = value!;
+                          });
+                        },
+                        buttonStyleData: DropdownStyle.buttonStyleMedium,
+                        iconStyleData: DropdownStyle.iconStyleData,
+                        dropdownStyleData: DropdownStyle.dropdownStyleMedium,
+                        menuItemStyleData: DropdownStyle.menuItemStyleData,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 55),
+                CustomButton(
+                  text: "Đăng Ký",
+                  width: screenWidth * 0.1,
+                  height: screenHeight * 0.07,
+                  onTap: () async {
+                    if (selectedHP.creditId.isNotEmpty &&
+                        selectedHP.creditName.isNotEmpty &&
+                        selectedHK != HocKy.empty &&
+                        selectedNH != NamHoc.empty) {
+                      if (setting.term != selectedHK &&
+                          selectedNH.start != setting.yearStart) {
+                        GV.error(
+                            context: context,
+                            message:
+                                'Vui lòng chọn đúng học kỳ và năm học hiện tại');
+                      } else {
+                        RegisterTraineeModel registerTraineeModel =
+                            RegisterTraineeModel(
+                          creditId: selectedHP.creditId,
+                          term: selectedHK,
+                          creditName: selectedHP.creditName,
+                          yearStart: selectedNH.start,
+                          userId: userId,
+                          yearEnd: selectedNH.end,
+                          course: currentUser.course.value,
+                          studentName: currentUser.userName.value,
+                          classId: currentUser.classId.value,
+                          reachedStep: 0,
+                          traineeStart: setting.traineeStart,
+                          traineeEnd: setting.traineeEnd,
+                        );
+                        if (setting.settingId != null) {
+                          final updateTimeTrainee = await firestore
+                              .collection('trainees')
+                              .where('term', isEqualTo: setting.term)
+                              .where('yearStart', isEqualTo: setting.yearStart)
+                              .where('yearEnd', isEqualTo: setting.yearEnd)
+                              .get();
+                          if (updateTimeTrainee.docs.isNotEmpty) {
+                            List<RegisterTraineeModel> traineeUpdates = [];
+                            updateTimeTrainee.docs.forEach((element) =>
+                                traineeUpdates.add(RegisterTraineeModel.fromMap(
+                                    element.data())));
+                            traineeUpdates.forEach((element) {
+                              element.traineeStart = setting.traineeStart;
+                              element.traineeEnd = setting.traineeEnd;
+                            });
+                            if (traineeUpdates.isNotEmpty) {
+                              traineeUpdates.forEach((element) {
+                                firestore
+                                    .collection('trainees')
+                                    .doc(element.userId)
+                                    .update({
+                                  'traineeStart': element.traineeStart,
+                                  'traineeEnd': element.traineeEnd,
+                                });
+                              });
+                            }
+                          }
+                        }
+                        currentUser.reachedStep.value = 0;
+                        final docRegister = firestore
+                            .collection('trainees')
+                            .doc(registerTraineeModel.userId);
+                        final json = registerTraineeModel.toMap();
+                        await docRegister.set(json);
+                        GV.success(context: context, message: 'Đã đăng ký!');
+                        _nextStep(StepEnabling.sequential);
+                        setState(() {
+                          trainee = registerTraineeModel;
+                        });
+                      }
+                    } else {
+                      GV.error(
+                          context: context, message: 'Chọn đầy đủ thông tin!');
+                    }
+                  },
+                ),
+              ],
+            ),
+          )
+        : DateTime.now().isBeforeTimestamp(setting.regisStart)
+            ? Container(
+                padding: const EdgeInsets.only(left: 50, right: 50),
+                constraints: BoxConstraints(
+                    minHeight: screenHeight * 0.5, maxWidth: screenWidth * 0.5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Chưa tới thời gian đăng ký.',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (setting.regisStart != null && setting.regisEnd != null)
+                      Text(
+                          'Thời gian đăng ký từ ngày ${GV.readTimestamp(setting.regisStart!)} đến ngày ${GV.readTimestamp(setting.regisEnd!)}')
+                  ],
+                ),
+              )
+            : DateTime.now().isAfterTimestamp(setting.regisEnd)
+                ? Container(
+                    padding: const EdgeInsets.only(left: 50, right: 50),
+                    constraints: BoxConstraints(
+                        minHeight: screenHeight * 0.5,
+                        maxWidth: screenWidth * 0.5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Đã quá thời gian đăng ký.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        if (setting.regisStart != null &&
+                            setting.regisEnd != null)
+                          Text(
+                              'Thời gian đăng ký từ ngày ${GV.readTimestamp(setting.regisStart!)} đến ngày ${GV.readTimestamp(setting.regisEnd!)}')
+                      ],
+                    ),
+                  )
+                : Container(
+                    padding: const EdgeInsets.only(left: 50, right: 50),
+                    constraints: BoxConstraints(
+                        minHeight: screenHeight * 0.5,
+                        maxWidth: screenWidth * 0.5),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Chưa có thời gian đăng ký cụ thể.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
   }
 
   Widget _infoCredit(RegisterTraineeModel loadTrainee) {
@@ -644,19 +811,34 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
           ),
           const SizedBox(height: 15),
           SizedBox(
-            width: screenWidth * 0.25,
+            width: screenWidth * 0.3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Mã HP: ${loadTrainee.creditId}'),
-                Text('Tên HP: ${loadTrainee.creditName}'),
-                Text('Học kỳ: ${loadTrainee.term}'),
-                Text(
-                    'Năm học: ${loadTrainee.yearStart} - ${loadTrainee.yearEnd}'),
+                LineDetail(
+                    field: 'Mã HP',
+                    widthField: 0.1,
+                    display: loadTrainee.creditId),
+                LineDetail(
+                    field: 'Tên HP',
+                    widthField: 0.1,
+                    display: loadTrainee.creditName),
+                LineDetail(
+                    field: 'Học kỳ',
+                    widthField: 0.1,
+                    display: loadTrainee.term),
+                LineDetail(
+                    field: 'Năm học',
+                    widthField: 0.1,
+                    display:
+                        '${loadTrainee.yearStart} - ${loadTrainee.yearEnd}'),
                 if (loadTrainee.traineeStart != null &&
                     loadTrainee.traineeEnd != null)
-                  Text(
-                      'Thời gian thực tập: ${GV.readTimestamp(loadTrainee.traineeStart!)} - ${GV.readTimestamp(loadTrainee.traineeEnd!)}'),
+                  LineDetail(
+                      field: 'Thời gian thực tập',
+                      widthField: 0.1,
+                      display:
+                          '${GV.readTimestamp(loadTrainee.traineeStart!)} - ${GV.readTimestamp(loadTrainee.traineeEnd!)}'),
               ],
             ),
           ),
@@ -669,7 +851,10 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return StreamBuilder(
-        stream: firestore.collection('trainees').doc(userId).snapshots(),
+        stream: firestore
+            .collection('trainees')
+            .doc(currentUser.userId.value)
+            .snapshots(),
         builder: (context, snapshotTrainee) {
           if (snapshotTrainee.hasData &&
               snapshotTrainee.data != null &&
@@ -719,12 +904,34 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Tên công ty: ${firm.firmName!}'),
-                                    Text('Người đại diện: ${firm.owner!}'),
-                                    Text('Số điện thoại: ${firm.phone!}'),
-                                    Text('Email: ${firm.email!}'),
-                                    Text('Địa chỉ: ${firm.address!}'),
-                                    Text('Mô tả: ${firm.describe!}'),
+                                    LineDetail(
+                                        field: 'Tên công ty',
+                                        display: firm.firmName,
+                                        widthForm: 0.28),
+                                    if (firm.owner != '')
+                                      LineDetail(
+                                          field: 'Người đại diện',
+                                          display: firm.owner,
+                                          widthForm: 0.28),
+                                    if (firm.phone != '')
+                                      LineDetail(
+                                          field: 'Số điện thoại',
+                                          display: firm.phone,
+                                          widthForm: 0.28),
+                                    if (firm.email != "")
+                                      LineDetail(
+                                          field: 'Email',
+                                          display: firm.email,
+                                          widthForm: 0.28),
+                                    if (firm.address != '')
+                                      LineDetail(
+                                          field: 'Địa chỉ',
+                                          display: firm.address,
+                                          widthForm: 0.28),
+                                    LineDetail(
+                                        field: 'Mô tả',
+                                        display: firm.describe,
+                                        widthForm: 0.28),
                                   ],
                                 ),
                               ),
@@ -744,14 +951,17 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                             padding: const EdgeInsets.only(top: 15),
                             child: Column(
                               children: [
-                                Container(
-                                  color: Colors.amber,
-                                  child: const Text(
-                                    'Các công ty chấp nhận thực tập',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                const Text(
+                                  'Các công ty chấp nhận thực tập',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
                                 ),
+                                if (setting.traineeStart != null)
+                                  Text(
+                                      'Bạn cần xác nhận trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                const SizedBox(height: 15),
                                 SizedBox(
                                   width: screenWidth * 0.5,
                                   child: ListView.separated(
@@ -789,240 +999,242 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                       : Text(listAccepted[index]
                                                           .status!),
                                                   onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      barrierColor:
-                                                          Colors.black12,
-                                                      builder: (context) {
-                                                        return Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                            top: screenHeight *
-                                                                0.06,
-                                                            bottom:
-                                                                screenHeight *
-                                                                    0.02,
-                                                            left: screenWidth *
-                                                                0.27,
-                                                            right: screenWidth *
-                                                                0.08,
-                                                          ),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              AlertDialog(
-                                                                scrollable:
-                                                                    true,
-                                                                title:
-                                                                    Container(
-                                                                  color: Colors
-                                                                      .blue
-                                                                      .shade600,
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.06,
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10),
-                                                                  child: Row(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            30,
-                                                                      ),
-                                                                      const Expanded(
-                                                                        child: Text(
-                                                                            'Chi tiết tuyển dụng',
-                                                                            style:
-                                                                                TextStyle(fontWeight: FontWeight.bold),
-                                                                            textAlign: TextAlign.center),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            30,
-                                                                        child: IconButton(
-                                                                            padding: const EdgeInsets.only(bottom: 1),
-                                                                            onPressed: () {
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            icon: const Icon(Icons.close)),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                titlePadding:
-                                                                    EdgeInsets
-                                                                        .zero,
-                                                                shape:
-                                                                    Border.all(
-                                                                        width:
-                                                                            0.5),
-                                                                content:
-                                                                    ConstrainedBox(
-                                                                  constraints: BoxConstraints(
-                                                                      minWidth:
-                                                                          screenWidth *
-                                                                              0.35),
-                                                                  child: Form(
-                                                                    child:
-                                                                        Column(
+                                                    if (DateTime.now()
+                                                        .isBeforeTimestamp(
+                                                            setting
+                                                                .traineeStart)) {
+                                                      showDialog(
+                                                        context: context,
+                                                        barrierColor:
+                                                            Colors.black12,
+                                                        builder: (context) {
+                                                          return Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                              top:
+                                                                  screenHeight *
+                                                                      0.06,
+                                                              bottom:
+                                                                  screenHeight *
+                                                                      0.02,
+                                                              left:
+                                                                  screenWidth *
+                                                                      0.27,
+                                                              right:
+                                                                  screenWidth *
+                                                                      0.08,
+                                                            ),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                AlertDialog(
+                                                                  scrollable:
+                                                                      true,
+                                                                  title:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .blue
+                                                                        .shade600,
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.06,
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        horizontal:
+                                                                            10),
+                                                                    child: Row(
                                                                       crossAxisAlignment:
                                                                           CrossAxisAlignment
-                                                                              .start,
-                                                                      children: <Widget>[
-                                                                        Text(
-                                                                            'Tên công ty: ${firm.firmName}'),
-                                                                        Text(
-                                                                            'Người đại diện: ${firm.owner}'),
-                                                                        Text(
-                                                                            'Số điện thoại: ${firm.phone}'),
-                                                                        Text(
-                                                                            'Email: ${firm.email}'),
-                                                                        Text(
-                                                                            'Địa chỉ: ${firm.address}'),
-                                                                        Text(
-                                                                            'Mô tả: ${firm.describe}'),
-                                                                        Text(
-                                                                            'Vị trí ứng tuyển: ${listAccepted[index].jobName} '),
-                                                                        Text(
-                                                                            'Ngày bắt đầu: ${GV.readTimestamp(trainee.traineeStart!)} - Ngày kết thúc:  ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                                                                        Text(
-                                                                            'Ngày ứng tuyển: ${GV.readTimestamp(listAccepted[index].createdAt!)}'),
-                                                                        Text(
-                                                                            'Ngày duyệt: ${GV.readTimestamp(listAccepted[index].repliedAt!)}'),
+                                                                              .center,
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              30,
+                                                                        ),
+                                                                        const Expanded(
+                                                                          child: Text(
+                                                                              'Chi tiết tuyển dụng',
+                                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              30,
+                                                                          child: IconButton(
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              icon: const Icon(Icons.close)),
+                                                                        )
                                                                       ],
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                actions: [
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      var loadCBHD = await firestore
-                                                                          .collection(
-                                                                              'users')
-                                                                          .doc(firm
-                                                                              .firmId)
-                                                                          .get();
-                                                                      final cbhdName =
-                                                                          UserModel.fromMap(loadCBHD.data()!)
-                                                                              .userName;
-                                                                      final plan =
-                                                                          PlanWorkModel(
-                                                                        cbhdId:
-                                                                            firm.firmId,
-                                                                        cbhdName:
-                                                                            cbhdName,
-                                                                        listWork: [],
-                                                                        userId:
-                                                                            userId,
-                                                                      );
-                                                                      var listRegis =
-                                                                          firm.listRegis;
-                                                                      for (int i =
-                                                                              0;
-                                                                          i < listRegis!.length;
-                                                                          i++) {
-                                                                        if (listRegis[i].userId ==
-                                                                            currentUser.userId.value) {
-                                                                          listRegis[i].isConfirmed =
-                                                                              true;
-                                                                          plan.traineeStart =
-                                                                              trainee.traineeStart;
-                                                                          plan.traineeEnd =
-                                                                              trainee.traineeEnd;
-                                                                        }
-                                                                      }
-                                                                      firestore
-                                                                          .collection(
-                                                                              'plans')
-                                                                          .doc(
-                                                                              userId)
-                                                                          .set(plan
-                                                                              .toMap());
-                                                                      firestore
-                                                                          .collection(
-                                                                              'firms')
-                                                                          .doc(firm
-                                                                              .firmId)
-                                                                          .update({
-                                                                        'listRegis': listRegis
-                                                                            .map((i) =>
-                                                                                i.toMap())
-                                                                            .toList()
-                                                                      });
-                                                                      final listUserRegis =
-                                                                          loadTrainee
-                                                                              .listRegis;
-                                                                      for (int i =
-                                                                              0;
-                                                                          i < listUserRegis!.length;
-                                                                          i++) {
-                                                                        if (listUserRegis[i].firmId ==
-                                                                            firm.firmId) {
-                                                                          listUserRegis[i].isConfirmed =
-                                                                              true;
-                                                                        }
-                                                                      }
-                                                                      firestore
-                                                                          .collection(
-                                                                              'trainees')
-                                                                          .doc(
-                                                                              userId)
-                                                                          .update({
-                                                                        'listRegis': listUserRegis
-                                                                            .map((i) =>
-                                                                                i.toMap())
-                                                                            .toList(),
-                                                                      });
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                      _nextStep(
-                                                                          StepEnabling
-                                                                              .sequential);
-                                                                      GV.success(
-                                                                          context:
-                                                                              context,
-                                                                          message:
-                                                                              'Đã xác nhận công ty thực tập');
-                                                                    },
-                                                                    child:
-                                                                        const Text(
-                                                                      'Xác nhận',
-                                                                      style: TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    ),
-                                                                  ),
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    child:
-                                                                        const Text(
-                                                                      'Để sau',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Colors
-                                                                            .red,
+                                                                  titlePadding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  shape: Border
+                                                                      .all(
+                                                                          width:
+                                                                              0.5),
+                                                                  content:
+                                                                      ConstrainedBox(
+                                                                    constraints:
+                                                                        BoxConstraints(
+                                                                            minWidth:
+                                                                                screenWidth * 0.35),
+                                                                    child: Form(
+                                                                      child:
+                                                                          Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: <Widget>[
+                                                                          Text(
+                                                                              'Tên công ty: ${firm.firmName}'),
+                                                                          Text(
+                                                                              'Người đại diện: ${firm.owner}'),
+                                                                          Text(
+                                                                              'Số điện thoại: ${firm.phone}'),
+                                                                          Text(
+                                                                              'Email: ${firm.email}'),
+                                                                          Text(
+                                                                              'Địa chỉ: ${firm.address}'),
+                                                                          Text(
+                                                                              'Mô tả: ${firm.describe}'),
+                                                                          Text(
+                                                                              'Vị trí ứng tuyển: ${listAccepted[index].jobName} '),
+                                                                          if (listAccepted[index].createdAt !=
+                                                                              null)
+                                                                            Text('Ngày ứng tuyển: ${GV.readTimestamp(listAccepted[index].createdAt!)}'),
+                                                                          if (listAccepted[index].repliedAt !=
+                                                                              null)
+                                                                            Text('Ngày duyệt: ${GV.readTimestamp(listAccepted[index].repliedAt!)}'),
+                                                                          if (trainee.traineeStart != null &&
+                                                                              trainee.traineeEnd != null)
+                                                                            Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày  ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                                                                        ],
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
+                                                                  actions: [
+                                                                    ElevatedButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        var loadCBHD = await firestore
+                                                                            .collection('users')
+                                                                            .doc(firm.firmId)
+                                                                            .get();
+                                                                        final cbhdName =
+                                                                            UserModel.fromMap(loadCBHD.data()!).userName;
+                                                                        final plan =
+                                                                            PlanWorkModel(
+                                                                          cbhdId:
+                                                                              firm.firmId,
+                                                                          cbhdName:
+                                                                              cbhdName,
+                                                                          listWork: [],
+                                                                          userId:
+                                                                              userId,
+                                                                        );
+                                                                        var listRegis =
+                                                                            firm.listRegis;
+                                                                        for (int i =
+                                                                                0;
+                                                                            i < listRegis!.length;
+                                                                            i++) {
+                                                                          if (listRegis[i].userId ==
+                                                                              currentUser.userId.value) {
+                                                                            listRegis[i].isConfirmed =
+                                                                                true;
+                                                                            plan.traineeStart =
+                                                                                trainee.traineeStart;
+                                                                            plan.traineeEnd =
+                                                                                trainee.traineeEnd;
+                                                                          }
+                                                                        }
+                                                                        firestore
+                                                                            .collection('plans')
+                                                                            .doc(userId)
+                                                                            .set(plan.toMap());
+                                                                        firestore
+                                                                            .collection(
+                                                                                'firms')
+                                                                            .doc(firm
+                                                                                .firmId)
+                                                                            .update({
+                                                                          'listRegis': listRegis
+                                                                              .map((i) => i.toMap())
+                                                                              .toList()
+                                                                        });
+                                                                        final listUserRegis =
+                                                                            loadTrainee.listRegis;
+                                                                        for (int i =
+                                                                                0;
+                                                                            i < listUserRegis!.length;
+                                                                            i++) {
+                                                                          if (listUserRegis[i].firmId ==
+                                                                              firm.firmId) {
+                                                                            listUserRegis[i].isConfirmed =
+                                                                                true;
+                                                                          }
+                                                                        }
+                                                                        firestore
+                                                                            .collection('trainees')
+                                                                            .doc(userId)
+                                                                            .update({
+                                                                          'listRegis': listUserRegis
+                                                                              .map((i) => i.toMap())
+                                                                              .toList(),
+                                                                        });
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        _nextStep(
+                                                                            StepEnabling.sequential);
+                                                                        GV.success(
+                                                                            context:
+                                                                                context,
+                                                                            message:
+                                                                                'Đã xác nhận công ty thực tập');
+                                                                      },
+                                                                      child:
+                                                                          const Text(
+                                                                        'Xác nhận',
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ),
+                                                                    ),
+                                                                    ElevatedButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          const Text(
+                                                                        'Để sau',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.red,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    } else {
+                                                      GV.error(
+                                                          context: context,
+                                                          message:
+                                                              'Đã quá thời gian không thể xác nhận');
+                                                    }
                                                   },
                                                 ),
                                               );
@@ -1041,10 +1253,19 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         : Padding(
                             padding: const EdgeInsets.only(top: 100),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Text(
-                                    'Chưa có công ty phê duyệt đăng ký của bạn.'),
-                                const SizedBox(height: 20),
+                                  'Chưa có công ty phê duyệt đăng ký của bạn.',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                if (setting.traineeStart != null)
+                                  Text(
+                                      'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                const SizedBox(height: 35),
                                 CustomButton(
                                   text: "Ứng tuyển thêm",
                                   width: screenWidth * 0.1,
@@ -1065,8 +1286,22 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         padding: const EdgeInsets.only(top: 100),
                         child: Column(
                           children: [
-                            const Text('Bạn chưa đăng ký công ty'),
-                            const SizedBox(height: 20),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Bạn chưa đăng ký công ty',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                if (setting.traineeStart != null)
+                                  Text(
+                                      'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})')
+                              ],
+                            ),
+                            const SizedBox(height: 35),
                             CustomButton(
                               text: "Tìm công ty ngay",
                               width: screenWidth * 0.1,
@@ -1094,7 +1329,10 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
     // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return StreamBuilder(
-        stream: firestore.collection('plans').doc(userId).snapshots(),
+        stream: firestore
+            .collection('plans')
+            .doc(currentUser.userId.value)
+            .snapshots(),
         builder: (context, snapshotPlan) {
           if (snapshotPlan.hasData &&
               snapshotPlan.data != null &&
@@ -1236,13 +1474,6 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  IconButton(
-                    onPressed: () {
-                      _nextStep(StepEnabling.sequential);
-                    },
-                    icon: const Icon(Icons.arrow_forward_outlined),
-                  ),
                   const SizedBox(height: 35),
                 ],
               ),
@@ -1263,13 +1494,14 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            color: Colors.amber,
-            child: const Text(
-              'Nộp tài liệu',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          const Text(
+            'Nộp tài liệu',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
+          const SizedBox(height: 15),
           SizedBox(
             width: screenWidth * 0.35,
             child: Column(
@@ -1300,7 +1532,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const Text("Đến hết ngày 15/11/2023"),
+                    if (setting.submitEnd != null)
+                      Text(
+                          "Đến hết ngày ${GV.readTimestamp(setting.submitEnd!)}"),
                   ],
                 ),
                 const SizedBox(height: 5),
@@ -1436,133 +1670,147 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   ],
                 ),
                 const SizedBox(height: 75),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      height: 35,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await selectMultipleFiles();
-                          await uploadMultipleFiles();
-                          _nextStep(StepEnabling.sequential);
-                        },
-                        style: const ButtonStyle(
-                            elevation: MaterialStatePropertyAll(5)),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Tải lên",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 10),
-                              Icon(
-                                Icons.upload_file,
-                                size: 25,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 35),
-                    SizedBox(
-                      width: 150,
-                      height: 35,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          showDialog(
-                              context: context,
-                              barrierColor: Colors.black12,
-                              builder: (context) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    top: screenHeight * 0.06,
-                                    bottom: screenHeight * 0.02,
-                                    left: screenWidth * 0.27,
-                                    right: screenWidth * 0.08,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      AlertDialog(
-                                        title: Container(
-                                          color: Colors.blue.shade600,
-                                          height: screenHeight * 0.06,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'Xóa tài liệu',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        titlePadding: EdgeInsets.zero,
-                                        shape: Border.all(width: 0.5),
-                                        content: const Text(
-                                            "Bạn có chắc chắn muốn xóa tất cả tài liệu này?"),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text(
-                                              "Hủy",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () async {
-                                              await deleteFile();
-                                            },
-                                            child: const Text(
-                                              "Đồng ý",
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              });
-                        },
-                        style: const ButtonStyle(
-                            elevation: MaterialStatePropertyAll(5)),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Xóa tất cả",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
+                DateTime.now().isBeforeOrEqual(setting.submitEnd)
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            height: 35,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await selectMultipleFiles();
+                                await uploadMultipleFiles();
+                              },
+                              style: const ButtonStyle(
+                                  elevation: MaterialStatePropertyAll(5)),
+                              child: const Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Tải lên",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Icon(
+                                      Icons.upload_file,
+                                      size: 25,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                          const SizedBox(width: 35),
+                          SizedBox(
+                            width: 150,
+                            height: 35,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                showDialog(
+                                    context: context,
+                                    barrierColor: Colors.black12,
+                                    builder: (context) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          top: screenHeight * 0.06,
+                                          bottom: screenHeight * 0.02,
+                                          left: screenWidth * 0.27,
+                                          right: screenWidth * 0.08,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            AlertDialog(
+                                              title: Container(
+                                                color: Colors.blue.shade600,
+                                                height: screenHeight * 0.06,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: const Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      'Xóa tài liệu',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 20),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              titlePadding: EdgeInsets.zero,
+                                              shape: Border.all(width: 0.5),
+                                              content: const Text(
+                                                  "Bạn có chắc chắn muốn xóa tất cả tài liệu này?"),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text(
+                                                    "Hủy",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    await deleteFile();
+                                                  },
+                                                  child: const Text(
+                                                    "Đồng ý",
+                                                    style: TextStyle(
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                              },
+                              style: const ButtonStyle(
+                                  elevation: MaterialStatePropertyAll(5)),
+                              child: const Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Xóa tất cả",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Đã quá thời gian nộp bài.',
+                            style: TextStyle(color: Colors.red),
+                          )
+                        ],
+                      )
               ],
             ),
           ),
@@ -1674,24 +1922,63 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Hoàn thành',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Kết quả thực tập',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           SizedBox(
             width: screenWidth * 0.25,
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Học phần: '),
-                Text('Công ty:'),
-                Text('Cán bộ:'),
-                Text('Cố vấn:'),
-                Text('Trạng thái: Đang chờ chấm điểm'),
-                Text('Điểm:'),
-                Text('Kết quả: Hoàn thành môn học')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    DateTime.now().isAfterTimestamp(setting.pointCVEnd)
+                        ? appreciate.pointChar != 'F'
+                            ? const Column(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline_rounded,
+                                    color: Colors.green,
+                                    size: 55,
+                                  ),
+                                  Text('Chúc mừng bạn đã hoàn thành môn học.'),
+                                ],
+                              )
+                            : const Column(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    color: Colors.red,
+                                    size: 55,
+                                  ),
+                                  Text('Bạn đã trượt môn học.'),
+                                ],
+                              )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+                LineDetail(field: 'Học kỳ', display: trainee.term),
+                LineDetail(
+                    field: 'Năm học',
+                    display: '${trainee.yearStart} - ${trainee.yearEnd}'),
+                LineDetail(
+                  field: 'Học phần',
+                  display: trainee.creditName,
+                ),
+                DateTime.now().isAfterTimestamp(setting.pointCVEnd)
+                    ? LineDetail(
+                        field: 'Điểm/Điểm chữ',
+                        display:
+                            '${appreciate.finalTotal}/${appreciate.pointChar}')
+                    : const LineDetail(
+                        field: 'Điểm/Điểm chữ', display: 'Đang chờ chấm điểm'),
               ],
             ),
           ),
@@ -1706,27 +1993,85 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         : reachedSteps.contains(index);
   }
 
-  _nextStep(StepEnabling enabling) {
+  _nextStep(StepEnabling enabling) async {
     if (currentUser.selectedStep.value < upperBound) {
       if (enabling == StepEnabling.sequential) {
         ++currentUser.selectedStep.value;
         if (currentUser.reachedStep.value < currentUser.selectedStep.value) {
           currentUser.reachedStep.value = currentUser.selectedStep.value;
+          final isExist =
+              await firestore.collection('trainees').doc(userId).get();
+          if (isExist.data() != null) {
+            firestore
+                .collection('trainees')
+                .doc(userId)
+                .update({'reachedStep': currentUser.reachedStep.value});
+          }
+        }
+      } else {
+        currentUser.selectedStep.value = reachedSteps
+            .firstWhere((element) => element > currentUser.selectedStep.value);
+        final isExist =
+            await firestore.collection('trainees').doc(userId).get();
+        if (isExist.data() != null) {
           firestore
               .collection('trainees')
               .doc(userId)
               .update({'reachedStep': currentUser.reachedStep.value});
         }
-      } else {
-        currentUser.selectedStep.value = reachedSteps
-            .firstWhere((element) => element > currentUser.selectedStep.value);
-        firestore
-            .collection('trainees')
-            .doc(userId)
-            .update({'reachedStep': currentUser.reachedStep.value});
       }
     }
   }
 }
 
 enum StepEnabling { sequential, individual }
+
+extension DateTimeExtension on DateTime {
+  bool isAfterTimestamp(Timestamp? timestamp) {
+    final temp = timestamp ?? Timestamp.now();
+    final date = DateTime.fromMillisecondsSinceEpoch(
+      temp.millisecondsSinceEpoch,
+    );
+    return isAfter(date);
+  }
+
+  bool isBeforeTimestamp(Timestamp? timestamp) {
+    final temp = timestamp ?? Timestamp.now();
+    final date = DateTime.fromMillisecondsSinceEpoch(
+      temp.millisecondsSinceEpoch,
+    );
+    return isBefore(date);
+  }
+
+  bool isAfterOrEqual(Timestamp? timestamp) {
+    final temp = timestamp ?? Timestamp.now();
+    final date = DateTime.fromMillisecondsSinceEpoch(
+      temp.millisecondsSinceEpoch,
+    );
+    return isAtSameMomentAs(date) || isAfter(date);
+  }
+
+  bool isBeforeOrEqual(Timestamp? timestamp) {
+    final temp = timestamp ?? Timestamp.now();
+    final date = DateTime.fromMillisecondsSinceEpoch(
+      temp.millisecondsSinceEpoch,
+    );
+    return isAtSameMomentAs(date) || isBefore(date);
+  }
+
+  bool isBetweenEqual({required Timestamp? from, required Timestamp? to}) {
+    return isAfterOrEqual(from) && isBeforeOrEqual(to);
+  }
+
+  bool isBetweenExclusive({required Timestamp? from, required Timestamp? to}) {
+    final tempFrom = from ?? Timestamp.now();
+    final fromDate = DateTime.fromMillisecondsSinceEpoch(
+      tempFrom.millisecondsSinceEpoch,
+    );
+    final tempTo = to ?? Timestamp.now();
+    final toDate = DateTime.fromMillisecondsSinceEpoch(
+      tempTo.millisecondsSinceEpoch,
+    );
+    return isAfter(fromDate) && isBefore(toDate);
+  }
+}
