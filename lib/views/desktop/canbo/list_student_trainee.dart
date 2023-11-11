@@ -279,7 +279,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
-                  width: screenWidth * 0.55,
+                  width: screenWidth * 0.6,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -320,6 +320,20 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                               ),
                             ),
                             Expanded(
+                              child: Text(
+                                'Phân việc',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Điểm',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
                               flex: 2,
                               child: Text(
                                 'Thao tác',
@@ -335,7 +349,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                               child: StreamBuilder(
                                 stream: firestore
                                     .collection('firms')
-                                    .where('firmId', isEqualTo: userId)
+                                    .where('firmId',
+                                        isEqualTo: currentUser.userId.value)
                                     .snapshots(),
                                 builder: (context, snapshotFirm) {
                                   if (snapshotFirm.hasData &&
@@ -453,7 +468,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                       .toUpperCase(),
                                                                   textAlign:
                                                                       TextAlign
-                                                                          .center),
+                                                                          .justify),
                                                             ),
                                                             Expanded(
                                                               flex: 3,
@@ -461,15 +476,79 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                   '${listRegis[indexRegis].userName}',
                                                                   textAlign:
                                                                       TextAlign
-                                                                          .center),
+                                                                          .justify),
                                                             ),
                                                             Expanded(
                                                               flex: 4,
                                                               child: Text(
-                                                                  '${listRegis[indexRegis].jobName}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center),
+                                                                '${listRegis[indexRegis].jobName}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                                child: plan
+                                                                        .listWork!
+                                                                        .isEmpty
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .not_interested_rounded,
+                                                                        color: Colors
+                                                                            .grey,
+                                                                      )
+                                                                    : const Icon(
+                                                                        Icons
+                                                                            .check_circle_rounded,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )),
+                                                            Expanded(
+                                                              child:
+                                                                  StreamBuilder(
+                                                                      stream: firestore
+                                                                          .collection(
+                                                                              'appreciates')
+                                                                          .doc(listRegis[indexRegis]
+                                                                              .userId)
+                                                                          .snapshots(),
+                                                                      builder:
+                                                                          (context,
+                                                                              snapshotA) {
+                                                                        if (snapshotA.hasData &&
+                                                                            snapshotA.data !=
+                                                                                null &&
+                                                                            snapshotA.data!.data() !=
+                                                                                null) {
+                                                                          final app = AppreciateModel.fromMap(snapshotA
+                                                                              .data!
+                                                                              .data()!);
+                                                                          double
+                                                                              total =
+                                                                              0;
+                                                                          app.listContent!
+                                                                              .forEach((element) {
+                                                                            total +=
+                                                                                element.point!;
+                                                                          });
+                                                                          return Text(
+                                                                            total > 70
+                                                                                ? '$total/100'
+                                                                                : '$total/70',
+                                                                            style:
+                                                                                const TextStyle(color: Colors.red),
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                          );
+                                                                        }
+                                                                        return const Text(
+                                                                            '-',
+                                                                            textAlign:
+                                                                                TextAlign.center);
+                                                                      }),
                                                             ),
                                                             Expanded(
                                                                 flex: 2,
@@ -592,12 +671,12 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                               .traineeEnd!)) {
                                                                             GV.error(
                                                                                 context: context,
-                                                                                message: 'Chưa đến thời gian chấm điểm.');
+                                                                                message: 'Chưa đến thời gian đánh giá thực tập.');
                                                                           } else if (DateTime.now()
                                                                               .isAfterTimestamp(setting.pointCBEnd!)) {
                                                                             GV.error(
                                                                                 context: context,
-                                                                                message: 'Đã quá thơi gian chấm điểm.');
+                                                                                message: 'Đã quá thơi gian đánh giá.');
                                                                           }
                                                                           if (DateTime.now().isBetweenEqual(
                                                                               from: setting.traineeEnd!,
@@ -682,6 +761,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                   child: StreamBuilder(
                                     stream: firestore
                                         .collection('firms')
+                                        .where('firmId',
+                                            isEqualTo: currentUser.userId.value)
                                         .snapshots(),
                                     builder: (context, snapshotFirm) {
                                       if (snapshotFirm.hasData &&
@@ -788,7 +869,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                           .toUpperCase(),
                                                                       textAlign:
                                                                           TextAlign
-                                                                              .center),
+                                                                              .justify),
                                                                 ),
                                                                 Expanded(
                                                                   flex: 3,
@@ -796,15 +877,59 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                       '${listRegis[indexRegis].userName}',
                                                                       textAlign:
                                                                           TextAlign
-                                                                              .center),
+                                                                              .justify),
                                                                 ),
                                                                 Expanded(
                                                                   flex: 4,
                                                                   child: Text(
-                                                                      '${listRegis[indexRegis].jobName}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
+                                                                    '${listRegis[indexRegis].jobName}',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: plan
+                                                                            .listWork!
+                                                                            .isEmpty
+                                                                        ? const Icon(
+                                                                            Icons.not_interested_rounded,
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          )
+                                                                        : const Icon(
+                                                                            Icons.check_circle_rounded,
+                                                                            color:
+                                                                                Colors.green,
+                                                                          )),
+                                                                Expanded(
+                                                                  child:
+                                                                      StreamBuilder(
+                                                                          stream: firestore
+                                                                              .collection('appreciates')
+                                                                              .doc(listRegis[indexRegis].userId)
+                                                                              .snapshots(),
+                                                                          builder: (context, snapshotA) {
+                                                                            if (snapshotA.hasData &&
+                                                                                snapshotA.data != null &&
+                                                                                snapshotA.data!.data() != null) {
+                                                                              final app = AppreciateModel.fromMap(snapshotA.data!.data()!);
+                                                                              double total = 0;
+                                                                              app.listContent!.forEach((element) {
+                                                                                total += element.point!;
+                                                                              });
+                                                                              return Text(
+                                                                                total > 70 ? '$total/100' : '$total/70',
+                                                                                style: const TextStyle(color: Colors.red),
+                                                                                textAlign: TextAlign.center,
+                                                                              );
+                                                                            }
+                                                                            return const Text('-',
+                                                                                textAlign: TextAlign.center);
+                                                                          }),
                                                                 ),
                                                                 Expanded(
                                                                     flex: 2,
@@ -890,9 +1015,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                 const EdgeInsets.only(bottom: 1),
                                                                             onPressed: () async {
                                                                               if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
-                                                                                GV.error(context: context, message: 'Chưa đến thời gian chấm điểm.');
+                                                                                GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
                                                                               } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
-                                                                                GV.error(context: context, message: 'Đã quá thơi gian chấm điểm.');
+                                                                                GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
                                                                               }
                                                                               if (DateTime.now().isBetweenEqual(from: setting.traineeEnd!, to: setting.pointCBEnd!)) {
                                                                                 points = [];
@@ -967,7 +1092,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                               : const Expanded(
                                   child: Center(
                                     child: Text(
-                                        'Vui lòng nhấn vào nút xem để tiếp tục.'),
+                                        'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
                                   ),
                                 ),
                     ],
@@ -1384,16 +1509,19 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                     content:
                                         'I.1. Thực hiện nội quy của cơ quan (nếu thực tập online thì không chẩm điểm)',
                                     point: points[0],
+                                    isOnl: true,
                                   ),
                                   rowAppreciate(
                                     content:
                                         'I.2. Chấp hành giờ giấc làm việc (nếu thực tập online thì không chẩm điểm)',
                                     point: points[1],
+                                    isOnl: true,
                                   ),
                                   rowAppreciate(
                                     content:
                                         'I.3. Thái độ giao tiếp với cán bộ trong đơn vị (nếu thực lập online thì không chấm điểm)',
                                     point: points[2],
+                                    isOnl: true,
                                   ),
                                   rowAppreciate(
                                     content: 'I.4. Tích cực trong công việc',
@@ -1531,7 +1659,33 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
+                                bool isOnl = false;
+                                if ((points[0].text == '0' &&
+                                        points[1].text != '0' &&
+                                        points[2].text != '0') ||
+                                    (points[0].text != '0' &&
+                                        points[1].text == '0' &&
+                                        points[2].text != '0') ||
+                                    (points[0].text != '0' &&
+                                        points[1].text != '0' &&
+                                        points[2].text == '0') ||
+                                    (points[0].text == '0' &&
+                                        points[1].text == '0' &&
+                                        points[2].text != '0') ||
+                                    (points[0].text != '0' &&
+                                        points[1].text == '0' &&
+                                        points[2].text == '0') ||
+                                    (points[0].text == '0' &&
+                                        points[1].text != '0' &&
+                                        points[2].text == '0')) {
+                                  isOnl = true;
+                                }
+                                if (isOnl) {
+                                  GV.error(
+                                      context: context,
+                                      message:
+                                          "Nếu online 3 mục đầu tiên đều phải bằng 0.");
+                                } else if (_formKey.currentState!.validate()) {
                                   List<ContentAppreciateModel>
                                       contentAppreciates = [];
                                   for (var index = 0; index < 10; index++) {
@@ -1677,11 +1831,15 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
             minLines: 1,
             maxLines: 10,
             style: const TextStyle(fontSize: 13),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(
+            decoration: InputDecoration(
+              hintText: DateTime.now().isAfter(dayEnd)
+                  ? null
+                  : 'Chưa đến thời gian đánh giá tiến độ',
+              border: const OutlineInputBorder(
                 borderSide: BorderSide.none,
               ),
             ),
+            enabled: DateTime.now().isAfter(dayEnd) ? true : false,
           ),
         ),
         TableCell(
@@ -1691,13 +1849,20 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
               builder: (context, value, child) {
                 return MaterialButton(
                   onPressed: () {
-                    setState(() {
-                      if (completed.value) {
-                        completed.value = false;
-                      } else {
-                        completed.value = true;
-                      }
-                    });
+                    if (DateTime.now().isAfter(dayEnd)) {
+                      setState(() {
+                        if (completed.value) {
+                          completed.value = false;
+                        } else {
+                          completed.value = true;
+                        }
+                      });
+                    } else {
+                      GV.error(
+                          context: context,
+                          message:
+                              'Bạn chỉ có thể đánh giá sau ngày ${DateFormat('dd/MM/yyyy').format(dayEnd)}');
+                    }
                   },
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
@@ -1738,6 +1903,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   TableRow rowAppreciate({
     required String content,
     TextEditingController? point,
+    bool isOnl = false,
   }) {
     return TableRow(
       children: [
@@ -1773,8 +1939,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
-                  validator: (value) =>
-                      double.parse(value!) > 10 ? "Bé hơn hoặc bằng 10" : null,
+                  validator: (value) => isOnl
+                      ? double.parse(value!) > 10
+                          ? "Từ 0đ đến 10đ"
+                          : null
+                      : double.parse(value!) < 1 || double.parse(value) > 10
+                          ? 'Từ 1đ đến 10đ'
+                          : null,
                 ),
               )
             : const SizedBox.shrink(),

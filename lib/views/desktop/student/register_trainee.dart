@@ -128,6 +128,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         if (isExitTrainee.data() != null) {
           RegisterTraineeModel loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
+
           if (loadTrainee.traineeStart == null &&
               loadTrainee.traineeEnd == null) {
             QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
@@ -146,32 +147,30 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
               });
               loadTrainee.traineeStart = settingTrainee.traineeStart;
               loadTrainee.traineeEnd = settingTrainee.traineeEnd;
-              if (DateTime.now().isAfterTimestamp(settingTrainee.traineeEnd) &&
-                  DateTime.now().isAfterTimestamp(loadTrainee.traineeEnd)) {
-                if (DateTime.now()
-                        .isAfterTimestamp(settingTrainee.traineeEnd) &&
-                    DateTime.now().isBeforeOrEqual(settingTrainee.submitEnd)) {
-                  loadTrainee.reachedStep = 3;
-                  final isExist =
-                      await firestore.collection('trainees').doc(userId).get();
-                  if (isExist.data() != null) {
-                    firestore
-                        .collection('trainees')
-                        .doc(userId)
-                        .update({'reachedStep': 3});
-                  }
-                } else if (DateTime.now()
-                    .isAfterTimestamp(settingTrainee.submitEnd)) {
-                  loadTrainee.reachedStep = 4;
-                  final isExist =
-                      await firestore.collection('trainees').doc(userId).get();
-                  if (isExist.data() != null) {
-                    firestore
-                        .collection('trainees')
-                        .doc(userId)
-                        .update({'reachedStep': 4});
-                  }
-                }
+            }
+          }
+          if (DateTime.now().isAfterTimestamp(setting.traineeEnd) &&
+              DateTime.now().isAfterTimestamp(loadTrainee.traineeEnd)) {
+            if (DateTime.now().isAfterTimestamp(setting.traineeEnd) &&
+                DateTime.now().isBeforeOrEqual(setting.submitEnd)) {
+              loadTrainee.reachedStep = 3;
+              final isExist =
+                  await firestore.collection('trainees').doc(userId).get();
+              if (isExist.data() != null) {
+                firestore
+                    .collection('trainees')
+                    .doc(userId)
+                    .update({'reachedStep': 3});
+              }
+            } else if (DateTime.now().isAfterTimestamp(setting.submitEnd)) {
+              loadTrainee.reachedStep = 4;
+              final isExist =
+                  await firestore.collection('trainees').doc(userId).get();
+              if (isExist.data() != null) {
+                firestore
+                    .collection('trainees')
+                    .doc(userId)
+                    .update({'reachedStep': 4});
               }
             }
           }

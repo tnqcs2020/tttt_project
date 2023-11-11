@@ -56,12 +56,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
           )
           .toString();
     });
-    // var loadFirm = await firestore.collection('firms').get();
-    // if (loadFirm.docs.isNotEmpty) {
-    //   setState(() {
-    //     firms = loadFirm.docs.map((e) => FirmModel.fromMap(e.data())).toList();
-    //   });
-    // }
     var loadAppreciateCB = await firestore.collection('appreciates').get();
     if (loadAppreciateCB.docs.isNotEmpty) {
       setState(() {
@@ -77,14 +71,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
             loadSubmit.docs.map((e) => SubmitModel.fromMap(e.data())).toList();
       });
     }
-    // var loadAppCV = await firestore.collection('appreciatesCV').get();
-    // if (loadAppCV.docs.isNotEmpty) {
-    //   setState(() {
-    //     appCV = loadAppCV.docs
-    //         .map((e) => AppreciateCVModel.fromMap(e.data()))
-    //         .toList();
-    //   });
-    // }
     var loadUser = await firestore.collection('users').get();
     if (loadUser.docs.isNotEmpty) {
       setState(() {
@@ -127,7 +113,6 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
         );
       }
     }
-
     currentUser.loadIn.value = true;
   }
 
@@ -259,7 +244,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 55),
+                    const SizedBox(width: 45),
                     CustomButton(
                         text: 'Xem',
                         width: 100,
@@ -273,6 +258,124 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                             currentUser.isCompleted.value = true;
                           }
                         }),
+                    const SizedBox(width: 25),
+                    CustomButton(
+                      text: 'Chấm tất cả',
+                      width: 100,
+                      height: 40,
+                      onTap: () async {
+                        final load = await firestore
+                            .collection('trainees')
+                            .where('classId', isEqualTo: myClass)
+                            .get();
+                        List<RegisterTraineeModel> trainees = [];
+                        if (load.docs.isNotEmpty) {
+                          load.docs.forEach((element) => trainees.add(
+                              RegisterTraineeModel.fromMap(element.data())));
+                        }
+                        List<AppreciateModel> totalAppCB = [];
+                        trainees.forEach((e1) {
+                          appreciateCB.forEach((e2) {
+                            if (e1.userId == e2.userId) {
+                              if (appCV
+                                  .where(
+                                      (element) => element.userId == e1.userId)
+                                  .isEmpty) {
+                                totalAppCB.add(e2);
+                              }
+                            }
+                          });
+                        });
+                        totalAppCB.forEach((element) {
+                          double totalCB = 0;
+                          bool isOnl = false;
+                          for (var i = 0;
+                              i < element.listContent!.length;
+                              i++) {
+                            if (i < 3 && element.listContent![i].point == 0) {
+                              isOnl = true;
+                            }
+                          }
+                          if (isOnl) {
+                            for (var i = 3;
+                                i < element.listContent!.length;
+                                i++) {
+                              totalCB += element.listContent![i].point!;
+                            }
+                          } else {
+                            for (var i = 0;
+                                i < element.listContent!.length;
+                                i++) {
+                              totalCB += element.listContent![i].point!;
+                            }
+                          }
+                          double pointCB = 0;
+                          if (isOnl) {
+                            pointCB = (totalCB / 70) * 5;
+                          } else {
+                            pointCB = (totalCB / 100) * 5;
+                          }
+                          double totalCV = 0;
+                          List<double> list = [];
+                          for (int i = 0; i < 10; i++) {
+                            if (i == 3) {
+                              list.add(
+                                  double.parse(pointCB.toStringAsFixed(2)));
+                              totalCV += pointCB;
+                            } else {
+                              list.add(initPoint[i]);
+                              totalCV += initPoint[i];
+                            }
+                          }
+
+                          totalCV = double.parse(totalCV.toStringAsFixed(2));
+                          String pointChar = '';
+                          if (totalCV >= 9.0) {
+                            pointChar = 'A';
+                          } else if (totalCV >= 8.0) {
+                            pointChar = 'B+';
+                          } else if (totalCV >= 7.0) {
+                            pointChar = 'B';
+                          } else if (totalCV >= 6.5) {
+                            pointChar = 'C+';
+                          } else if (totalCV >= 5.5) {
+                            pointChar = 'C';
+                          } else if (totalCV >= 5.0) {
+                            pointChar = 'D+';
+                          } else if (totalCV >= 4.0) {
+                            pointChar = 'D';
+                          } else {
+                            pointChar = 'F';
+                          }
+                          final temp = trainees.firstWhere(
+                            (e) => e.userId == element.userId,
+                            orElse: () => RegisterTraineeModel(),
+                          );
+                          AppreciateCVModel appreciateModel = AppreciateCVModel(
+                            cbhdId: element.cbhdId,
+                            firmName: element.firmName,
+                            jobName: element.jobName,
+                            userId: element.userId,
+                            userName: temp.studentName,
+                            traineeStart: element.traineeStart,
+                            traineeEnd: element.traineeEnd,
+                            createdAt: Timestamp.now(),
+                            total: totalCV,
+                            finalTotal: totalCV,
+                            subPoint: 0,
+                            listPoint: list,
+                            term: temp.term,
+                            yearStart: temp.yearStart,
+                            yearEnd: temp.yearEnd,
+                            pointChar: pointChar,
+                          );
+                          firestore
+                              .collection('appreciatesCV')
+                              .doc(appreciateModel.userId)
+                              .set(appreciateModel.toMap());
+                        });
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -325,6 +428,14 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                               flex: 2,
                               child: Text(
                                 'Cán bộ chấm điểm',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'Điểm môn học',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
@@ -492,6 +603,43 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                     .not_interested),
                                                           ),
                                                           Expanded(
+                                                            flex: 2,
+                                                            child:
+                                                                StreamBuilder(
+                                                                    stream: firestore
+                                                                        .collection(
+                                                                            'appreciatesCV')
+                                                                        .doc(traineeClass[indexTrain]
+                                                                            .userId)
+                                                                        .snapshots(),
+                                                                    builder:
+                                                                        (context,
+                                                                            snapshot) {
+                                                                      if (snapshot
+                                                                              .hasData &&
+                                                                          snapshot.data !=
+                                                                              null &&
+                                                                          snapshot.data!.data() !=
+                                                                              null) {
+                                                                        final appre = AppreciateCVModel.fromMap(snapshot
+                                                                            .data!
+                                                                            .data()!);
+                                                                        return Text(
+                                                                          appre
+                                                                              .finalTotal
+                                                                              .toString(),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        );
+                                                                      }
+                                                                      return const Text(
+                                                                        '-',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      );
+                                                                    }),
+                                                          ),
+                                                          Expanded(
                                                               flex: 2,
                                                               child: Row(
                                                                 mainAxisAlignment:
@@ -601,22 +749,49 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                   }
                                                                                 }
                                                                               });
-                                                                              for (int i = 0; i < 11; i++) {
-                                                                                if (i == 3) {
-                                                                                  points.add(TextEditingController(text: pointCB.toStringAsFixed(2)));
-                                                                                } else {
-                                                                                  points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                              bool isAppCV = false;
+                                                                              appCV.forEach((element) {
+                                                                                if (element.userId == user.userId) {
+                                                                                  isAppCV = true;
                                                                                 }
-                                                                              }
-                                                                              double temp = 0;
-                                                                              for (var i = 0; i < 10; i++) {
-                                                                                temp += double.parse(points[i].text);
-                                                                              }
-                                                                              setState(() {
-                                                                                total.value = double.parse(temp.toStringAsFixed(2));
-                                                                                finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(2));
                                                                               });
-                                                                              showAppreciate(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
+                                                                              if (isAppCV) {
+                                                                                appCV.forEach((element) {
+                                                                                  if (element.userId == user.userId) {
+                                                                                    for (int i = 0; i < 10; i++) {
+                                                                                      points.add(TextEditingController(text: element.listPoint![i].toString()));
+                                                                                    }
+                                                                                    points.add(TextEditingController(text: element.subPoint.toString()));
+                                                                                    setState(() {
+                                                                                      total.value = element.total!;
+                                                                                      finalTotal.value = element.finalTotal!;
+                                                                                    });
+                                                                                  }
+                                                                                });
+                                                                              } else {
+                                                                                for (int i = 0; i < 11; i++) {
+                                                                                  if (i == 3) {
+                                                                                    points.add(TextEditingController(text: pointCB.toStringAsFixed(2)));
+                                                                                  } else {
+                                                                                    points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                                  }
+                                                                                }
+                                                                                double temp = 0;
+                                                                                for (var i = 0; i < 10; i++) {
+                                                                                  temp += double.parse(points[i].text);
+                                                                                }
+                                                                                setState(() {
+                                                                                  total.value = double.parse(temp.toStringAsFixed(2));
+                                                                                  finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(2));
+                                                                                });
+                                                                              }
+                                                                              showAppreciate(
+                                                                                context: context,
+                                                                                user: user,
+                                                                                trainee: traineeClass[indexTrain],
+                                                                                userRegister: userRegister,
+                                                                                isUpdate: isAppCV,
+                                                                              );
                                                                             },
                                                                             icon: const Icon(
                                                                               CupertinoIcons.pencil_ellipsis_rectangle,
@@ -792,6 +967,36 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                             .not_interested),
                                                               ),
                                                               Expanded(
+                                                                flex: 2,
+                                                                child:
+                                                                    StreamBuilder(
+                                                                        stream: firestore
+                                                                            .collection(
+                                                                                'appreciatesCV')
+                                                                            .doc(traineeClass[indexTrain]
+                                                                                .userId)
+                                                                            .snapshots(),
+                                                                        builder:
+                                                                            (context,
+                                                                                snapshot) {
+                                                                          if (snapshot.hasData &&
+                                                                              snapshot.data != null &&
+                                                                              snapshot.data!.data() != null) {
+                                                                            final appre =
+                                                                                AppreciateCVModel.fromMap(snapshot.data!.data()!);
+                                                                            return Text(
+                                                                              appre.finalTotal.toString(),
+                                                                              textAlign: TextAlign.center,
+                                                                            );
+                                                                          }
+                                                                          return const Text(
+                                                                            '-',
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                          );
+                                                                        }),
+                                                              ),
+                                                              Expanded(
                                                                   flex: 2,
                                                                   child: Row(
                                                                     mainAxisAlignment:
@@ -926,6 +1131,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                     user: user,
                                                                                     trainee: traineeClass[indexTrain],
                                                                                     userRegister: userRegister,
+                                                                                    isUpdate: isAppCV,
                                                                                   );
                                                                                 },
                                                                                 icon: const Icon(
@@ -1081,7 +1287,8 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                   scrollDirection: Axis.vertical,
                   child: Container(
                     constraints: BoxConstraints(minWidth: screenWidth * 0.35),
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -1337,6 +1544,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
     required UserModel user,
     required RegisterTraineeModel trainee,
     required UserRegisterModel userRegister,
+    required bool isUpdate,
   }) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -1765,9 +1973,9 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                               },
                               style: const ButtonStyle(
                                   elevation: MaterialStatePropertyAll(5)),
-                              child: const Text(
-                                'Đánh giá',
-                                style: TextStyle(
+                              child: Text(
+                                isUpdate ? 'Cập nhật' : 'Đánh giá',
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -2124,7 +2332,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                     child: Text(
                   point.toString(),
                   style: content == 'CỘNG'
-                      ? TextStyle(fontWeight: FontWeight.bold)
+                      ? const TextStyle(fontWeight: FontWeight.bold)
                       : null,
                 )),
               )
