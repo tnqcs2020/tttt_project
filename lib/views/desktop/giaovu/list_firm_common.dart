@@ -114,7 +114,7 @@ class _FirmLinkState extends State<ListFirmCommon> {
                   Expanded(
                     child: Container(
                       constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.7),
+                          BoxConstraints(minHeight: screenHeight * 0.67),
                       decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           border: Border.all(
@@ -339,12 +339,12 @@ class _FirmLinkState extends State<ListFirmCommon> {
                                                                                     '${firmResult[indexFirm].firmName}',
                                                                                     textAlign: TextAlign.justify,
                                                                                     overflow: TextOverflow.ellipsis,
+                                                                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                   ),
                                                                                   Text(
                                                                                     'Mô tả: ${firmResult[indexFirm].describe}',
                                                                                     textAlign: TextAlign.justify,
                                                                                     overflow: TextOverflow.ellipsis,
-                                                                                    style: const TextStyle(fontSize: 13),
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -475,12 +475,14 @@ class _FirmLinkState extends State<ListFirmCommon> {
                                                                                 children: [
                                                                                   Text(
                                                                                     '${firms[indexFirm].firmName}',
+                                                                                    textAlign: TextAlign.justify,
                                                                                     overflow: TextOverflow.ellipsis,
+                                                                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                   ),
                                                                                   Text(
                                                                                     'Mô tả: ${firms[indexFirm].describe}',
+                                                                                    textAlign: TextAlign.justify,
                                                                                     overflow: TextOverflow.ellipsis,
-                                                                                    style: const TextStyle(fontSize: 13),
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -625,7 +627,9 @@ class _FirmLinkState extends State<ListFirmCommon> {
                 titlePadding: EdgeInsets.zero,
                 shape: Border.all(width: 0.5),
                 content: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: screenWidth * 0.35),
+                  constraints: BoxConstraints(
+                      minWidth: screenWidth * 0.35,
+                      maxWidth: screenWidth * 0.5),
                   child: Form(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -635,7 +639,11 @@ class _FirmLinkState extends State<ListFirmCommon> {
                         Text('Số điện thoại: ${firm.phone!}'),
                         Text('Email: ${firm.email!}'),
                         Text('Địa chỉ: ${firm.address!}'),
-                        Text('Mô tả: ${firm.describe!}'),
+                        Text(
+                          'Mô tả: ${firm.describe!}',
+                          textAlign: TextAlign.justify,
+                          overflow: TextOverflow.clip,
+                        ),
                         const Text('Vị trí tuyển dụng:'),
                         for (var job in firm.listJob!)
                           Padding(
@@ -643,8 +651,16 @@ class _FirmLinkState extends State<ListFirmCommon> {
                             child: ListTile(
                               dense: true,
                               contentPadding: EdgeInsets.zero,
-                              title: Text('${job.jobName}'),
-                              subtitle: Text('${job.describeJob}'),
+                              title: Text(
+                                '${job.jobName}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                '${job.describeJob}',
+                                textAlign: TextAlign.justify,
+                                overflow: TextOverflow.clip,
+                              ),
                             ),
                           ),
                       ],

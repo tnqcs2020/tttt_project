@@ -174,7 +174,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15),
+                padding: const EdgeInsets.only(top: 15, bottom: 35),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
@@ -239,263 +239,107 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                       ),
                       isViewed.value && currentUser.isCompleted.isTrue
                           ? Expanded(
-                              child: StreamBuilder(
-                                stream: firestore
-                                    .collection('firms')
-                                    .where('firmId', isEqualTo: userId)
-                                    .snapshots(),
-                                builder: (context, snapshotFirm) {
-                                  List<FirmModel> loadFirms = [];
-                                  if (snapshotFirm.hasData &&
-                                      snapshotFirm.data != null &&
-                                      snapshotFirm.connectionState ==
-                                          ConnectionState.active) {
-                                    snapshotFirm.data?.docs.forEach((element) {
-                                      loadFirms.add(
-                                          FirmModel.fromMap(element.data()));
-                                    });
-                                    listRegis = [];
-                                    for (var element in loadFirms) {
-                                      if (element.firmId == userId) {
-                                        for (var e in element.listRegis!) {
-                                          if (selectedTT == TrangThai.tatca &&
-                                              e.isConfirmed == false) {
-                                            listRegis.add(e);
-                                          } else {
-                                            if (e.status == selectedTT &&
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: StreamBuilder(
+                                  stream: firestore
+                                      .collection('firms')
+                                      .where('firmId', isEqualTo: userId)
+                                      .snapshots(),
+                                  builder: (context, snapshotFirm) {
+                                    List<FirmModel> loadFirms = [];
+                                    if (snapshotFirm.hasData &&
+                                        snapshotFirm.data != null &&
+                                        snapshotFirm.connectionState ==
+                                            ConnectionState.active) {
+                                      snapshotFirm.data?.docs
+                                          .forEach((element) {
+                                        loadFirms.add(
+                                            FirmModel.fromMap(element.data()));
+                                      });
+                                      listRegis = [];
+                                      for (var element in loadFirms) {
+                                        if (element.firmId == userId) {
+                                          for (var e in element.listRegis!) {
+                                            if (selectedTT == TrangThai.tatca &&
                                                 e.isConfirmed == false) {
                                               listRegis.add(e);
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                    return listRegis.isNotEmpty
-                                        ? ListView.builder(
-                                            itemCount: listRegis.length,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, indexRegis) {
-                                              return Container(
-                                                height: screenHeight * 0.05,
-                                                color: indexRegis % 2 == 0
-                                                    ? Colors.blue.shade50
-                                                    : null,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                          '${indexRegis + 1}',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 3,
-                                                      child: Text(
-                                                          '${listRegis[indexRegis].userId}'
-                                                              .toUpperCase(),
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 4,
-                                                      child: Text(
-                                                          '${listRegis[indexRegis].userName}',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 5,
-                                                      child: Text(
-                                                          '${listRegis[indexRegis].jobName}',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 3,
-                                                      child: Text(
-                                                          listRegis[indexRegis]
-                                                                      .status! ==
-                                                                  TrangThai
-                                                                      .accept
-                                                              ? 'Chờ xác nhận'
-                                                              : listRegis[
-                                                                      indexRegis]
-                                                                  .status!,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .red),
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          IconButton(
-                                                              tooltip:
-                                                                  'Thông tin và xét duyệt',
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      bottom:
-                                                                          1),
-                                                              onPressed:
-                                                                  () async {
-                                                                loadUsers.forEach(
-                                                                    (element) {
-                                                                  if (element
-                                                                          .userId ==
-                                                                      listRegis[
-                                                                              indexRegis]
-                                                                          .userId) {
-                                                                    user =
-                                                                        element;
-                                                                  }
-                                                                });
-                                                                showInfoAndReply(
-                                                                  context:
-                                                                      context,
-                                                                  jobRegister:
-                                                                      listRegis[
-                                                                          indexRegis],
-                                                                );
-                                                              },
-                                                              icon: Icon(
-                                                                  CupertinoIcons
-                                                                      .pencil_outline,
-                                                                  size: 22,
-                                                                  color: Colors
-                                                                      .blue
-                                                                      .shade900))
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          )
-                                        : const Center(
-                                            child: Text(
-                                                'Chưa có sinh viên đăng ký.'));
-                                  } else {
-                                    return const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Loading(),
-                                      ],
-                                    );
-                                  }
-                                },
-                              ),
-                            )
-                          : selectedTT == TrangThai.empty
-                              ? Expanded(
-                                  child: StreamBuilder(
-                                    stream: firestore
-                                        .collection('firms')
-                                        .where('firmId', isEqualTo: userId)
-                                        .snapshots(),
-                                    builder: (context, snapshotFirm) {
-                                      List<FirmModel> loadFirms = [];
-                                      if (snapshotFirm.hasData &&
-                                          snapshotFirm.data != null &&
-                                          snapshotFirm.connectionState ==
-                                              ConnectionState.active) {
-                                        snapshotFirm.data?.docs
-                                            .forEach((element) {
-                                          loadFirms.add(FirmModel.fromMap(
-                                              element.data()));
-                                        });
-                                        listRegis = [];
-                                        for (var element in loadFirms) {
-                                          if (element.firmId == userId) {
-                                            for (var e in element.listRegis!) {
-                                              if (e.status == TrangThai.wait ||
-                                                  e.status ==
-                                                          TrangThai.accept &&
-                                                      e.isConfirmed == false) {
+                                            } else {
+                                              if (e.status == selectedTT &&
+                                                  e.isConfirmed == false) {
                                                 listRegis.add(e);
                                               }
                                             }
                                           }
                                         }
-                                        return listRegis.isNotEmpty
-                                            ? ListView.builder(
-                                                itemCount: listRegis.length,
-                                                shrinkWrap: true,
-                                                itemBuilder:
-                                                    (context, indexRegis) {
-                                                  return Container(
-                                                    height: screenHeight * 0.05,
-                                                    color: indexRegis % 2 == 0
-                                                        ? Colors.blue.shade50
-                                                        : null,
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child: Text(
-                                                              '${indexRegis + 1}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 3,
-                                                          child: Text(
-                                                              '${listRegis[indexRegis].userId}'
-                                                                  .toUpperCase(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Text(
-                                                              '${listRegis[indexRegis].userName}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 5,
-                                                          child: Text(
-                                                              '${listRegis[indexRegis].jobName}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 3,
-                                                          child: Text(
-                                                              listRegis[indexRegis]
-                                                                          .status! ==
-                                                                      TrangThai
-                                                                          .accept
-                                                                  ? 'Chờ xác nhận'
-                                                                  : listRegis[
-                                                                          indexRegis]
-                                                                      .status!,
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .red),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 2,
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              IconButton(
+                                      }
+                                      return listRegis.isNotEmpty
+                                          ? ListView.builder(
+                                              itemCount: listRegis.length,
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (context, indexRegis) {
+                                                return Container(
+                                                  height: screenHeight * 0.05,
+                                                  color: indexRegis % 2 == 0
+                                                      ? Colors.blue.shade50
+                                                      : null,
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                            '${indexRegis + 1}',
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: Text(
+                                                            '${listRegis[indexRegis].userId}'
+                                                                .toUpperCase(),
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 4,
+                                                        child: Text(
+                                                            '${listRegis[indexRegis].userName}',
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 5,
+                                                        child: Text(
+                                                            '${listRegis[indexRegis].jobName}',
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: Text(
+                                                            listRegis[indexRegis]
+                                                                        .status! ==
+                                                                    TrangThai
+                                                                        .accept
+                                                                ? 'Chờ xác nhận'
+                                                                : listRegis[
+                                                                        indexRegis]
+                                                                    .status!,
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 2,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            IconButton(
                                                                 tooltip:
                                                                     'Thông tin và xét duyệt',
                                                                 padding:
@@ -529,29 +373,201 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                     size: 22,
                                                                     color: Colors
                                                                         .blue
-                                                                        .shade900),
-                                                              )
-                                                            ],
-                                                          ),
+                                                                        .shade900))
+                                                          ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              )
-                                            : const Center(
-                                                child: Text(
-                                                    'Chưa có sinh viên đăng ký.'));
-                                      } else {
-                                        return const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Loading(),
-                                      ],
-                                    );
-                                      }
-                                    },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                          : const Center(
+                                              child: Text(
+                                                  'Chưa có sinh viên đăng ký.'));
+                                    } else {
+                                      return const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Loading(),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            )
+                          : selectedTT == TrangThai.empty
+                              ? Expanded(
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: StreamBuilder(
+                                      stream: firestore
+                                          .collection('firms')
+                                          .where('firmId', isEqualTo: userId)
+                                          .snapshots(),
+                                      builder: (context, snapshotFirm) {
+                                        List<FirmModel> loadFirms = [];
+                                        if (snapshotFirm.hasData &&
+                                            snapshotFirm.data != null &&
+                                            snapshotFirm.connectionState ==
+                                                ConnectionState.active) {
+                                          snapshotFirm.data?.docs
+                                              .forEach((element) {
+                                            loadFirms.add(FirmModel.fromMap(
+                                                element.data()));
+                                          });
+                                          listRegis = [];
+                                          for (var element in loadFirms) {
+                                            if (element.firmId == userId) {
+                                              for (var e
+                                                  in element.listRegis!) {
+                                                if (e.status ==
+                                                        TrangThai.wait ||
+                                                    e.status ==
+                                                            TrangThai.accept &&
+                                                        e.isConfirmed ==
+                                                            false) {
+                                                  listRegis.add(e);
+                                                }
+                                              }
+                                            }
+                                          }
+                                          return listRegis.isNotEmpty
+                                              ? ListView.builder(
+                                                  itemCount: listRegis.length,
+                                                  shrinkWrap: true,
+                                                  itemBuilder:
+                                                      (context, indexRegis) {
+                                                    return Container(
+                                                      height:
+                                                          screenHeight * 0.05,
+                                                      color: indexRegis % 2 == 0
+                                                          ? Colors.blue.shade50
+                                                          : null,
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                                '${indexRegis + 1}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 3,
+                                                            child: Text(
+                                                                '${listRegis[indexRegis].userId}'
+                                                                    .toUpperCase(),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: Text(
+                                                                '${listRegis[indexRegis].userName}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 5,
+                                                            child: Text(
+                                                                '${listRegis[indexRegis].jobName}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 3,
+                                                            child: Text(
+                                                                listRegis[indexRegis]
+                                                                            .status! ==
+                                                                        TrangThai
+                                                                            .accept
+                                                                    ? 'Chờ xác nhận'
+                                                                    : listRegis[
+                                                                            indexRegis]
+                                                                        .status!,
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                IconButton(
+                                                                  tooltip:
+                                                                      'Thông tin và xét duyệt',
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          bottom:
+                                                                              1),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    loadUsers
+                                                                        .forEach(
+                                                                            (element) {
+                                                                      if (element
+                                                                              .userId ==
+                                                                          listRegis[indexRegis]
+                                                                              .userId) {
+                                                                        user =
+                                                                            element;
+                                                                      }
+                                                                    });
+                                                                    showInfoAndReply(
+                                                                      context:
+                                                                          context,
+                                                                      jobRegister:
+                                                                          listRegis[
+                                                                              indexRegis],
+                                                                    );
+                                                                  },
+                                                                  icon: Icon(
+                                                                      CupertinoIcons
+                                                                          .pencil_outline,
+                                                                      size: 22,
+                                                                      color: Colors
+                                                                          .blue
+                                                                          .shade900),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : const Center(
+                                                  child: Text(
+                                                      'Chưa có sinh viên đăng ký.'));
+                                        } else {
+                                          return const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Loading(),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
                                   ),
                                 )
                               : const Expanded(

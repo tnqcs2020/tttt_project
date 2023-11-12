@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tttt_project/common/constant.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart'; 
+import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/common/date_inputformatter.dart';
@@ -359,310 +359,314 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                   child:
                                       isLook.value &&
                                               currentUser.isCompleted.isTrue
-                                          ? StreamBuilder(
-                                              stream: firestore
-                                                  .collection('planTrainees')
-                                                  .snapshots(),
-                                              builder: (context, snapshot) {
-                                                List<PlanTraineeModel>
-                                                    loadPlanTrainee = [];
-                                                List<PlanTraineeModel> dskh =
-                                                    [];
-                                                if (snapshot.hasData &&
-                                                    snapshot.connectionState ==
-                                                        ConnectionState
-                                                            .active) {
-                                                  snapshot.data?.docs
-                                                      .forEach((element) {
-                                                    loadPlanTrainee.add(
-                                                        PlanTraineeModel
-                                                            .fromMap(element
-                                                                .data()));
-                                                  });
-                                                  if (selectedHK ==
-                                                          HocKy.tatca &&
-                                                      selectedNH ==
-                                                          NamHoc.tatca) {
-                                                    loadPlanTrainee
-                                                        .forEach((e) {
-                                                      dskh.add(e);
+                                          ? SingleChildScrollView(
+                                              scrollDirection: Axis.vertical,
+                                              child: StreamBuilder(
+                                                stream: firestore
+                                                    .collection('planTrainees')
+                                                    .snapshots(),
+                                                builder: (context, snapshot) {
+                                                  List<PlanTraineeModel>
+                                                      loadPlanTrainee = [];
+                                                  List<PlanTraineeModel> dskh =
+                                                      [];
+                                                  if (snapshot.hasData &&
+                                                      snapshot.connectionState ==
+                                                          ConnectionState
+                                                              .active) {
+                                                    snapshot.data?.docs
+                                                        .forEach((element) {
+                                                      loadPlanTrainee.add(
+                                                          PlanTraineeModel
+                                                              .fromMap(element
+                                                                  .data()));
                                                     });
-                                                  } else if (selectedHK ==
-                                                      HocKy.tatca) {
-                                                    loadPlanTrainee
-                                                        .forEach((e) {
-                                                      if (e.yearStart ==
-                                                          selectedNH.start) {
+                                                    if (selectedHK ==
+                                                            HocKy.tatca &&
+                                                        selectedNH ==
+                                                            NamHoc.tatca) {
+                                                      loadPlanTrainee
+                                                          .forEach((e) {
                                                         dskh.add(e);
-                                                      }
-                                                    });
-                                                  } else if (selectedNH ==
-                                                      NamHoc.tatca) {
-                                                    loadPlanTrainee
-                                                        .forEach((e) {
-                                                      if (e.term ==
-                                                          selectedHK) {
-                                                        dskh.add(e);
-                                                      }
-                                                    });
-                                                  } else {
-                                                    loadPlanTrainee
-                                                        .forEach((e) {
-                                                      if (e.term ==
-                                                              selectedHK &&
-                                                          e.yearStart ==
-                                                              selectedNH
-                                                                  .start) {
-                                                        dskh.add(e);
-                                                      }
-                                                    });
-                                                  }
-                                                  dskh.sort(
-                                                    (a, b) => a.createdAt!
-                                                        .compareTo(
-                                                            b.createdAt!),
-                                                  );
-                                                  return dskh.isNotEmpty
-                                                      ? ListView.builder(
-                                                          itemCount:
-                                                              dskh.length,
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            return Container(
-                                                              height:
-                                                                  screenHeight *
-                                                                      0.05,
-                                                              color: index %
-                                                                          2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                              child: Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                        '${index + 1}',
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 5,
-                                                                    child: Text(
-                                                                        dskh[index]
-                                                                            .title!,
-                                                                        textAlign:
-                                                                            TextAlign.justify),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: Text(
-                                                                        GV.readTimestamp(dskh[index]
-                                                                            .createdAt!),
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        IconButton(
-                                                                          tooltip:
-                                                                              'Chỉnh sửa kế hoạch',
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom: 1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            await editPlanTrainee(
-                                                                              context: context,
-                                                                              planTrainee: dskh[index],
-                                                                              isCreate: false,
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              Icon(
-                                                                            Icons.edit_document,
-                                                                            color:
-                                                                                Colors.blue.shade900,
-                                                                            size:
-                                                                                20,
+                                                      });
+                                                    } else if (selectedHK ==
+                                                        HocKy.tatca) {
+                                                      loadPlanTrainee
+                                                          .forEach((e) {
+                                                        if (e.yearStart ==
+                                                            selectedNH.start) {
+                                                          dskh.add(e);
+                                                        }
+                                                      });
+                                                    } else if (selectedNH ==
+                                                        NamHoc.tatca) {
+                                                      loadPlanTrainee
+                                                          .forEach((e) {
+                                                        if (e.term ==
+                                                            selectedHK) {
+                                                          dskh.add(e);
+                                                        }
+                                                      });
+                                                    } else {
+                                                      loadPlanTrainee
+                                                          .forEach((e) {
+                                                        if (e.term ==
+                                                                selectedHK &&
+                                                            e.yearStart ==
+                                                                selectedNH
+                                                                    .start) {
+                                                          dskh.add(e);
+                                                        }
+                                                      });
+                                                    }
+                                                    dskh.sort(
+                                                      (a, b) => a.createdAt!
+                                                          .compareTo(
+                                                              b.createdAt!),
+                                                    );
+                                                    return dskh.isNotEmpty
+                                                        ? ListView.builder(
+                                                            itemCount:
+                                                                dskh.length,
+                                                            shrinkWrap: true,
+                                                            scrollDirection:
+                                                                Axis.vertical,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return Container(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.05,
+                                                                color: index %
+                                                                            2 ==
+                                                                        0
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade50
+                                                                    : null,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      flex: 1,
+                                                                      child: Text(
+                                                                          '${index + 1}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 5,
+                                                                      child: Text(
+                                                                          dskh[index]
+                                                                              .title!,
+                                                                          textAlign:
+                                                                              TextAlign.justify),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          GV.readTimestamp(dskh[index]
+                                                                              .createdAt!),
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          IconButton(
+                                                                            tooltip:
+                                                                                'Chỉnh sửa kế hoạch',
+                                                                            padding:
+                                                                                const EdgeInsets.only(bottom: 1),
+                                                                            onPressed:
+                                                                                () async {
+                                                                              await editPlanTrainee(
+                                                                                context: context,
+                                                                                planTrainee: dskh[index],
+                                                                                isCreate: false,
+                                                                              );
+                                                                            },
+                                                                            icon:
+                                                                                Icon(
+                                                                              Icons.edit_document,
+                                                                              color: Colors.blue.shade900,
+                                                                              size: 20,
+                                                                            ),
                                                                           ),
+                                                                          IconButton(
+                                                                            tooltip:
+                                                                                'Xóa kế hoạch',
+                                                                            padding:
+                                                                                const EdgeInsets.only(bottom: 1),
+                                                                            onPressed:
+                                                                                () async {
+                                                                              await deletePlanTrainee(
+                                                                                context: context,
+                                                                                planTrainee: dskh[index],
+                                                                              );
+                                                                            },
+                                                                            icon:
+                                                                                const Icon(
+                                                                              Icons.delete_rounded,
+                                                                              color: Colors.red,
+                                                                              size: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : const Center(
+                                                            child: Text(
+                                                                'Chưa có sinh viên đăng ký.'),
+                                                          );
+                                                  } else {
+                                                    return const Center(
+                                                        child: Loading());
+                                                  }
+                                                },
+                                              ),
+                                            )
+                                          : selectedHK == HocKy.empty &&
+                                                  selectedNH == NamHoc.empty
+                                              ? SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  child: StreamBuilder(
+                                                    stream: firestore
+                                                        .collection(
+                                                            'planTrainees')
+                                                        .snapshots(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      List<PlanTraineeModel>
+                                                          dskh = [];
+                                                      if (snapshot.hasData &&
+                                                          snapshot.connectionState ==
+                                                              ConnectionState
+                                                                  .active) {
+                                                        snapshot.data?.docs
+                                                            .forEach((element) {
+                                                          dskh.add(
+                                                              PlanTraineeModel
+                                                                  .fromMap(element
+                                                                      .data()));
+                                                        });
+                                                        dskh.sort(
+                                                          (a, b) => a.createdAt!
+                                                              .compareTo(
+                                                                  b.createdAt!),
+                                                        );
+                                                        return dskh.isNotEmpty
+                                                            ? ListView.builder(
+                                                                itemCount:
+                                                                    dskh.length,
+                                                                shrinkWrap:
+                                                                    true,
+                                                                scrollDirection:
+                                                                    Axis.vertical,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        index) {
+                                                                  return Container(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.05,
+                                                                    color: index %
+                                                                                2 ==
+                                                                            0
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .shade50
+                                                                        : null,
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child: Text(
+                                                                              '${index + 1}',
+                                                                              textAlign: TextAlign.center),
                                                                         ),
-                                                                        IconButton(
-                                                                          tooltip:
-                                                                              'Xóa kế hoạch',
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom: 1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            await deletePlanTrainee(
-                                                                              context: context,
-                                                                              planTrainee: dskh[index],
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              const Icon(
-                                                                            Icons.delete_rounded,
-                                                                            color:
-                                                                                Colors.red,
-                                                                            size:
-                                                                                20,
+                                                                        Expanded(
+                                                                          flex:
+                                                                              5,
+                                                                          child: Text(
+                                                                              dskh[index].title!,
+                                                                              textAlign: TextAlign.justify),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child: Text(
+                                                                              GV.readTimestamp(dskh[index].createdAt!),
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              IconButton(
+                                                                                tooltip: 'Chỉnh sửa kế hoạch',
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () async {
+                                                                                  await editPlanTrainee(
+                                                                                    context: context,
+                                                                                    planTrainee: dskh[index],
+                                                                                    isCreate: false,
+                                                                                  );
+                                                                                },
+                                                                                icon: Icon(
+                                                                                  Icons.edit_document,
+                                                                                  color: Colors.blue.shade900,
+                                                                                  size: 20,
+                                                                                ),
+                                                                              ),
+                                                                              IconButton(
+                                                                                tooltip: 'Xóa kế hoạch',
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () async {
+                                                                                  await deletePlanTrainee(
+                                                                                    context: context,
+                                                                                    planTrainee: dskh[index],
+                                                                                  );
+                                                                                },
+                                                                                icon: const Icon(
+                                                                                  Icons.delete_rounded,
+                                                                                  color: Colors.red,
+                                                                                  size: 20,
+                                                                                ),
+                                                                              ),
+                                                                            ],
                                                                           ),
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      : const Center(
-                                                          child: Text(
-                                                              'Chưa có sinh viên đăng ký.'),
-                                                        );
-                                                } else {
-                                                  return const Center(
-                                                      child: Loading());
-                                                }
-                                              },
-                                            )
-                                          : selectedHK == HocKy.empty &&
-                                                  selectedNH == NamHoc.empty
-                                              ? StreamBuilder(
-                                                  stream: firestore
-                                                      .collection(
-                                                          'planTrainees')
-                                                      .snapshots(),
-                                                  builder: (context, snapshot) {
-                                                    List<PlanTraineeModel>
-                                                        dskh = [];
-                                                    if (snapshot.hasData &&
-                                                        snapshot.connectionState ==
-                                                            ConnectionState
-                                                                .active) {
-                                                      snapshot.data?.docs
-                                                          .forEach((element) {
-                                                        dskh.add(
-                                                            PlanTraineeModel
-                                                                .fromMap(element
-                                                                    .data()));
-                                                      });
-                                                      dskh.sort(
-                                                        (a, b) => a.createdAt!
-                                                            .compareTo(
-                                                                b.createdAt!),
-                                                      );
-                                                      return dskh.isNotEmpty
-                                                          ? ListView.builder(
-                                                              itemCount:
-                                                                  dskh.length,
-                                                              shrinkWrap: true,
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Container(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.05,
-                                                                  color: index %
-                                                                              2 ==
-                                                                          0
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade50
-                                                                      : null,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            '${index + 1}',
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 5,
-                                                                        child: Text(
-                                                                            dskh[index]
-                                                                                .title!,
-                                                                            textAlign:
-                                                                                TextAlign.justify),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child: Text(
-                                                                            GV.readTimestamp(dskh[index]
-                                                                                .createdAt!),
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            IconButton(
-                                                                              tooltip: 'Chỉnh sửa kế hoạch',
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () async {
-                                                                                await editPlanTrainee(
-                                                                                  context: context,
-                                                                                  planTrainee: dskh[index],
-                                                                                  isCreate: false,
-                                                                                );
-                                                                              },
-                                                                              icon: Icon(
-                                                                                Icons.edit_document,
-                                                                                color: Colors.blue.shade900,
-                                                                                size: 20,
-                                                                              ),
-                                                                            ),
-                                                                            IconButton(
-                                                                              tooltip: 'Xóa kế hoạch',
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () async {
-                                                                                await deletePlanTrainee(
-                                                                                  context: context,
-                                                                                  planTrainee: dskh[index],
-                                                                                );
-                                                                              },
-                                                                              icon: const Icon(
-                                                                                Icons.delete_rounded,
-                                                                                color: Colors.red,
-                                                                                size: 20,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : const Center(
-                                                              child: Text(
-                                                                  'Chưa có kế hoạch nào trong khoản thời gian bạn chọn.'),
-                                                            );
-                                                    } else {
-                                                      return const Center(
-                                                          child: Loading());
-                                                    }
-                                                  },
+                                                                  );
+                                                                },
+                                                              )
+                                                            : const Center(
+                                                                child: Text(
+                                                                    'Chưa có kế hoạch nào trong khoản thời gian bạn chọn.'),
+                                                              );
+                                                      } else {
+                                                        return const Center(
+                                                            child: Loading());
+                                                      }
+                                                    },
+                                                  ),
                                                 )
                                               : const Center(
                                                   child: Text(
@@ -671,18 +675,6 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                 )
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CustomButton(
-                                text: 'Thiết lập thời gian thực tập',
-                                width: screenWidth * 0.07,
-                                height: screenHeight * 0.06,
-                                onTap: () {},
-                              ),
-                            ],
                           ),
                           const SizedBox(height: 35),
                         ],

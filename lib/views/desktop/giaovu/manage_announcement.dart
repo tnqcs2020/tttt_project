@@ -331,308 +331,314 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                       ),
                                       isLook.value &&
                                               currentUser.isCompleted.isTrue
-                                          ? StreamBuilder(
-                                              stream: firestore
-                                                  .collection('announcements')
-                                                  .snapshots(),
-                                              builder: (context, snapshot) {
-                                                List<AnnouncementModel>
-                                                    loadAnnouncement = [];
-                                                List<AnnouncementModel>
-                                                    listAnnouncement = [];
-                                                if (snapshot.hasData &&
-                                                    selectedType
-                                                        .value.isNotEmpty &&
-                                                    snapshot.connectionState ==
-                                                        ConnectionState
-                                                            .active) {
-                                                  snapshot.data?.docs
-                                                      .forEach((element) {
-                                                    loadAnnouncement.add(
-                                                        AnnouncementModel
-                                                            .fromMap(element
-                                                                .data()));
-                                                  });
-                                                  if (selectedType.value ==
-                                                      "Tất cả") {
-                                                    loadAnnouncement
+                                          ? SingleChildScrollView(
+                                                scrollDirection: Axis.vertical,
+                                            child: StreamBuilder(
+                                                stream: firestore
+                                                    .collection('announcements')
+                                                    .snapshots(),
+                                                builder: (context, snapshot) {
+                                                  List<AnnouncementModel>
+                                                      loadAnnouncement = [];
+                                                  List<AnnouncementModel>
+                                                      listAnnouncement = [];
+                                                  if (snapshot.hasData &&
+                                                      selectedType
+                                                          .value.isNotEmpty &&
+                                                      snapshot.connectionState ==
+                                                          ConnectionState
+                                                              .active) {
+                                                    snapshot.data?.docs
                                                         .forEach((element) {
-                                                      listAnnouncement
-                                                          .add(element);
+                                                      loadAnnouncement.add(
+                                                          AnnouncementModel
+                                                              .fromMap(element
+                                                                  .data()));
                                                     });
-                                                  } else {
-                                                    loadAnnouncement
-                                                        .forEach((element) {
-                                                      if (element.type ==
-                                                          selectedType.value) {
+                                                    if (selectedType.value ==
+                                                        "Tất cả") {
+                                                      loadAnnouncement
+                                                          .forEach((element) {
                                                         listAnnouncement
                                                             .add(element);
-                                                      }
-                                                    });
-                                                  }
-                                                  return listAnnouncement
-                                                          .isNotEmpty
-                                                      ? ListView.builder(
-                                                          itemCount:
-                                                              listAnnouncement
-                                                                  .length,
-                                                          shrinkWrap: true,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            return Container(
-                                                              height:
-                                                                  screenHeight *
-                                                                      0.05,
-                                                              color: index %
-                                                                          2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                              child: Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                        '${index + 1}',
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 5,
-                                                                    child: Text(
-                                                                      listAnnouncement[
-                                                                              index]
-                                                                          .title!,
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .justify,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
+                                                      });
+                                                    } else {
+                                                      loadAnnouncement
+                                                          .forEach((element) {
+                                                        if (element.type ==
+                                                            selectedType.value) {
+                                                          listAnnouncement
+                                                              .add(element);
+                                                        }
+                                                      });
+                                                    }
+                                                    return listAnnouncement
+                                                            .isNotEmpty
+                                                        ? ListView.builder(
+                                                            itemCount:
+                                                                listAnnouncement
+                                                                    .length,
+                                                            shrinkWrap: true,
+                                                            itemBuilder:
+                                                                (context, index) {
+                                                              return Container(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.05,
+                                                                color: index %
+                                                                            2 ==
+                                                                        0
+                                                                    ? Colors.blue
+                                                                        .shade50
+                                                                    : null,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      flex: 1,
+                                                                      child: Text(
+                                                                          '${index + 1}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
                                                                     ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 3,
-                                                                    child: Text(
-                                                                        GV.readTimestamp(listAnnouncement[index]
-                                                                            .createdAt!),
+                                                                    Expanded(
+                                                                      flex: 5,
+                                                                      child: Text(
+                                                                        listAnnouncement[
+                                                                                index]
+                                                                            .title!,
                                                                         textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
+                                                                            TextAlign
+                                                                                .justify,
+                                                                        overflow:
+                                                                            TextOverflow
+                                                                                .ellipsis,
+                                                                      ),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 3,
+                                                                      child: Text(
+                                                                          GV.readTimestamp(listAnnouncement[index]
+                                                                              .createdAt!),
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment
+                                                                                .center,
+                                                                        children: [
+                                                                          IconButton(
+                                                                            padding: const EdgeInsets
+                                                                                .only(
+                                                                                bottom: 1),
+                                                                            onPressed:
+                                                                                () async {
+                                                                              await editAnnouncement(
+                                                                                context: context,
+                                                                                announcement: listAnnouncement[index],
+                                                                                isCreate: false,
+                                                                              );
+                                                                            },
+                                                                            icon:
+                                                                                Icon(
+                                                                              Icons.edit_document,
+                                                                              color:
+                                                                                  Colors.blue.shade900,
+                                                                              size:
+                                                                                  20,
+                                                                            ),
+                                                                          ),
+                                                                          IconButton(
+                                                                            padding: const EdgeInsets
+                                                                                .only(
+                                                                                bottom: 1),
+                                                                            onPressed:
+                                                                                () async {
+                                                                              await deleteAnnouncement(
+                                                                                context: context,
+                                                                                announcement: listAnnouncement[index],
+                                                                              );
+                                                                            },
+                                                                            icon:
+                                                                                const Icon(
+                                                                              Icons.delete_rounded,
+                                                                              color:
+                                                                                  Colors.red,
+                                                                              size:
+                                                                                  20,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 150),
+                                                            child: Center(
+                                                              child: Text(
+                                                                  'Chưa có thông báo.'),
+                                                            ),
+                                                          );
+                                                  } else {
+                                                    return const Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 150),
+                                                      child: Loading(),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                          )
+                                          : selectedType.value == ''
+                                              ? SingleChildScrollView(
+                                                scrollDirection: Axis.vertical,
+                                                child: StreamBuilder(
+                                                    stream: firestore
+                                                        .collection(
+                                                            'announcements')
+                                                        .snapshots(),
+                                                    builder: (context,
+                                                        snapshotAnnouncement) {
+                                                      if (snapshotAnnouncement
+                                                              .hasData &&
+                                                          snapshotAnnouncement
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .active) {
+                                                        List<AnnouncementModel>
+                                                            listAnnouncement = [];
+                                                        snapshotAnnouncement
+                                                            .data?.docs
+                                                            .forEach((element) {
+                                                          listAnnouncement.add(
+                                                              AnnouncementModel
+                                                                  .fromMap(element
+                                                                      .data()));
+                                                        });
+                                                        return listAnnouncement
+                                                                .isNotEmpty
+                                                            ? ListView.builder(
+                                                                itemCount:
+                                                                    listAnnouncement
+                                                                        .length,
+                                                                shrinkWrap: true,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        index) {
+                                                                  return Container(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.05,
+                                                                    color: index %
+                                                                                2 ==
+                                                                            0
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .shade50
+                                                                        : null,
                                                                     child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
                                                                       children: [
-                                                                        IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom: 1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            await editAnnouncement(
-                                                                              context: context,
-                                                                              announcement: listAnnouncement[index],
-                                                                              isCreate: false,
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              Icon(
-                                                                            Icons.edit_document,
-                                                                            color:
-                                                                                Colors.blue.shade900,
-                                                                            size:
-                                                                                20,
+                                                                        Expanded(
+                                                                          flex: 1,
+                                                                          child: Text(
+                                                                              '${index + 1}',
+                                                                              textAlign:
+                                                                                  TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex: 5,
+                                                                          child:
+                                                                              Text(
+                                                                            listAnnouncement[index]
+                                                                                .title!,
+                                                                            textAlign:
+                                                                                TextAlign.justify,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
                                                                           ),
                                                                         ),
-                                                                        IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom: 1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            await deleteAnnouncement(
-                                                                              context: context,
-                                                                              announcement: listAnnouncement[index],
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              const Icon(
-                                                                            Icons.delete_rounded,
-                                                                            color:
-                                                                                Colors.red,
-                                                                            size:
-                                                                                20,
+                                                                        Expanded(
+                                                                          flex: 3,
+                                                                          child: Text(
+                                                                              GV.readTimestamp(listAnnouncement[index]
+                                                                                  .createdAt!),
+                                                                              textAlign:
+                                                                                  TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex: 2,
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              SizedBox(
+                                                                                child: IconButton(
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  onPressed: () async {
+                                                                                    await editAnnouncement(
+                                                                                      context: context,
+                                                                                      announcement: listAnnouncement[index],
+                                                                                      isCreate: false,
+                                                                                    );
+                                                                                  },
+                                                                                  icon: Icon(
+                                                                                    Icons.edit_document,
+                                                                                    color: Colors.blue.shade900,
+                                                                                    size: 20,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              IconButton(
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () async {
+                                                                                  await deleteAnnouncement(
+                                                                                    context: context,
+                                                                                    announcement: listAnnouncement[index],
+                                                                                  );
+                                                                                },
+                                                                                icon: const Icon(
+                                                                                  Icons.delete_rounded,
+                                                                                  color: Colors.red,
+                                                                                  size: 20,
+                                                                                ),
+                                                                              ),
+                                                                            ],
                                                                           ),
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      : const Padding(
+                                                                  );
+                                                                },
+                                                              )
+                                                            : const Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        top: 150),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                      'Chưa có thông báo.'),
+                                                                ),
+                                                              );
+                                                      } else {
+                                                        return const Padding(
                                                           padding:
                                                               EdgeInsets.only(
                                                                   top: 150),
-                                                          child: Center(
-                                                            child: Text(
-                                                                'Chưa có thông báo.'),
-                                                          ),
+                                                          child: Loading(),
                                                         );
-                                                } else {
-                                                  return const Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 150),
-                                                    child: Loading(),
-                                                  );
-                                                }
-                                              },
-                                            )
-                                          : selectedType.value == ''
-                                              ? StreamBuilder(
-                                                  stream: firestore
-                                                      .collection(
-                                                          'announcements')
-                                                      .snapshots(),
-                                                  builder: (context,
-                                                      snapshotAnnouncement) {
-                                                    if (snapshotAnnouncement
-                                                            .hasData &&
-                                                        snapshotAnnouncement
-                                                                .connectionState ==
-                                                            ConnectionState
-                                                                .active) {
-                                                      List<AnnouncementModel>
-                                                          listAnnouncement = [];
-                                                      snapshotAnnouncement
-                                                          .data?.docs
-                                                          .forEach((element) {
-                                                        listAnnouncement.add(
-                                                            AnnouncementModel
-                                                                .fromMap(element
-                                                                    .data()));
-                                                      });
-                                                      return listAnnouncement
-                                                              .isNotEmpty
-                                                          ? ListView.builder(
-                                                              itemCount:
-                                                                  listAnnouncement
-                                                                      .length,
-                                                              shrinkWrap: true,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Container(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.05,
-                                                                  color: index %
-                                                                              2 ==
-                                                                          0
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade50
-                                                                      : null,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            '${index + 1}',
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 5,
-                                                                        child:
-                                                                            Text(
-                                                                          listAnnouncement[index]
-                                                                              .title!,
-                                                                          textAlign:
-                                                                              TextAlign.justify,
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                        ),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 3,
-                                                                        child: Text(
-                                                                            GV.readTimestamp(listAnnouncement[index]
-                                                                                .createdAt!),
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            SizedBox(
-                                                                              child: IconButton(
-                                                                                padding: const EdgeInsets.only(bottom: 1),
-                                                                                onPressed: () async {
-                                                                                  await editAnnouncement(
-                                                                                    context: context,
-                                                                                    announcement: listAnnouncement[index],
-                                                                                    isCreate: false,
-                                                                                  );
-                                                                                },
-                                                                                icon: Icon(
-                                                                                  Icons.edit_document,
-                                                                                  color: Colors.blue.shade900,
-                                                                                  size: 20,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            IconButton(
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () async {
-                                                                                await deleteAnnouncement(
-                                                                                  context: context,
-                                                                                  announcement: listAnnouncement[index],
-                                                                                );
-                                                                              },
-                                                                              icon: const Icon(
-                                                                                Icons.delete_rounded,
-                                                                                color: Colors.red,
-                                                                                size: 20,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : const Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      top: 150),
-                                                              child: Center(
-                                                                child: Text(
-                                                                    'Chưa có thông báo.'),
-                                                              ),
-                                                            );
-                                                    } else {
-                                                      return const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 150),
-                                                        child: Loading(),
-                                                      );
-                                                    }
-                                                  },
-                                                )
+                                                      }
+                                                    },
+                                                  ),
+                                              )
                                               : const Padding(
                                                   padding:
                                                       EdgeInsets.only(top: 150),

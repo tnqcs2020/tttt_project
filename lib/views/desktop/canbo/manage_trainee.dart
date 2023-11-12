@@ -114,7 +114,7 @@ class _ManageTraineeState extends State<ManageTrainee> {
                             Expanded(
                               child: Container(
                                 constraints: BoxConstraints(
-                                    minHeight: screenHeight * 0.7),
+                                    minHeight: screenHeight * 0.67),
                                 decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
                                     border: Border.all(

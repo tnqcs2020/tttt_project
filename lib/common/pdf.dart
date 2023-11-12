@@ -152,7 +152,7 @@ exportPDF(String classId, String term, NamHoc year,
   List<int> bytes = await document.save();
   document.dispose();
 
-  saveAndLaunchFile(bytes, 'Diem_TTTT_$classId.pdf');
+  savePDF(bytes, 'Diem_TTTT_$classId.pdf');
 }
 
 PdfGrid _addContentRow(
@@ -187,7 +187,7 @@ PdfGrid _addContentRow(
   return grid;
 }
 
-Future<void> saveAndLaunchFile(List<int> bytes, String fileName) async {
+Future<void> savePDF(List<int> bytes, String fileName) async {
   AnchorElement(
     href:
         "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}",

@@ -370,315 +370,309 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                       child:
                                           isLook.value &&
                                                   currentUser.isCompleted.isTrue
-                                              ? StreamBuilder(
-                                                  stream: firestore
-                                                      .collection('credits')
-                                                      .snapshots(),
-                                                  builder: (context, snapshot) {
-                                                    List<CreditModel>
-                                                        loadCredit = [];
-                                                    List<CreditModel>
-                                                        listCredit = [];
-                                                    if (snapshot.hasData &&
-                                                        snapshot.connectionState ==
-                                                            ConnectionState
-                                                                .active) {
-                                                      snapshot.data?.docs
-                                                          .forEach((element) {
-                                                        loadCredit.add(
-                                                            CreditModel.fromMap(
-                                                                element
-                                                                    .data()));
-                                                      });
-                                                      if (selectedCourse ==
-                                                              'Tất cả' &&
-                                                          selectedMajor ==
-                                                              'Tất cả') {
-                                                        loadCredit
+                                              ? SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  child: StreamBuilder(
+                                                    stream: firestore
+                                                        .collection('credits')
+                                                        .snapshots(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      List<CreditModel>
+                                                          loadCredit = [];
+                                                      List<CreditModel>
+                                                          listCredit = [];
+                                                      if (snapshot.hasData &&
+                                                          snapshot.connectionState ==
+                                                              ConnectionState
+                                                                  .active) {
+                                                        snapshot.data?.docs
                                                             .forEach((element) {
-                                                          listCredit
-                                                              .add(element);
+                                                          loadCredit.add(
+                                                              CreditModel.fromMap(
+                                                                  element
+                                                                      .data()));
                                                         });
-                                                      } else if (selectedCourse ==
-                                                          'Tất cả') {
-                                                        loadCredit
-                                                            .forEach((element) {
-                                                          if (element.major ==
-                                                              selectedMajor) {
+                                                        if (selectedCourse ==
+                                                                'Tất cả' &&
+                                                            selectedMajor ==
+                                                                'Tất cả') {
+                                                          loadCredit.forEach(
+                                                              (element) {
                                                             listCredit
                                                                 .add(element);
-                                                          }
-                                                        });
-                                                      } else if (selectedMajor ==
-                                                          'Tất cả') {
-                                                        loadCredit
-                                                            .forEach((element) {
-                                                          if (element.course ==
-                                                              selectedCourse) {
-                                                            listCredit
-                                                                .add(element);
-                                                          }
-                                                        });
-                                                      }
-                                                      listCredit.sort(
-                                                        (a, b) => a.creditId
-                                                            .compareTo(
-                                                                b.creditId),
-                                                      );
-                                                      return listCredit
-                                                              .isNotEmpty
-                                                          ? ListView.builder(
-                                                              itemCount:
-                                                                  listCredit
-                                                                      .length,
-                                                              shrinkWrap: true,
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Container(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.05,
-                                                                  color: index %
-                                                                              2 ==
-                                                                          0
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade50
-                                                                      : null,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            '${index + 1}',
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child: Text(
-                                                                            listCredit[index]
-                                                                                .creditId
-                                                                                .toUpperCase(),
-                                                                            textAlign:
-                                                                                TextAlign.justify),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 3,
-                                                                        child: Text(
-                                                                            listCredit[index]
-                                                                                .creditName,
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                            overflow: TextOverflow.ellipsis),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 4,
-                                                                        child: Text(
-                                                                            listCredit[index]
-                                                                                .major,
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                            overflow: TextOverflow.ellipsis),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            listCredit[index]
-                                                                                .course,
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            IconButton(
-                                                                                tooltip: 'Cập nhật thông tin học phần',
-                                                                                onPressed: () async {
-                                                                                  await addAndEditCredit(credit: listCredit[index], isCreate: false);
-                                                                                },
-                                                                                padding: const EdgeInsets.only(bottom: 1),
-                                                                                icon: Icon(
-                                                                                  Icons.edit_square,
-                                                                                  color: Colors.blue.shade900,
-                                                                                )),
-                                                                            IconButton(
-                                                                                tooltip: 'Xóa học phần',
-                                                                                onPressed: () {
-                                                                                  deleteCredit(context: context, creditId: listCredit[index].creditId);
-                                                                                },
-                                                                                padding: const EdgeInsets.only(bottom: 1),
-                                                                                icon: const Icon(
-                                                                                  Icons.delete,
-                                                                                  color: Colors.red,
-                                                                                )),
-                                                                          ],
+                                                          });
+                                                        } else if (selectedCourse ==
+                                                            'Tất cả') {
+                                                          loadCredit.forEach(
+                                                              (element) {
+                                                            if (element.major ==
+                                                                selectedMajor) {
+                                                              listCredit
+                                                                  .add(element);
+                                                            }
+                                                          });
+                                                        } else if (selectedMajor ==
+                                                            'Tất cả') {
+                                                          loadCredit.forEach(
+                                                              (element) {
+                                                            if (element
+                                                                    .course ==
+                                                                selectedCourse) {
+                                                              listCredit
+                                                                  .add(element);
+                                                            }
+                                                          });
+                                                        }
+                                                        listCredit.sort(
+                                                          (a, b) => a.creditId
+                                                              .compareTo(
+                                                                  b.creditId),
+                                                        );
+                                                        return listCredit
+                                                                .isNotEmpty
+                                                            ? ListView.builder(
+                                                                itemCount:
+                                                                    listCredit
+                                                                        .length,
+                                                                shrinkWrap:
+                                                                    true,
+                                                                scrollDirection:
+                                                                    Axis.vertical,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        index) {
+                                                                  return Container(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.05,
+                                                                    color: index %
+                                                                                2 ==
+                                                                            0
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .shade50
+                                                                        : null,
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child: Text(
+                                                                              '${index + 1}',
+                                                                              textAlign: TextAlign.center),
                                                                         ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : const Center(
-                                                              child: Text(
-                                                                  'Chưa có học phần.'),
-                                                            );
-                                                    } else {
-                                                      return const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Loading(),
-                                                        ],
-                                                      );
-                                                    }
-                                                  },
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child: Text(
+                                                                              listCredit[index].creditId.toUpperCase(),
+                                                                              textAlign: TextAlign.justify),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              3,
+                                                                          child: Text(
+                                                                              listCredit[index].creditName,
+                                                                              textAlign: TextAlign.justify,
+                                                                              overflow: TextOverflow.ellipsis),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              4,
+                                                                          child: Text(
+                                                                              listCredit[index].major,
+                                                                              textAlign: TextAlign.justify,
+                                                                              overflow: TextOverflow.ellipsis),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child: Text(
+                                                                              listCredit[index].course,
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              IconButton(
+                                                                                  tooltip: 'Cập nhật thông tin học phần',
+                                                                                  onPressed: () async {
+                                                                                    await addAndEditCredit(credit: listCredit[index], isCreate: false);
+                                                                                  },
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  icon: Icon(
+                                                                                    Icons.edit_square,
+                                                                                    color: Colors.blue.shade900,
+                                                                                  )),
+                                                                              IconButton(
+                                                                                  tooltip: 'Xóa học phần',
+                                                                                  onPressed: () {
+                                                                                    deleteCredit(context: context, creditId: listCredit[index].creditId);
+                                                                                  },
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  icon: const Icon(
+                                                                                    Icons.delete,
+                                                                                    color: Colors.red,
+                                                                                  )),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              )
+                                                            : const Center(
+                                                                child: Text(
+                                                                    'Chưa có học phần.'),
+                                                              );
+                                                      } else {
+                                                        return const Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Loading(),
+                                                          ],
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
                                                 )
                                               : selectedCourse.isEmpty &&
                                                       selectedMajor.isEmpty
-                                                  ? StreamBuilder(
-                                                      stream: firestore
-                                                          .collection('credits')
-                                                          .snapshots(),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        List<CreditModel>
-                                                            listCredit = [];
-                                                        if (snapshot.hasData &&
-                                                            snapshot.connectionState ==
-                                                                ConnectionState
-                                                                    .active) {
-                                                          snapshot.data?.docs
-                                                              .forEach(
-                                                                  (element) {
-                                                            listCredit.add(
-                                                                CreditModel.fromMap(
-                                                                    element
-                                                                        .data()));
-                                                          });
-                                                          listCredit.sort(
-                                                            (a, b) => a.creditId
-                                                                .compareTo(
-                                                                    b.creditId),
-                                                          );
-                                                          return listCredit
-                                                                  .isNotEmpty
-                                                              ? ListView
-                                                                  .builder(
-                                                                  itemCount:
-                                                                      listCredit
-                                                                          .length,
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  scrollDirection:
-                                                                      Axis.vertical,
-                                                                  itemBuilder:
-                                                                      (context,
-                                                                          index) {
-                                                                    return Container(
-                                                                      height:
-                                                                          screenHeight *
-                                                                              0.05,
-                                                                      color: index % 2 ==
-                                                                              0
-                                                                          ? Colors
-                                                                              .blue
-                                                                              .shade50
-                                                                          : null,
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Expanded(
-                                                                            flex:
-                                                                                1,
-                                                                            child:
-                                                                                Text('${index + 1}', textAlign: TextAlign.center),
-                                                                          ),
-                                                                          Expanded(
-                                                                            flex:
-                                                                                2,
-                                                                            child:
-                                                                                Text(listCredit[index].creditId.toUpperCase(), textAlign: TextAlign.justify),
-                                                                          ),
-                                                                          Expanded(
-                                                                            flex:
-                                                                                3,
-                                                                            child: Text(listCredit[index].creditName,
-                                                                                textAlign: TextAlign.justify,
-                                                                                overflow: TextOverflow.ellipsis),
-                                                                          ),
-                                                                          Expanded(
-                                                                            flex:
-                                                                                4,
-                                                                            child: Text(listCredit[index].major,
-                                                                                textAlign: TextAlign.justify,
-                                                                                overflow: TextOverflow.ellipsis),
-                                                                          ),
-                                                                          Expanded(
-                                                                            flex:
-                                                                                1,
-                                                                            child:
-                                                                                Text(listCredit[index].course, textAlign: TextAlign.center),
-                                                                          ),
-                                                                          Expanded(
-                                                                            flex:
-                                                                                2,
-                                                                            child:
-                                                                                Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                              children: [
-                                                                                IconButton(
-                                                                                    tooltip: 'Cập nhật thông tin học phần',
-                                                                                    onPressed: () async {
-                                                                                      await addAndEditCredit(credit: listCredit[index], isCreate: false);
-                                                                                    },
-                                                                                    padding: const EdgeInsets.only(bottom: 1),
-                                                                                    icon: Icon(
-                                                                                      Icons.edit_square,
-                                                                                      color: Colors.blue.shade900,
-                                                                                    )),
-                                                                                IconButton(
-                                                                                    tooltip: 'Xóa học phần',
-                                                                                    onPressed: () {
-                                                                                      deleteCredit(context: context, creditId: listCredit[index].creditId);
-                                                                                    },
-                                                                                    padding: const EdgeInsets.only(bottom: 1),
-                                                                                    icon: const Icon(
-                                                                                      Icons.delete,
-                                                                                      color: Colors.red,
-                                                                                    )),
-                                                                              ],
+                                                  ? SingleChildScrollView(
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      child: StreamBuilder(
+                                                        stream: firestore
+                                                            .collection(
+                                                                'credits')
+                                                            .snapshots(),
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          List<CreditModel>
+                                                              listCredit = [];
+                                                          if (snapshot
+                                                                  .hasData &&
+                                                              snapshot.connectionState ==
+                                                                  ConnectionState
+                                                                      .active) {
+                                                            snapshot.data?.docs
+                                                                .forEach(
+                                                                    (element) {
+                                                              listCredit.add(
+                                                                  CreditModel
+                                                                      .fromMap(
+                                                                          element
+                                                                              .data()));
+                                                            });
+                                                            listCredit.sort(
+                                                              (a, b) => a
+                                                                  .creditId
+                                                                  .compareTo(b
+                                                                      .creditId),
+                                                            );
+                                                            return listCredit
+                                                                    .isNotEmpty
+                                                                ? ListView
+                                                                    .builder(
+                                                                    itemCount:
+                                                                        listCredit
+                                                                            .length,
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    scrollDirection:
+                                                                        Axis.vertical,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return Container(
+                                                                        height: screenHeight *
+                                                                            0.05,
+                                                                        color: index % 2 ==
+                                                                                0
+                                                                            ? Colors.blue.shade50
+                                                                            : null,
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Text('${index + 1}', textAlign: TextAlign.center),
                                                                             ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                )
-                                                              : const Center(
-                                                                  child: Text(
-                                                                      'Chưa có học phần.'),
-                                                                );
-                                                        } else {
-                                                          return const Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Loading(),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
+                                                                            Expanded(
+                                                                              flex: 2,
+                                                                              child: Text(listCredit[index].creditId.toUpperCase(), textAlign: TextAlign.justify),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 3,
+                                                                              child: Text(listCredit[index].creditName, textAlign: TextAlign.justify, overflow: TextOverflow.ellipsis),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 4,
+                                                                              child: Text(listCredit[index].major, textAlign: TextAlign.justify, overflow: TextOverflow.ellipsis),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Text(listCredit[index].course, textAlign: TextAlign.center),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 2,
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                                children: [
+                                                                                  IconButton(
+                                                                                      tooltip: 'Cập nhật thông tin học phần',
+                                                                                      onPressed: () async {
+                                                                                        await addAndEditCredit(credit: listCredit[index], isCreate: false);
+                                                                                      },
+                                                                                      padding: const EdgeInsets.only(bottom: 1),
+                                                                                      icon: Icon(
+                                                                                        Icons.edit_square,
+                                                                                        color: Colors.blue.shade900,
+                                                                                      )),
+                                                                                  IconButton(
+                                                                                      tooltip: 'Xóa học phần',
+                                                                                      onPressed: () {
+                                                                                        deleteCredit(context: context, creditId: listCredit[index].creditId);
+                                                                                      },
+                                                                                      padding: const EdgeInsets.only(bottom: 1),
+                                                                                      icon: const Icon(
+                                                                                        Icons.delete,
+                                                                                        color: Colors.red,
+                                                                                      )),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  )
+                                                                : const Center(
+                                                                    child: Text(
+                                                                        'Chưa có học phần.'),
+                                                                  );
+                                                          } else {
+                                                            return const Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Loading(),
+                                                              ],
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
                                                     )
                                                   : const Center(
                                                       child: Text(

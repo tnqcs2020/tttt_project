@@ -367,271 +367,275 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       ),
                                     ),
                                     Expanded(
-                                      child: isLook.value &&
-                                              currentUser.isCompleted.isTrue
-                                          ? StreamBuilder(
-                                              stream: firestore
-                                                  .collection('trainees')
-                                                  .snapshots(),
-                                              builder: (context, snapshot) {
-                                                List<RegisterTraineeModel>
-                                                    loadTrainee = [];
-                                                List<RegisterTraineeModel>
-                                                    dstttt = [];
-                                                if (snapshot.hasData &&
-                                                    snapshot.connectionState ==
-                                                        ConnectionState
-                                                            .active) {
-                                                  snapshot.data?.docs
-                                                      .forEach((element) {
-                                                    loadTrainee.add(
-                                                        RegisterTraineeModel
-                                                            .fromMap(element
-                                                                .data()));
-                                                  });
-                                                  if (selectedHK ==
-                                                          HocKy.tatca &&
-                                                      selectedNH ==
-                                                          NamHoc.tatca) {
-                                                    loadTrainee.forEach((e) {
-                                                      dstttt.add(e);
-                                                    });
-                                                  } else if (selectedHK ==
-                                                      HocKy.tatca) {
-                                                    loadTrainee.forEach((e) {
-                                                      if (e.yearStart ==
-                                                          selectedNH.start) {
-                                                        dstttt.add(e);
-                                                      }
-                                                    });
-                                                  } else if (selectedNH ==
-                                                      NamHoc.tatca) {
-                                                    loadTrainee.forEach((e) {
-                                                      if (e.term ==
-                                                          selectedHK) {
-                                                        dstttt.add(e);
-                                                      }
-                                                    });
-                                                  } else {
-                                                    loadTrainee.forEach((e) {
-                                                      if (e.term ==
-                                                              selectedHK &&
-                                                          e.yearStart ==
-                                                              selectedNH
-                                                                  .start) {
-                                                        dstttt.add(e);
-                                                      }
-                                                    });
-                                                  }
-                                                  dstttt.sort(
-                                                    (a, b) => a.userId!
-                                                        .compareTo(b.userId!),
-                                                  );
-                                                  return dstttt.isNotEmpty
-                                                      ? ListView.builder(
-                                                          itemCount:
-                                                              dstttt.length,
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            return Container(
-                                                              height:
-                                                                  screenHeight *
-                                                                      0.05,
-                                                              color: index %
-                                                                          2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                              child: Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                        '${index + 1}',
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: Text(
-                                                                        dstttt[index]
-                                                                            .userId!
-                                                                            .toUpperCase(),
-                                                                        textAlign:
-                                                                            TextAlign.justify),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 4,
-                                                                    child: Text(
-                                                                        dstttt[index]
-                                                                            .studentName!,
-                                                                        textAlign:
-                                                                            TextAlign.justify),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 5,
-                                                                    child: Text(
-                                                                      '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .justify,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                    ),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                        dstttt[index]
-                                                                            .course!,
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      : const Center(
-                                                          child: Text(
-                                                              'Chưa có sinh viên đăng ký.'),
+                                      child:
+                                          isLook.value &&
+                                                  currentUser.isCompleted.isTrue
+                                              ? SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  child: StreamBuilder(
+                                                    stream: firestore
+                                                        .collection('trainees')
+                                                        .snapshots(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      List<RegisterTraineeModel>
+                                                          loadTrainee = [];
+                                                      List<RegisterTraineeModel>
+                                                          dstttt = [];
+                                                      if (snapshot.hasData &&
+                                                          snapshot.connectionState ==
+                                                              ConnectionState
+                                                                  .active) {
+                                                        snapshot.data?.docs
+                                                            .forEach((element) {
+                                                          loadTrainee.add(
+                                                              RegisterTraineeModel
+                                                                  .fromMap(element
+                                                                      .data()));
+                                                        });
+                                                        if (selectedHK ==
+                                                                HocKy.tatca &&
+                                                            selectedNH ==
+                                                                NamHoc.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            dstttt.add(e);
+                                                          });
+                                                        } else if (selectedHK ==
+                                                            HocKy.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.yearStart ==
+                                                                selectedNH
+                                                                    .start) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        } else if (selectedNH ==
+                                                            NamHoc.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.term ==
+                                                                selectedHK) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        } else {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.term ==
+                                                                    selectedHK &&
+                                                                e.yearStart ==
+                                                                    selectedNH
+                                                                        .start) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        }
+                                                        dstttt.sort(
+                                                          (a, b) => a.userId!
+                                                              .compareTo(
+                                                                  b.userId!),
                                                         );
-                                                } else {
-                                                  return const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Loading(),
-                                                        ],
-                                                      );
-                                                }
-                                              },
-                                            )
-                                          : selectedHK.isEmpty &&
-                                                  selectedNH.start.isEmpty &&
-                                                  selectedNH.end.isEmpty
-                                              ? StreamBuilder(
-                                                  stream: firestore
-                                                      .collection('trainees')
-                                                      .snapshots(),
-                                                  builder: (context, snapshot) {
-                                                    List<RegisterTraineeModel>
-                                                        dstttt = [];
-                                                    if (snapshot.hasData &&
-                                                        snapshot.connectionState ==
-                                                            ConnectionState
-                                                                .active) {
-                                                      snapshot.data?.docs
-                                                          .forEach((element) {
-                                                        dstttt.add(
-                                                            RegisterTraineeModel
-                                                                .fromMap(element
-                                                                    .data()));
-                                                      });
-                                                      dstttt.sort(
-                                                        (a, b) => a.userId!
-                                                            .compareTo(
-                                                                b.userId!),
-                                                      );
-                                                      return dstttt.isNotEmpty
-                                                          ? ListView.builder(
-                                                              itemCount:
-                                                                  dstttt.length,
-                                                              shrinkWrap: true,
-                                                              scrollDirection:
-                                                                  Axis.vertical,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Container(
-                                                                  height:
-                                                                      screenHeight *
-                                                                          0.05,
-                                                                  color: index %
-                                                                              2 ==
-                                                                          0
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade50
-                                                                      : null,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            '${index + 1}',
-                                                                            textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 2,
-                                                                        child: Text(
-                                                                            dstttt[index]
-                                                                                .userId!
-                                                                                .toUpperCase(),
-                                                                            textAlign:
-                                                                                TextAlign.justify),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 4,
-                                                                        child:
-                                                                            Text(
-                                                                          dstttt[index]
-                                                                              .studentName!,
-                                                                          textAlign:
-                                                                              TextAlign.justify,
+                                                        return dstttt.isNotEmpty
+                                                            ? ListView.builder(
+                                                                itemCount:
+                                                                    dstttt
+                                                                        .length,
+                                                                shrinkWrap:
+                                                                    true,
+                                                                scrollDirection:
+                                                                    Axis.vertical,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        index) {
+                                                                  return Container(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.05,
+                                                                    color: index %
+                                                                                2 ==
+                                                                            0
+                                                                        ? Colors
+                                                                            .blue
+                                                                            .shade50
+                                                                        : null,
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child: Text(
+                                                                              '${index + 1}',
+                                                                              textAlign: TextAlign.center),
                                                                         ),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 5,
-                                                                        child:
-                                                                            Text(
-                                                                          '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                          textAlign:
-                                                                              TextAlign.justify,
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child: Text(
+                                                                              dstttt[index].userId!.toUpperCase(),
+                                                                              textAlign: TextAlign.justify),
                                                                         ),
-                                                                      ),
-                                                                      Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            dstttt[index]
-                                                                                .course!,
+                                                                        Expanded(
+                                                                          flex:
+                                                                              4,
+                                                                          child: Text(
+                                                                              dstttt[index].studentName!,
+                                                                              textAlign: TextAlign.justify),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              5,
+                                                                          child:
+                                                                              Text(
+                                                                            '${dstttt[index].creditId} - ${dstttt[index].creditName}',
                                                                             textAlign:
-                                                                                TextAlign.center),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : const Center(
-                                                              child: Text(
-                                                                  'Chưa có sinh viên đăng ký.'),
-                                                            );
-                                                    } else {
-                                                      return const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Loading(),
-                                                        ],
-                                                      );
-                                                    }
-                                                  },
+                                                                                TextAlign.justify,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                          ),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              1,
+                                                                          child: Text(
+                                                                              dstttt[index].course!,
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              )
+                                                            : const Center(
+                                                                child: Text(
+                                                                    'Chưa có sinh viên đăng ký.'),
+                                                              );
+                                                      } else {
+                                                        return const Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Loading(),
+                                                          ],
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
                                                 )
-                                              : const Center(
-                                                  child: Text(
-                                                      'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
-                                                ),
+                                              : selectedHK.isEmpty &&
+                                                      selectedNH
+                                                          .start.isEmpty &&
+                                                      selectedNH.end.isEmpty
+                                                  ? SingleChildScrollView(
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      child: StreamBuilder(
+                                                        stream: firestore
+                                                            .collection(
+                                                                'trainees')
+                                                            .snapshots(),
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          List<RegisterTraineeModel>
+                                                              dstttt = [];
+                                                          if (snapshot
+                                                                  .hasData &&
+                                                              snapshot.connectionState ==
+                                                                  ConnectionState
+                                                                      .active) {
+                                                            snapshot.data?.docs
+                                                                .forEach(
+                                                                    (element) {
+                                                              dstttt.add(RegisterTraineeModel
+                                                                  .fromMap(element
+                                                                      .data()));
+                                                            });
+                                                            dstttt.sort(
+                                                              (a, b) => a
+                                                                  .userId!
+                                                                  .compareTo(b
+                                                                      .userId!),
+                                                            );
+                                                            return dstttt
+                                                                    .isNotEmpty
+                                                                ? ListView
+                                                                    .builder(
+                                                                    itemCount:
+                                                                        dstttt
+                                                                            .length,
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    scrollDirection:
+                                                                        Axis.vertical,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return Container(
+                                                                        height: screenHeight *
+                                                                            0.05,
+                                                                        color: index % 2 ==
+                                                                                0
+                                                                            ? Colors.blue.shade50
+                                                                            : null,
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Text('${index + 1}', textAlign: TextAlign.center),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 2,
+                                                                              child: Text(dstttt[index].userId!.toUpperCase(), textAlign: TextAlign.justify),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 4,
+                                                                              child: Text(
+                                                                                dstttt[index].studentName!,
+                                                                                textAlign: TextAlign.justify,
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 5,
+                                                                              child: Text(
+                                                                                '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                                textAlign: TextAlign.justify,
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Text(dstttt[index].course!, textAlign: TextAlign.center),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  )
+                                                                : const Center(
+                                                                    child: Text(
+                                                                        'Chưa có sinh viên đăng ký.'),
+                                                                  );
+                                                          } else {
+                                                            return const Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Loading(),
+                                                              ],
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
+                                                    )
+                                                  : const Center(
+                                                      child: Text(
+                                                          'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                                    ),
                                     )
                                   ],
                                 ),

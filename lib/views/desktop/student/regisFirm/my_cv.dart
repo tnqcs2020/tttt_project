@@ -377,7 +377,12 @@ class _MyCVState extends State<MyCV> {
                                                           leading: const Icon(
                                                               Icons.house),
                                                           title: Text(
-                                                              firm.firmName!),
+                                                            firm.firmName!,
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
                                                           subtitle: Text(
                                                             firm.describe!,
                                                             overflow:
@@ -544,8 +549,15 @@ class _MyCVState extends State<MyCV> {
                                                                                         child: ListTile(
                                                                                           dense: true,
                                                                                           contentPadding: EdgeInsets.zero,
-                                                                                          title: Text('${job.jobName} - SL: ${job.quantity}'),
-                                                                                          subtitle: Text('${job.describeJob}'),
+                                                                                          title: Text(
+                                                                                            '${job.jobName}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          ),
+                                                                                          subtitle: Text(
+                                                                                            '${job.describeJob}',
+                                                                                            textAlign: TextAlign.justify,
+                                                                                            overflow: TextOverflow.clip,
+                                                                                          ),
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -571,8 +583,15 @@ class _MyCVState extends State<MyCV> {
                                                                                         child: ListTile(
                                                                                           dense: true,
                                                                                           contentPadding: EdgeInsets.zero,
-                                                                                          title: Text('${job.jobName}'),
-                                                                                          subtitle: Text('${job.describeJob}'),
+                                                                                          title: Text(
+                                                                                            '${job.jobName}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          ),
+                                                                                          subtitle: Text(
+                                                                                            '${job.describeJob}',
+                                                                                            textAlign: TextAlign.justify,
+                                                                                            overflow: TextOverflow.clip,
+                                                                                          ),
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -603,8 +622,15 @@ class _MyCVState extends State<MyCV> {
                                                                                         child: ListTile(
                                                                                           dense: true,
                                                                                           contentPadding: EdgeInsets.zero,
-                                                                                          title: Text('${job.jobName} - SL: ${job.quantity}'),
-                                                                                          subtitle: Text('${job.describeJob}'),
+                                                                                          title: Text(
+                                                                                            '${job.jobName}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          ),
+                                                                                          subtitle: Text(
+                                                                                            '${job.describeJob}',
+                                                                                            textAlign: TextAlign.justify,
+                                                                                            overflow: TextOverflow.clip,
+                                                                                          ),
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -627,7 +653,7 @@ class _MyCVState extends State<MyCV> {
                                                                                     for (var data in firm.listJob!)
                                                                                       Obx(
                                                                                         () => CustomRadio(
-                                                                                          title: '${data.jobName} - SL còn lai: ${data.quantity}',
+                                                                                          title: '${data.jobName}',
                                                                                           onTap: () => currentUser.selectedJob.value = data,
                                                                                           subtitle: '${data.describeJob}',
                                                                                           selected: currentUser.selectedJob.value == data,
@@ -648,8 +674,15 @@ class _MyCVState extends State<MyCV> {
                                                                                         child: ListTile(
                                                                                           dense: true,
                                                                                           contentPadding: EdgeInsets.zero,
-                                                                                          title: Text('${job.jobName}'),
-                                                                                          subtitle: Text('${job.describeJob}'),
+                                                                                          title: Text(
+                                                                                            '${job.jobName}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          ),
+                                                                                          subtitle: Text(
+                                                                                            '${job.describeJob}',
+                                                                                            textAlign: TextAlign.justify,
+                                                                                            overflow: TextOverflow.clip,
+                                                                                          ),
                                                                                         ),
                                                                                       ),
                                                                                   ],

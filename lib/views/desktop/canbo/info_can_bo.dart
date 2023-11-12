@@ -156,7 +156,7 @@ class _InfoCBState extends State<InfoCB> {
                       phoneCBCtrl.text != currentUser.phone.value ||
                       emailCBCtrl.text != currentUser.email.value) {
                     GV.usersCol.doc(currentUser.userId.value).update({
-                      'name': nameCBCtrl.text,
+                      'userName': nameCBCtrl.text,
                       'phone': phoneCBCtrl.text,
                       'email': emailCBCtrl.text
                     });

@@ -340,6 +340,10 @@ class _ListFirmState extends State<ListFirm> {
                                                               overflow:
                                                                   TextOverflow
                                                                       .ellipsis,
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
                                                             ),
                                                             Text(
                                                               'Mô tả: ${firmResult[indexFirm].describe}',
@@ -559,13 +563,15 @@ class _ListFirmState extends State<ListFirm> {
                                                         '${firms[indexFirm].firmName}',
                                                         overflow: TextOverflow
                                                             .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
                                                       ),
                                                       Text(
                                                         'Mô tả: ${firms[indexFirm].describe}',
                                                         overflow: TextOverflow
                                                             .ellipsis,
-                                                        style: const TextStyle(
-                                                            fontSize: 13),
                                                       ),
                                                     ],
                                                   ),

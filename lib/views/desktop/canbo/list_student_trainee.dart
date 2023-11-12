@@ -14,7 +14,7 @@ import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/plan_work_model.dart'; 
+import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
@@ -275,7 +275,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15),
+                padding: const EdgeInsets.only(top: 15, bottom: 35),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
@@ -285,7 +285,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                     children: [
                       Container(
                         color: Colors.green,
-                        height: screenHeight * 0.035,
+                        height: screenHeight * 0.04,
                         child: const Row(
                           children: [
                             Expanded(
@@ -346,747 +346,716 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                       ),
                       isViewed.value && currentUser.isCompleted.isTrue
                           ? Expanded(
-                              child: StreamBuilder(
-                                stream: firestore
-                                    .collection('firms')
-                                    .where('firmId',
-                                        isEqualTo: currentUser.userId.value)
-                                    .snapshots(),
-                                builder: (context, snapshotFirm) {
-                                  if (snapshotFirm.hasData &&
-                                      snapshotFirm.data != null &&
-                                      snapshotFirm.connectionState ==
-                                          ConnectionState.active) {
-                                    List<FirmModel> loadFirms = [];
-                                    List<JobRegisterModel> listRegis = [];
-                                    if (snapshotFirm.data!.docs.isNotEmpty) {
-                                      snapshotFirm.data!.docs.forEach(
-                                          (element) => loadFirms.add(
-                                              FirmModel.fromMap(
-                                                  element.data())));
-                                      for (var e
-                                          in loadFirms.first.listRegis!) {
-                                        if (e.isConfirmed == true) {
-                                          listRegis.add(e);
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: StreamBuilder(
+                                  stream: firestore
+                                      .collection('firms')
+                                      .where('firmId',
+                                          isEqualTo: currentUser.userId.value)
+                                      .snapshots(),
+                                  builder: (context, snapshotFirm) {
+                                    if (snapshotFirm.hasData &&
+                                        snapshotFirm.data != null &&
+                                        snapshotFirm.connectionState ==
+                                            ConnectionState.active) {
+                                      List<FirmModel> loadFirms = [];
+                                      List<JobRegisterModel> listRegis = [];
+                                      if (snapshotFirm.data!.docs.isNotEmpty) {
+                                        snapshotFirm.data!.docs.forEach(
+                                            (element) => loadFirms.add(
+                                                FirmModel.fromMap(
+                                                    element.data())));
+                                        for (var e
+                                            in loadFirms.first.listRegis!) {
+                                          if (e.isConfirmed == true) {
+                                            listRegis.add(e);
+                                          }
                                         }
                                       }
-                                    }
-                                    List<JobRegisterModel> listSelect = [];
-                                    listRegis.forEach((e1) {
-                                      trainees.forEach((e2) {
-                                        if (selectedHK == HocKy.tatca &&
-                                            selectedNH == NamHoc.tatca) {
-                                          if (e1.userId == e2.userId) {
-                                            listSelect.add(e1);
-                                          }
-                                        } else if (selectedHK == HocKy.tatca) {
-                                          if (e1.userId == e2.userId &&
+                                      List<JobRegisterModel> listSelect = [];
+                                      listRegis.forEach((e1) {
+                                        trainees.forEach((e2) {
+                                          if (selectedHK == HocKy.tatca &&
+                                              selectedNH == NamHoc.tatca) {
+                                            if (e1.userId == e2.userId) {
+                                              listSelect.add(e1);
+                                            }
+                                          } else if (selectedHK ==
+                                              HocKy.tatca) {
+                                            if (e1.userId == e2.userId &&
+                                                e2.yearStart ==
+                                                    selectedNH.start) {
+                                              listSelect.add(e1);
+                                            }
+                                          } else if (selectedNH ==
+                                              NamHoc.tatca) {
+                                            if (e1.userId == e2.userId &&
+                                                e2.term == selectedHK) {
+                                              listSelect.add(e1);
+                                            }
+                                          } else if (e1.userId == e2.userId &&
+                                              e2.term == selectedHK &&
                                               e2.yearStart ==
                                                   selectedNH.start) {
                                             listSelect.add(e1);
                                           }
-                                        } else if (selectedNH == NamHoc.tatca) {
-                                          if (e1.userId == e2.userId &&
-                                              e2.term == selectedHK) {
-                                            listSelect.add(e1);
-                                          }
-                                        } else if (e1.userId == e2.userId &&
-                                            e2.term == selectedHK &&
-                                            e2.yearStart == selectedNH.start) {
-                                          listSelect.add(e1);
-                                        }
+                                        });
                                       });
-                                    });
-                                    return listSelect.isNotEmpty
-                                        ? ListView.builder(
-                                            itemCount: listSelect.length,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, indexRegis) {
-                                              return StreamBuilder(
-                                                  stream: firestore
-                                                      .collection('plans')
-                                                      .where('userId',
-                                                          isEqualTo: listRegis[
-                                                                  indexRegis]
-                                                              .userId)
-                                                      .snapshots(),
-                                                  builder:
-                                                      (context, snapshotPlan) {
-                                                    if (snapshotPlan.hasData &&
-                                                        snapshotPlan.data !=
-                                                            null &&
-                                                        snapshotPlan
-                                                                .connectionState ==
-                                                            ConnectionState
-                                                                .active) {
-                                                      PlanWorkModel plan =
-                                                          PlanWorkModel();
-                                                      List<PlanWorkModel>
-                                                          listPlan = [];
-                                                      RegisterTraineeModel
-                                                          trainee =
-                                                          RegisterTraineeModel();
-                                                      if (snapshotPlan.data!
-                                                          .docs.isNotEmpty) {
-                                                        snapshotPlan.data!.docs
-                                                            .forEach((element) =>
-                                                                listPlan.add(
-                                                                    PlanWorkModel
-                                                                        .fromMap(
-                                                                            element.data())));
-                                                        listPlan
-                                                            .forEach((element) {
-                                                          if (element.userId ==
-                                                              listRegis[
-                                                                      indexRegis]
-                                                                  .userId) {
-                                                            plan = element;
-                                                          }
-                                                        });
-                                                      }
-                                                      return Container(
-                                                        height:
-                                                            screenHeight * 0.05,
-                                                        color:
-                                                            indexRegis % 2 == 0
-                                                                ? Colors.blue
-                                                                    .shade50
-                                                                : null,
-                                                        child: Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: Text(
-                                                                  '${indexRegis + 1}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center),
-                                                            ),
-                                                            Expanded(
-                                                              flex: 2,
-                                                              child: Text(
-                                                                  '${listRegis[indexRegis].userId}'
-                                                                      .toUpperCase(),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify),
-                                                            ),
-                                                            Expanded(
-                                                              flex: 3,
-                                                              child: Text(
-                                                                  '${listRegis[indexRegis].userName}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify),
-                                                            ),
-                                                            Expanded(
-                                                              flex: 4,
-                                                              child: Text(
-                                                                '${listRegis[indexRegis].jobName}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .justify,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
+                                      return listSelect.isNotEmpty
+                                          ? ListView.builder(
+                                              itemCount: listSelect.length,
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (context, indexRegis) {
+                                                return StreamBuilder(
+                                                    stream: firestore
+                                                        .collection('plans')
+                                                        .where('userId',
+                                                            isEqualTo: listRegis[
+                                                                    indexRegis]
+                                                                .userId)
+                                                        .snapshots(),
+                                                    builder: (context,
+                                                        snapshotPlan) {
+                                                      if (snapshotPlan
+                                                              .hasData &&
+                                                          snapshotPlan.data !=
+                                                              null &&
+                                                          snapshotPlan
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .active) {
+                                                        PlanWorkModel plan =
+                                                            PlanWorkModel();
+                                                        List<PlanWorkModel>
+                                                            listPlan = [];
+                                                        RegisterTraineeModel
+                                                            trainee =
+                                                            RegisterTraineeModel();
+                                                        if (snapshotPlan.data!
+                                                            .docs.isNotEmpty) {
+                                                          snapshotPlan
+                                                              .data!.docs
+                                                              .forEach((element) =>
+                                                                  listPlan.add(
+                                                                      PlanWorkModel.fromMap(
+                                                                          element
+                                                                              .data())));
+                                                          listPlan.forEach(
+                                                              (element) {
+                                                            if (element
+                                                                    .userId ==
+                                                                listRegis[
+                                                                        indexRegis]
+                                                                    .userId) {
+                                                              plan = element;
+                                                            }
+                                                          });
+                                                        }
+                                                        return Container(
+                                                          height: screenHeight *
+                                                              0.05,
+                                                          color:
+                                                              indexRegis % 2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child: Text(
+                                                                    '${indexRegis + 1}',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center),
                                                               ),
-                                                            ),
-                                                            Expanded(
-                                                                child: plan
-                                                                        .listWork!
-                                                                        .isEmpty
-                                                                    ? const Icon(
-                                                                        Icons
-                                                                            .not_interested_rounded,
-                                                                        color: Colors
-                                                                            .grey,
-                                                                      )
-                                                                    : const Icon(
-                                                                        Icons
-                                                                            .check_circle_rounded,
-                                                                        color: Colors
-                                                                            .green,
-                                                                      )),
-                                                            Expanded(
-                                                              child:
-                                                                  StreamBuilder(
-                                                                      stream: firestore
-                                                                          .collection(
-                                                                              'appreciates')
-                                                                          .doc(listRegis[indexRegis]
-                                                                              .userId)
-                                                                          .snapshots(),
-                                                                      builder:
-                                                                          (context,
-                                                                              snapshotA) {
-                                                                        if (snapshotA.hasData &&
-                                                                            snapshotA.data !=
-                                                                                null &&
-                                                                            snapshotA.data!.data() !=
-                                                                                null) {
-                                                                          final app = AppreciateModel.fromMap(snapshotA
-                                                                              .data!
-                                                                              .data()!);
-                                                                          double
-                                                                              total =
-                                                                              0;
-                                                                          app.listContent!
-                                                                              .forEach((element) {
-                                                                            total +=
-                                                                                element.point!;
-                                                                          });
-                                                                          return Text(
-                                                                            total > 70
-                                                                                ? '$total/100'
-                                                                                : '$total/70',
-                                                                            style:
-                                                                                const TextStyle(color: Colors.red),
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                          );
-                                                                        }
-                                                                        return const Text(
-                                                                            '-',
-                                                                            textAlign:
-                                                                                TextAlign.center);
-                                                                      }),
-                                                            ),
-                                                            Expanded(
+                                                              Expanded(
                                                                 flex: 2,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    IconButton(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            bottom:
-                                                                                1),
-                                                                        onPressed:
-                                                                            () {
-                                                                          loadUsers
-                                                                              .forEach((element) {
-                                                                            if (element.userId ==
-                                                                                listRegis[indexRegis].userId) {
-                                                                              user = element;
-                                                                            }
-                                                                          });
-                                                                          trainees
-                                                                              .forEach((element) {
-                                                                            if (element.userId ==
-                                                                                listRegis[indexRegis].userId) {
-                                                                              trainee = element;
-                                                                            }
-                                                                          });
-                                                                          showInfo(
-                                                                            context:
-                                                                                context,
-                                                                            jobRegister:
-                                                                                listRegis[indexRegis],
-                                                                            trainee:
-                                                                                trainee,
-                                                                          );
-                                                                        },
-                                                                        icon:
-                                                                            const Icon(
+                                                                child: Text(
+                                                                    '${listRegis[indexRegis].userId}'
+                                                                        .toUpperCase(),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify),
+                                                              ),
+                                                              Expanded(
+                                                                flex: 3,
+                                                                child: Text(
+                                                                    '${listRegis[indexRegis].userName}',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify),
+                                                              ),
+                                                              Expanded(
+                                                                flex: 4,
+                                                                child: Text(
+                                                                  '${listRegis[indexRegis].jobName}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                  child: plan
+                                                                          .listWork!
+                                                                          .isEmpty
+                                                                      ? const Icon(
                                                                           Icons
-                                                                              .info,
-                                                                          size:
-                                                                              22,
+                                                                              .not_interested_rounded,
                                                                           color:
                                                                               Colors.grey,
-                                                                        )),
-                                                                    IconButton(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            bottom:
-                                                                                1),
-                                                                        onPressed:
-                                                                            () {
-                                                                          contents =
-                                                                              [];
-                                                                          comments =
-                                                                              [];
-                                                                          totalDay =
-                                                                              [];
-                                                                          isCompleted =
-                                                                              [];
-                                                                          weekStart =
-                                                                              [];
-                                                                          weekEnd =
-                                                                              [];
-                                                                          if (plan
-                                                                              .listWork!
-                                                                              .isEmpty) {
-                                                                            for (var i = 0;
-                                                                                i < 8;
-                                                                                i++) {
-                                                                              contents.add(TextEditingController());
-                                                                              totalDay.add(TextEditingController());
-
-                                                                              comments.add(TextEditingController());
-                                                                              isCompleted.add(ValueNotifier(false));
-                                                                              weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                              weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
-                                                                            }
-                                                                          } else {
-                                                                            for (var i = 0;
-                                                                                i < 8;
-                                                                                i++) {
-                                                                              contents.add(TextEditingController(text: plan.listWork![i].content));
-                                                                              totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
-                                                                              comments.add(TextEditingController(text: plan.listWork![i].comment));
-                                                                              isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
-                                                                              weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                              weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
-                                                                            }
-                                                                          }
-                                                                          showAssignAndFollow(
-                                                                            context:
-                                                                                context,
-                                                                            plan:
-                                                                                plan,
-                                                                            jobRegister:
-                                                                                listRegis[indexRegis],
-                                                                          );
-                                                                        },
-                                                                        icon:
-                                                                            Icon(
+                                                                        )
+                                                                      : const Icon(
                                                                           Icons
-                                                                              .work_history_rounded,
-                                                                          size:
-                                                                              22,
-                                                                          color: Colors
-                                                                              .blue
-                                                                              .shade900,
+                                                                              .check_circle_rounded,
+                                                                          color:
+                                                                              Colors.green,
                                                                         )),
-                                                                    IconButton(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            bottom:
-                                                                                1),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          if (DateTime.now().isBeforeTimestamp(setting
-                                                                              .traineeEnd!)) {
-                                                                            GV.error(
-                                                                                context: context,
-                                                                                message: 'Chưa đến thời gian đánh giá thực tập.');
-                                                                          } else if (DateTime.now()
-                                                                              .isAfterTimestamp(setting.pointCBEnd!)) {
-                                                                            GV.error(
-                                                                                context: context,
-                                                                                message: 'Đã quá thơi gian đánh giá.');
+                                                              Expanded(
+                                                                child:
+                                                                    StreamBuilder(
+                                                                        stream: firestore
+                                                                            .collection(
+                                                                                'appreciates')
+                                                                            .doc(listRegis[indexRegis]
+                                                                                .userId)
+                                                                            .snapshots(),
+                                                                        builder:
+                                                                            (context,
+                                                                                snapshotA) {
+                                                                          if (snapshotA.hasData &&
+                                                                              snapshotA.data != null &&
+                                                                              snapshotA.data!.data() != null) {
+                                                                            final app =
+                                                                                AppreciateModel.fromMap(snapshotA.data!.data()!);
+                                                                            double
+                                                                                total =
+                                                                                0;
+                                                                            app.listContent!.forEach((element) {
+                                                                              total += element.point!;
+                                                                            });
+                                                                            return Text(
+                                                                              total > 70 ? '$total/100' : '$total/70',
+                                                                              style: const TextStyle(color: Colors.red),
+                                                                              textAlign: TextAlign.center,
+                                                                            );
                                                                           }
-                                                                          if (DateTime.now().isBetweenEqual(
-                                                                              from: setting.traineeEnd!,
-                                                                              to: setting.pointCBEnd!)) {
-                                                                            points =
-                                                                                [];
+                                                                          return const Text(
+                                                                              '-',
+                                                                              textAlign: TextAlign.center);
+                                                                        }),
+                                                              ),
+                                                              Expanded(
+                                                                  flex: 2,
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      IconButton(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom:
+                                                                                  1),
+                                                                          onPressed:
+                                                                              () {
                                                                             loadUsers.forEach((element) {
                                                                               if (element.userId == listRegis[indexRegis].userId) {
                                                                                 user = element;
                                                                               }
                                                                             });
-                                                                            var loadAppeciate =
-                                                                                await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
-                                                                            if (loadAppeciate.docs.isNotEmpty) {
-                                                                              var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
-                                                                              var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
-                                                                              for (var i = 0; i < appreciate.listContent!.length; i++) {
-                                                                                points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                            trainees.forEach((element) {
+                                                                              if (element.userId == listRegis[indexRegis].userId) {
+                                                                                trainee = element;
                                                                               }
-                                                                              for (var i = 0; i < appreciatesCTDT.length; i++) {
-                                                                                if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
-                                                                                  appreciateCTDT = appreciate.appreciateCTDT!;
-                                                                                  currentUser.selected.value = i;
-                                                                                }
+                                                                            });
+                                                                            showInfo(
+                                                                              context: context,
+                                                                              jobRegister: listRegis[indexRegis],
+                                                                              trainee: trainee,
+                                                                            );
+                                                                          },
+                                                                          icon:
+                                                                              const Icon(
+                                                                            Icons.info,
+                                                                            size:
+                                                                                22,
+                                                                            color:
+                                                                                Colors.grey,
+                                                                          )),
+                                                                      IconButton(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom:
+                                                                                  1),
+                                                                          onPressed:
+                                                                              () {
+                                                                            contents =
+                                                                                [];
+                                                                            comments =
+                                                                                [];
+                                                                            totalDay =
+                                                                                [];
+                                                                            isCompleted =
+                                                                                [];
+                                                                            weekStart =
+                                                                                [];
+                                                                            weekEnd =
+                                                                                [];
+                                                                            if (plan.listWork!.isEmpty) {
+                                                                              for (var i = 0; i < 8; i++) {
+                                                                                contents.add(TextEditingController());
+                                                                                totalDay.add(TextEditingController());
+
+                                                                                comments.add(TextEditingController());
+                                                                                isCompleted.add(ValueNotifier(false));
+                                                                                weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
                                                                               }
-                                                                              commentCTDT.text = appreciate.commentCTDT!;
-                                                                              commentSV.text = appreciate.commentSV!;
                                                                             } else {
-                                                                              for (var i = 0; i < 10; i++) {
-                                                                                points.add(TextEditingController(text: '10'));
+                                                                              for (var i = 0; i < 8; i++) {
+                                                                                contents.add(TextEditingController(text: plan.listWork![i].content));
+                                                                                totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
+                                                                                comments.add(TextEditingController(text: plan.listWork![i].comment));
+                                                                                isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
+                                                                                weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
                                                                               }
-                                                                              currentUser.selected.value = 5;
                                                                             }
-                                                                            showAppreciate(
+                                                                            showAssignAndFollow(
                                                                               context: context,
                                                                               plan: plan,
                                                                               jobRegister: listRegis[indexRegis],
-                                                                              firms: loadFirms,
                                                                             );
-                                                                          }
-                                                                        },
-                                                                        icon:
-                                                                            const Icon(
-                                                                          CupertinoIcons
-                                                                              .pencil_ellipsis_rectangle,
-                                                                          size:
-                                                                              22,
-                                                                          color:
-                                                                              Colors.red,
-                                                                        ))
-                                                                  ],
-                                                                )),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    }
-                                                    return const SizedBox
-                                                        .shrink();
-                                                  });
-                                            },
-                                          )
-                                        : const Center(
-                                            child: Text(
-                                                'Chưa có sinh viên thực tập.'));
-                                  } else {
-                                    return const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Loading(),
-                                      ],
-                                    );
-                                  }
-                                },
-                              ),
-                            )
-                          : selectedHK == HocKy.empty &&
-                                  selectedNH == NamHoc.empty
-                              ? Expanded(
-                                  child: StreamBuilder(
-                                    stream: firestore
-                                        .collection('firms')
-                                        .where('firmId',
-                                            isEqualTo: currentUser.userId.value)
-                                        .snapshots(),
-                                    builder: (context, snapshotFirm) {
-                                      if (snapshotFirm.hasData &&
-                                          snapshotFirm.data != null &&
-                                          snapshotFirm.connectionState ==
-                                              ConnectionState.active) {
-                                        List<FirmModel> loadFirms = [];
-                                        List<JobRegisterModel> listRegis = [];
-                                        if (snapshotFirm
-                                            .data!.docs.isNotEmpty) {
-                                          snapshotFirm.data!.docs.forEach(
-                                              (element) => loadFirms.add(
-                                                  FirmModel.fromMap(
-                                                      element.data())));
-                                          FirmModel firm = FirmModel();
-                                          loadFirms.forEach((element) {
-                                            if (element.firmId == userId) {
-                                              firm = element;
-                                            }
-                                          });
-                                          if (firm.listRegis != null) {
-                                            for (var e in firm.listRegis!) {
-                                              if (e.isConfirmed == true) {
-                                                listRegis.add(e);
-                                              }
-                                            }
-                                          }
-                                        }
-                                        return listRegis.isNotEmpty
-                                            ? ListView.builder(
-                                                itemCount: listRegis.length,
-                                                shrinkWrap: true,
-                                                itemBuilder:
-                                                    (context, indexRegis) {
-                                                  return StreamBuilder(
-                                                      stream: firestore
-                                                          .collection('plans')
-                                                          .where('userId',
-                                                              isEqualTo: listRegis[
-                                                                      indexRegis]
-                                                                  .userId)
-                                                          .snapshots(),
-                                                      builder: (context,
-                                                          snapshotPlan) {
-                                                        if (snapshotPlan
-                                                                .hasData &&
-                                                            snapshotPlan.data !=
-                                                                null &&
-                                                            snapshotPlan
-                                                                    .connectionState ==
-                                                                ConnectionState
-                                                                    .active) {
-                                                          PlanWorkModel plan =
-                                                              PlanWorkModel();
-                                                          List<PlanWorkModel>
-                                                              listPlan = [];
-                                                          RegisterTraineeModel
-                                                              trainee =
-                                                              RegisterTraineeModel();
-                                                          if (snapshotPlan
-                                                              .data!
-                                                              .docs
-                                                              .isNotEmpty) {
-                                                            snapshotPlan
-                                                                .data!.docs
-                                                                .forEach((element) =>
-                                                                    listPlan.add(
-                                                                        PlanWorkModel.fromMap(
-                                                                            element.data())));
-                                                            listPlan.forEach(
-                                                                (element) {
-                                                              if (element
-                                                                      .userId ==
-                                                                  listRegis[
-                                                                          indexRegis]
-                                                                      .userId) {
-                                                                plan = element;
-                                                              }
-                                                            });
-                                                          }
-                                                          return Container(
-                                                            height:
-                                                                screenHeight *
-                                                                    0.05,
-                                                            color: indexRegis %
-                                                                        2 ==
-                                                                    0
-                                                                ? Colors.blue
-                                                                    .shade50
-                                                                : null,
-                                                            child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                  child: Text(
-                                                                      '${indexRegis + 1}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 2,
-                                                                  child: Text(
-                                                                      '${listRegis[indexRegis].userId}'
-                                                                          .toUpperCase(),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .justify),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 3,
-                                                                  child: Text(
-                                                                      '${listRegis[indexRegis].userName}',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .justify),
-                                                                ),
-                                                                Expanded(
-                                                                  flex: 4,
-                                                                  child: Text(
-                                                                    '${listRegis[indexRegis].jobName}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                ),
-                                                                Expanded(
-                                                                    child: plan
-                                                                            .listWork!
-                                                                            .isEmpty
-                                                                        ? const Icon(
-                                                                            Icons.not_interested_rounded,
+                                                                          },
+                                                                          icon:
+                                                                              Icon(
+                                                                            Icons.work_history_rounded,
+                                                                            size:
+                                                                                22,
                                                                             color:
-                                                                                Colors.grey,
-                                                                          )
-                                                                        : const Icon(
-                                                                            Icons.check_circle_rounded,
-                                                                            color:
-                                                                                Colors.green,
+                                                                                Colors.blue.shade900,
                                                                           )),
-                                                                Expanded(
-                                                                  child:
-                                                                      StreamBuilder(
-                                                                          stream: firestore
-                                                                              .collection('appreciates')
-                                                                              .doc(listRegis[indexRegis].userId)
-                                                                              .snapshots(),
-                                                                          builder: (context, snapshotA) {
-                                                                            if (snapshotA.hasData &&
-                                                                                snapshotA.data != null &&
-                                                                                snapshotA.data!.data() != null) {
-                                                                              final app = AppreciateModel.fromMap(snapshotA.data!.data()!);
-                                                                              double total = 0;
-                                                                              app.listContent!.forEach((element) {
-                                                                                total += element.point!;
-                                                                              });
-                                                                              return Text(
-                                                                                total > 70 ? '$total/100' : '$total/70',
-                                                                                style: const TextStyle(color: Colors.red),
-                                                                                textAlign: TextAlign.center,
-                                                                              );
+                                                                      IconButton(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom:
+                                                                                  1),
+                                                                          onPressed:
+                                                                              () async {
+                                                                            if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
+                                                                              GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
+                                                                            } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
+                                                                              GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
                                                                             }
-                                                                            return const Text('-',
-                                                                                textAlign: TextAlign.center);
-                                                                          }),
-                                                                ),
-                                                                Expanded(
-                                                                    flex: 2,
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        IconButton(
-                                                                            tooltip:
-                                                                                'Thông tin sinh viên',
-                                                                            padding:
-                                                                                const EdgeInsets.only(bottom: 1),
-                                                                            onPressed: () {
+                                                                            if (DateTime.now().isBetweenEqual(
+                                                                                from: setting.traineeEnd!,
+                                                                                to: setting.pointCBEnd!)) {
+                                                                              points = [];
                                                                               loadUsers.forEach((element) {
                                                                                 if (element.userId == listRegis[indexRegis].userId) {
                                                                                   user = element;
                                                                                 }
                                                                               });
-                                                                              trainees.forEach((element) {
-                                                                                if (element.userId == listRegis[indexRegis].userId) {
-                                                                                  trainee = element;
+                                                                              var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
+                                                                              if (loadAppeciate.docs.isNotEmpty) {
+                                                                                var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
+                                                                                var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                                for (var i = 0; i < appreciate.listContent!.length; i++) {
+                                                                                  points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
                                                                                 }
-                                                                              });
-                                                                              showInfo(
-                                                                                context: context,
-                                                                                jobRegister: listRegis[indexRegis],
-                                                                                trainee: trainee,
-                                                                              );
-                                                                            },
-                                                                            icon: const Icon(
-                                                                              Icons.info,
-                                                                              size: 22,
-                                                                              color: Colors.grey,
-                                                                            )),
-                                                                        IconButton(
-                                                                            tooltip:
-                                                                                'Phân công và theo dõi',
-                                                                            padding:
-                                                                                const EdgeInsets.only(bottom: 1),
-                                                                            onPressed: () {
-                                                                              contents = [];
-                                                                              comments = [];
-                                                                              totalDay = [];
-                                                                              isCompleted = [];
-                                                                              weekStart = [];
-                                                                              weekEnd = [];
-                                                                              if (plan.listWork!.isEmpty) {
-                                                                                for (var i = 0; i < 8; i++) {
-                                                                                  contents.add(TextEditingController());
-                                                                                  totalDay.add(TextEditingController());
-
-                                                                                  comments.add(TextEditingController());
-                                                                                  isCompleted.add(ValueNotifier(false));
-                                                                                  weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                                  weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
+                                                                                for (var i = 0; i < appreciatesCTDT.length; i++) {
+                                                                                  if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
+                                                                                    appreciateCTDT = appreciate.appreciateCTDT!;
+                                                                                    currentUser.selected.value = i;
+                                                                                  }
                                                                                 }
+                                                                                commentCTDT.text = appreciate.commentCTDT!;
+                                                                                commentSV.text = appreciate.commentSV!;
                                                                               } else {
-                                                                                for (var i = 0; i < 8; i++) {
-                                                                                  contents.add(TextEditingController(text: plan.listWork![i].content));
-                                                                                  totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
-                                                                                  comments.add(TextEditingController(text: plan.listWork![i].comment));
-                                                                                  isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
-                                                                                  weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                                  weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
+                                                                                for (var i = 0; i < 10; i++) {
+                                                                                  points.add(TextEditingController(text: '10'));
                                                                                 }
+                                                                                currentUser.selected.value = 5;
                                                                               }
-                                                                              showAssignAndFollow(
+                                                                              showAppreciate(
                                                                                 context: context,
                                                                                 plan: plan,
                                                                                 jobRegister: listRegis[indexRegis],
+                                                                                firms: loadFirms,
                                                                               );
-                                                                            },
-                                                                            icon: Icon(
-                                                                              Icons.work_history_rounded,
-                                                                              size: 22,
-                                                                              color: Colors.blue.shade900,
+                                                                            }
+                                                                          },
+                                                                          icon:
+                                                                              const Icon(
+                                                                            CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                            size:
+                                                                                22,
+                                                                            color:
+                                                                                Colors.red,
+                                                                          ))
+                                                                    ],
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    });
+                                              },
+                                            )
+                                          : const Center(
+                                              child: Text(
+                                                  'Chưa có sinh viên thực tập.'));
+                                    } else {
+                                      return const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Loading(),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            )
+                          : selectedHK == HocKy.empty &&
+                                  selectedNH == NamHoc.empty
+                              ? Expanded(
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: StreamBuilder(
+                                      stream: firestore
+                                          .collection('firms')
+                                          .where('firmId',
+                                              isEqualTo:
+                                                  currentUser.userId.value)
+                                          .snapshots(),
+                                      builder: (context, snapshotFirm) {
+                                        if (snapshotFirm.hasData &&
+                                            snapshotFirm.data != null &&
+                                            snapshotFirm.connectionState ==
+                                                ConnectionState.active) {
+                                          List<FirmModel> loadFirms = [];
+                                          List<JobRegisterModel> listRegis = [];
+                                          if (snapshotFirm
+                                              .data!.docs.isNotEmpty) {
+                                            snapshotFirm.data!.docs.forEach(
+                                                (element) => loadFirms.add(
+                                                    FirmModel.fromMap(
+                                                        element.data())));
+                                            FirmModel firm = FirmModel();
+                                            loadFirms.forEach((element) {
+                                              if (element.firmId == userId) {
+                                                firm = element;
+                                              }
+                                            });
+                                            if (firm.listRegis != null) {
+                                              for (var e in firm.listRegis!) {
+                                                if (e.isConfirmed == true) {
+                                                  listRegis.add(e);
+                                                }
+                                              }
+                                            }
+                                          }
+                                          return listRegis.isNotEmpty
+                                              ? ListView.builder(
+                                                  itemCount: listRegis.length,
+                                                  shrinkWrap: true,
+                                                  itemBuilder:
+                                                      (context, indexRegis) {
+                                                    return StreamBuilder(
+                                                        stream: firestore
+                                                            .collection('plans')
+                                                            .where('userId',
+                                                                isEqualTo:
+                                                                    listRegis[
+                                                                            indexRegis]
+                                                                        .userId)
+                                                            .snapshots(),
+                                                        builder: (context,
+                                                            snapshotPlan) {
+                                                          if (snapshotPlan
+                                                                  .hasData &&
+                                                              snapshotPlan
+                                                                      .data !=
+                                                                  null &&
+                                                              snapshotPlan
+                                                                      .connectionState ==
+                                                                  ConnectionState
+                                                                      .active) {
+                                                            PlanWorkModel plan =
+                                                                PlanWorkModel();
+                                                            List<PlanWorkModel>
+                                                                listPlan = [];
+                                                            RegisterTraineeModel
+                                                                trainee =
+                                                                RegisterTraineeModel();
+                                                            if (snapshotPlan
+                                                                .data!
+                                                                .docs
+                                                                .isNotEmpty) {
+                                                              snapshotPlan
+                                                                  .data!.docs
+                                                                  .forEach((element) =>
+                                                                      listPlan.add(
+                                                                          PlanWorkModel.fromMap(
+                                                                              element.data())));
+                                                              listPlan.forEach(
+                                                                  (element) {
+                                                                if (element
+                                                                        .userId ==
+                                                                    listRegis[
+                                                                            indexRegis]
+                                                                        .userId) {
+                                                                  plan =
+                                                                      element;
+                                                                }
+                                                              });
+                                                            }
+                                                            return Container(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.05,
+                                                              color: indexRegis %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Colors.blue
+                                                                      .shade50
+                                                                  : null,
+                                                              child: Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                        '${indexRegis + 1}',
+                                                                        textAlign:
+                                                                            TextAlign.center),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                        '${listRegis[indexRegis].userId}'
+                                                                            .toUpperCase(),
+                                                                        textAlign:
+                                                                            TextAlign.justify),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child: Text(
+                                                                        '${listRegis[indexRegis].userName}',
+                                                                        textAlign:
+                                                                            TextAlign.justify),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 4,
+                                                                    child: Text(
+                                                                      '${listRegis[indexRegis].jobName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                      child: plan
+                                                                              .listWork!
+                                                                              .isEmpty
+                                                                          ? const Icon(
+                                                                              Icons.not_interested_rounded,
+                                                                              color: Colors.grey,
+                                                                            )
+                                                                          : const Icon(
+                                                                              Icons.check_circle_rounded,
+                                                                              color: Colors.green,
                                                                             )),
-                                                                        IconButton(
-                                                                            tooltip:
-                                                                                'Đánh giá',
-                                                                            padding:
-                                                                                const EdgeInsets.only(bottom: 1),
-                                                                            onPressed: () async {
-                                                                              if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
-                                                                                GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
-                                                                              } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
-                                                                                GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
-                                                                              }
-                                                                              if (DateTime.now().isBetweenEqual(from: setting.traineeEnd!, to: setting.pointCBEnd!)) {
-                                                                                points = [];
+                                                                  Expanded(
+                                                                    child: StreamBuilder(
+                                                                        stream: firestore.collection('appreciates').doc(listRegis[indexRegis].userId).snapshots(),
+                                                                        builder: (context, snapshotA) {
+                                                                          if (snapshotA.hasData &&
+                                                                              snapshotA.data != null &&
+                                                                              snapshotA.data!.data() != null) {
+                                                                            final app =
+                                                                                AppreciateModel.fromMap(snapshotA.data!.data()!);
+                                                                            double
+                                                                                total =
+                                                                                0;
+                                                                            app.listContent!.forEach((element) {
+                                                                              total += element.point!;
+                                                                            });
+                                                                            return Text(
+                                                                              total > 70 ? '$total/100' : '$total/70',
+                                                                              style: const TextStyle(color: Colors.red),
+                                                                              textAlign: TextAlign.center,
+                                                                            );
+                                                                          }
+                                                                          return const Text(
+                                                                              '-',
+                                                                              textAlign: TextAlign.center);
+                                                                        }),
+                                                                  ),
+                                                                  Expanded(
+                                                                      flex: 2,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          IconButton(
+                                                                              tooltip: 'Thông tin sinh viên',
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              onPressed: () {
                                                                                 loadUsers.forEach((element) {
                                                                                   if (element.userId == listRegis[indexRegis].userId) {
                                                                                     user = element;
                                                                                   }
                                                                                 });
-                                                                                var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
-                                                                                if (loadAppeciate.docs.isNotEmpty) {
-                                                                                  var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
-                                                                                  var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
-                                                                                  for (var i = 0; i < appreciate.listContent!.length; i++) {
-                                                                                    points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                                trainees.forEach((element) {
+                                                                                  if (element.userId == listRegis[indexRegis].userId) {
+                                                                                    trainee = element;
                                                                                   }
-                                                                                  for (var i = 0; i < appreciatesCTDT.length; i++) {
-                                                                                    if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
-                                                                                      appreciateCTDT = appreciate.appreciateCTDT!;
-                                                                                      currentUser.selected.value = i;
-                                                                                    }
+                                                                                });
+                                                                                showInfo(
+                                                                                  context: context,
+                                                                                  jobRegister: listRegis[indexRegis],
+                                                                                  trainee: trainee,
+                                                                                );
+                                                                              },
+                                                                              icon: const Icon(
+                                                                                Icons.info,
+                                                                                size: 22,
+                                                                                color: Colors.grey,
+                                                                              )),
+                                                                          IconButton(
+                                                                              tooltip: 'Phân công và theo dõi',
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              onPressed: () {
+                                                                                contents = [];
+                                                                                comments = [];
+                                                                                totalDay = [];
+                                                                                isCompleted = [];
+                                                                                weekStart = [];
+                                                                                weekEnd = [];
+                                                                                if (plan.listWork!.isEmpty) {
+                                                                                  for (var i = 0; i < 8; i++) {
+                                                                                    contents.add(TextEditingController());
+                                                                                    totalDay.add(TextEditingController());
+
+                                                                                    comments.add(TextEditingController());
+                                                                                    isCompleted.add(ValueNotifier(false));
+                                                                                    weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                    weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
                                                                                   }
-                                                                                  commentCTDT.text = appreciate.commentCTDT!;
-                                                                                  commentSV.text = appreciate.commentSV!;
                                                                                 } else {
-                                                                                  for (var i = 0; i < 10; i++) {
-                                                                                    points.add(TextEditingController(text: '10'));
+                                                                                  for (var i = 0; i < 8; i++) {
+                                                                                    contents.add(TextEditingController(text: plan.listWork![i].content));
+                                                                                    totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
+                                                                                    comments.add(TextEditingController(text: plan.listWork![i].comment));
+                                                                                    isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
+                                                                                    weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                    weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
                                                                                   }
-                                                                                  currentUser.selected.value = 5;
                                                                                 }
-                                                                                showAppreciate(
+                                                                                showAssignAndFollow(
                                                                                   context: context,
                                                                                   plan: plan,
                                                                                   jobRegister: listRegis[indexRegis],
-                                                                                  firms: loadFirms,
                                                                                 );
-                                                                              }
-                                                                            },
-                                                                            icon: const Icon(
-                                                                              CupertinoIcons.pencil_ellipsis_rectangle,
-                                                                              size: 22,
-                                                                              color: Colors.red,
-                                                                            ))
-                                                                      ],
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        }
-                                                        return const SizedBox
-                                                            .shrink();
-                                                      });
-                                                },
-                                              )
-                                            : const Center(
-                                                child: Text(
-                                                    'Chưa có sinh viên thực tập.'),
-                                              );
-                                      } else {
-                                        return const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Loading(),
-                                          ],
-                                        );
-                                      }
-                                    },
+                                                                              },
+                                                                              icon: Icon(
+                                                                                Icons.work_history_rounded,
+                                                                                size: 22,
+                                                                                color: Colors.blue.shade900,
+                                                                              )),
+                                                                          IconButton(
+                                                                              tooltip: 'Đánh giá',
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              onPressed: () async {
+                                                                                if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
+                                                                                  GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
+                                                                                } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
+                                                                                  GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
+                                                                                }
+                                                                                if (DateTime.now().isBetweenEqual(from: setting.traineeEnd!, to: setting.pointCBEnd!)) {
+                                                                                  points = [];
+                                                                                  loadUsers.forEach((element) {
+                                                                                    if (element.userId == listRegis[indexRegis].userId) {
+                                                                                      user = element;
+                                                                                    }
+                                                                                  });
+                                                                                  var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
+                                                                                  if (loadAppeciate.docs.isNotEmpty) {
+                                                                                    var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
+                                                                                    var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                                    for (var i = 0; i < appreciate.listContent!.length; i++) {
+                                                                                      points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                                    }
+                                                                                    for (var i = 0; i < appreciatesCTDT.length; i++) {
+                                                                                      if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
+                                                                                        appreciateCTDT = appreciate.appreciateCTDT!;
+                                                                                        currentUser.selected.value = i;
+                                                                                      }
+                                                                                    }
+                                                                                    commentCTDT.text = appreciate.commentCTDT!;
+                                                                                    commentSV.text = appreciate.commentSV!;
+                                                                                  } else {
+                                                                                    for (var i = 0; i < 10; i++) {
+                                                                                      points.add(TextEditingController(text: '10'));
+                                                                                    }
+                                                                                    currentUser.selected.value = 5;
+                                                                                  }
+                                                                                  showAppreciate(
+                                                                                    context: context,
+                                                                                    plan: plan,
+                                                                                    jobRegister: listRegis[indexRegis],
+                                                                                    firms: loadFirms,
+                                                                                  );
+                                                                                }
+                                                                              },
+                                                                              icon: const Icon(
+                                                                                CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                                size: 22,
+                                                                                color: Colors.red,
+                                                                              ))
+                                                                        ],
+                                                                      )),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }
+                                                          return const SizedBox
+                                                              .shrink();
+                                                        });
+                                                  },
+                                                )
+                                              : const Center(
+                                                  child: Text(
+                                                      'Chưa có sinh viên thực tập.'),
+                                                );
+                                        } else {
+                                          return const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Loading(),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
                                   ),
                                 )
                               : const Expanded(
