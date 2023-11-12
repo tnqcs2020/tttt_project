@@ -11,7 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class ManageInfoCB extends StatefulWidget {
   const ManageInfoCB({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:universal_html/html.dart';
 

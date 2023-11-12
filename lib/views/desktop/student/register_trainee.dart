@@ -9,7 +9,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
+import 'package:tttt_project/common/date_time_extension.dart';
 import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:tttt_project/models/credit_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
@@ -25,7 +26,7 @@ import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class RegisterTrainee extends StatefulWidget {
   const RegisterTrainee({Key? key}) : super(key: key);
@@ -287,7 +288,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Quản Lý Thực Tập Thực Tế",
+                                      "Quản lý thực tập thực tế",
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -2024,53 +2025,3 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
 }
 
 enum StepEnabling { sequential, individual }
-
-extension DateTimeExtension on DateTime {
-  bool isAfterTimestamp(Timestamp? timestamp) {
-    final temp = timestamp ?? Timestamp.now();
-    final date = DateTime.fromMillisecondsSinceEpoch(
-      temp.millisecondsSinceEpoch,
-    );
-    return isAfter(date);
-  }
-
-  bool isBeforeTimestamp(Timestamp? timestamp) {
-    final temp = timestamp ?? Timestamp.now();
-    final date = DateTime.fromMillisecondsSinceEpoch(
-      temp.millisecondsSinceEpoch,
-    );
-    return isBefore(date);
-  }
-
-  bool isAfterOrEqual(Timestamp? timestamp) {
-    final temp = timestamp ?? Timestamp.now();
-    final date = DateTime.fromMillisecondsSinceEpoch(
-      temp.millisecondsSinceEpoch,
-    );
-    return isAtSameMomentAs(date) || isAfter(date);
-  }
-
-  bool isBeforeOrEqual(Timestamp? timestamp) {
-    final temp = timestamp ?? Timestamp.now();
-    final date = DateTime.fromMillisecondsSinceEpoch(
-      temp.millisecondsSinceEpoch,
-    );
-    return isAtSameMomentAs(date) || isBefore(date);
-  }
-
-  bool isBetweenEqual({required Timestamp? from, required Timestamp? to}) {
-    return isAfterOrEqual(from) && isBeforeOrEqual(to);
-  }
-
-  bool isBetweenExclusive({required Timestamp? from, required Timestamp? to}) {
-    final tempFrom = from ?? Timestamp.now();
-    final fromDate = DateTime.fromMillisecondsSinceEpoch(
-      tempFrom.millisecondsSinceEpoch,
-    );
-    final tempTo = to ?? Timestamp.now();
-    final toDate = DateTime.fromMillisecondsSinceEpoch(
-      tempTo.millisecondsSinceEpoch,
-    );
-    return isAfter(fromDate) && isBefore(toDate);
-  }
-}

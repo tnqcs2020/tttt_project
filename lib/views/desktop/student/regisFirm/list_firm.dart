@@ -5,16 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
+import 'package:tttt_project/common/date_time_extension.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
-import 'package:tttt_project/views/desktop/student/register_trainee.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class ListFirm extends StatefulWidget {
   const ListFirm({Key? key}) : super(key: key);
@@ -235,7 +235,7 @@ class _ListFirmState extends State<ListFirm> {
                           ),
                           SizedBox(width: 5),
                           Expanded(
-                            flex: 2,
+                            flex: 3,
                             child: Text(
                               'Liên hệ',
                               textAlign: TextAlign.center,
@@ -244,7 +244,7 @@ class _ListFirmState extends State<ListFirm> {
                           ),
                           SizedBox(width: 5),
                           Expanded(
-                            flex: 2,
+                            flex: 1,
                             child: Text(
                               'Đăng ký',
                               textAlign: TextAlign.center,
@@ -359,7 +359,7 @@ class _ListFirmState extends State<ListFirm> {
                                                       ),
                                                       const SizedBox(width: 5),
                                                       Expanded(
-                                                        flex: 2,
+                                                        flex: 3,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -374,6 +374,12 @@ class _ListFirmState extends State<ListFirm> {
                                                                 .isNotEmpty)
                                                               Text(
                                                                 '${firmResult[indexFirm].phone}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             if (firmResult[
                                                                     indexFirm]
@@ -381,6 +387,12 @@ class _ListFirmState extends State<ListFirm> {
                                                                 .isNotEmpty)
                                                               Text(
                                                                 '${firmResult[indexFirm].email}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             if (firmResult[
                                                                         indexFirm]
@@ -401,7 +413,7 @@ class _ListFirmState extends State<ListFirm> {
                                                       ),
                                                       const SizedBox(width: 5),
                                                       Expanded(
-                                                        flex: 2,
+                                                        flex: 1,
                                                         child: check
                                                             ? const Icon(
                                                                 Icons
@@ -430,55 +442,36 @@ class _ListFirmState extends State<ListFirm> {
                                                                               1),
                                                                   onPressed:
                                                                       () {
-                                                                    if (setting.settingId !=
-                                                                            null &&
-                                                                        setting.term !=
-                                                                            trainee
-                                                                                .term &&
-                                                                        setting.traineeStart !=
-                                                                            trainee
-                                                                                .traineeStart) {
-                                                                      GV.error(
-                                                                          context:
-                                                                              context,
-                                                                          message:
-                                                                              'Bạn không đăng ký thực tập trong học kỳ này không thể đăng ký');
-                                                                    } else if (setting.settingId !=
-                                                                            null &&
-                                                                        DateTime.now()
-                                                                            .isBeforeTimestamp(setting.traineeStart!)) {
-                                                                      JobRegisterModel
-                                                                          loadRegis =
-                                                                          JobRegisterModel();
-                                                                      for (var d
-                                                                          in firmResult[indexFirm]
-                                                                              .listRegis!) {
-                                                                        if (d.userId ==
-                                                                            userId) {
-                                                                          currentUser.selectedJob.value = firmResult[indexFirm].listJob!.firstWhere((element) =>
-                                                                              element.jobId ==
-                                                                              d.jobId);
-                                                                          loadRegis =
-                                                                              d;
-                                                                        }
+                                                                    JobRegisterModel
+                                                                        loadRegis =
+                                                                        JobRegisterModel();
+                                                                    for (var d in firmResult[
+                                                                            indexFirm]
+                                                                        .listRegis!) {
+                                                                      if (d.userId ==
+                                                                          userId) {
+                                                                        currentUser
+                                                                            .selectedJob
+                                                                            .value = firmResult[
+                                                                                indexFirm]
+                                                                            .listJob!
+                                                                            .firstWhere((element) =>
+                                                                                element.jobId ==
+                                                                                d.jobId);
+                                                                        loadRegis =
+                                                                            d;
                                                                       }
-                                                                      regisFirm(
-                                                                        context:
-                                                                            context,
-                                                                        firm: firmResult[
-                                                                            indexFirm],
-                                                                        loadRegis:
-                                                                            loadRegis,
-                                                                        isTrainee:
-                                                                            isTrainee,
-                                                                      );
-                                                                    } else {
-                                                                      GV.error(
-                                                                          context:
-                                                                              context,
-                                                                          message:
-                                                                              'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển');
                                                                     }
+                                                                    regisFirm(
+                                                                      context:
+                                                                          context,
+                                                                      firm: firmResult[
+                                                                          indexFirm],
+                                                                      loadRegis:
+                                                                          loadRegis,
+                                                                      isTrainee:
+                                                                          isTrainee,
+                                                                    );
                                                                   },
                                                                   icon:
                                                                       const Icon(
@@ -579,7 +572,7 @@ class _ListFirmState extends State<ListFirm> {
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Expanded(
-                                                  flex: 2,
+                                                  flex: 3,
                                                   child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
@@ -593,12 +586,20 @@ class _ListFirmState extends State<ListFirm> {
                                                           .isNotEmpty)
                                                         Text(
                                                           '${firms[indexFirm].phone}',
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
                                                       if (firms[indexFirm]
                                                           .email!
                                                           .isNotEmpty)
                                                         Text(
                                                           '${firms[indexFirm].email}',
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
                                                       if (firms[indexFirm]
                                                               .phone!
@@ -616,7 +617,7 @@ class _ListFirmState extends State<ListFirm> {
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Expanded(
-                                                    flex: 2,
+                                                    flex: 1,
                                                     child: check
                                                         ? const Icon(
                                                             Icons
@@ -641,63 +642,35 @@ class _ListFirmState extends State<ListFirm> {
                                                                   .only(
                                                                   bottom: 1),
                                                           onPressed: () {
-                                                            if (setting.settingId !=
-                                                                    null &&
-                                                                setting.term !=
-                                                                    trainee
-                                                                        .term &&
-                                                                setting.traineeStart !=
-                                                                    trainee
-                                                                        .traineeStart) {
-                                                              GV.error(
-                                                                  context:
-                                                                      context,
-                                                                  message:
-                                                                      'Bạn không đăng ký thực tập trong học kỳ này không thể đăng ký');
-                                                            } else if (setting
-                                                                        .settingId !=
-                                                                    null &&
-                                                                DateTime.now()
-                                                                    .isBeforeTimestamp(
-                                                                        setting
-                                                                            .traineeStart!)) {
-                                                              JobRegisterModel
-                                                                  loadRegis =
-                                                                  JobRegisterModel();
-                                                              for (var d in firms[
-                                                                      indexFirm]
-                                                                  .listRegis!) {
-                                                                if (d.userId ==
-                                                                    userId) {
-                                                                  currentUser
-                                                                      .selectedJob
-                                                                      .value = firms[
-                                                                          indexFirm]
-                                                                      .listJob!
-                                                                      .firstWhere((element) =>
-                                                                          element
-                                                                              .jobId ==
-                                                                          d.jobId);
-                                                                  loadRegis = d;
-                                                                }
+                                                            JobRegisterModel
+                                                                loadRegis =
+                                                                JobRegisterModel();
+                                                            for (var d in firms[
+                                                                    indexFirm]
+                                                                .listRegis!) {
+                                                              if (d.userId ==
+                                                                  userId) {
+                                                                currentUser
+                                                                    .selectedJob
+                                                                    .value = firms[
+                                                                        indexFirm]
+                                                                    .listJob!
+                                                                    .firstWhere((element) =>
+                                                                        element
+                                                                            .jobId ==
+                                                                        d.jobId);
+                                                                loadRegis = d;
                                                               }
-                                                              regisFirm(
-                                                                context:
-                                                                    context,
-                                                                firm: firms[
-                                                                    indexFirm],
-                                                                loadRegis:
-                                                                    loadRegis,
-                                                                isTrainee:
-                                                                    isTrainee,
-                                                              );
-                                                            } else {
-                                                              GV.error(
-                                                                  context:
-                                                                      context,
-                                                                  message:
-                                                                      'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển');
                                                             }
+                                                            regisFirm(
+                                                              context: context,
+                                                              firm: firms[
+                                                                  indexFirm],
+                                                              loadRegis:
+                                                                  loadRegis,
+                                                              isTrainee:
+                                                                  isTrainee,
+                                                            );
                                                           },
                                                           icon: const Icon(
                                                             CupertinoIcons
@@ -783,7 +756,9 @@ class _ListFirmState extends State<ListFirm> {
                 titlePadding: EdgeInsets.zero,
                 shape: Border.all(width: 0.5),
                 content: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: screenWidth * 0.35),
+                  constraints: BoxConstraints(
+                      minWidth: screenWidth * 0.35,
+                      maxWidth: screenWidth * 0.5),
                   child: Form(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -793,64 +768,151 @@ class _ListFirmState extends State<ListFirm> {
                         Text('Số điện thoại: ${firm.phone!}'),
                         Text('Email: ${firm.email!}'),
                         Text('Địa chỉ: ${firm.address!}'),
-                        Text('Mô tả: ${firm.describe!}'),
-                        if (isRegistered == false) ...[
-                          const Text('Vị trí tuyển dụng:'),
-                          for (var job in firm.listJob!)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 25),
-                              child: ListTile(
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                    '${job.jobName} - SL: ${job.quantity}'),
-                                subtitle: Text('${job.describeJob}'),
-                              ),
-                            ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Bạn cần phải đăng ký thực tập thực tế trước khi ứng tuyển.',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.red,
-                                  ),
+                        Text(
+                          'Mô tả: ${firm.describe!}',
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.justify,
+                        ),
+                        if (setting.settingId != null &&
+                            DateTime.now()
+                                .isBeforeTimestamp(setting.traineeStart!)) ...[
+                          if (isRegistered == false) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: Text('${job.describeJob}'),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ] else if (isTrainee && loadRegis.isConfirmed!) ...[
-                          Text(
-                              'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
-                          Text(
-                              'Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
-                          Text(
-                              'Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
-                          Text(
-                              'Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                        ] else if (isTrainee) ...[
-                          const Text('Vị trí tuyển dụng:'),
-                          for (var job in firm.listJob!)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 25),
-                              child: ListTile(
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                    '${job.jobName} - SL: ${job.quantity}'),
-                                subtitle: Text('${job.describeJob}'),
+                              ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Bạn cần phải đăng ký thực tập thực tế trước khi ứng tuyển.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                          ] else if (setting.settingId != null &&
+                              setting.term != trainee.term &&
+                              setting.traineeStart != trainee.traineeStart) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: Text('${job.describeJob}'),
+                                ),
+                              ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Bạn không đăng ký thực tập trong học kỳ này không thể đăng ký.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                            Text(
+                                'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
+                            Text(
+                                'Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
+                            Text(
+                                'Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
+                            Text(
+                                'Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                          ] else if (isTrainee) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: Text('${job.describeJob}'),
+                                ),
+                              ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Bạn đã có công ty thực tập không thể ứng tuyển được nữa.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ] else if (loadRegis.status == TrangThai.wait ||
+                              loadRegis.userId == null) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var data in firm.listJob!)
+                              Obx(
+                                () => CustomRadio(
+                                  title: '${data.jobName}',
+                                  onTap: () =>
+                                      currentUser.selectedJob.value = data,
+                                  subtitle: '${data.describeJob}',
+                                  selected:
+                                      currentUser.selectedJob.value == data,
+                                ),
+                              ),
+                          ]
+                        ] else ...[
+                          if (isTrainee && loadRegis.isConfirmed!) ...[
+                            Text(
+                                'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
+                            Text(
+                                'Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
+                            Text(
+                                'Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
+                            Text(
+                                'Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                          ] else if (isTrainee) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: Text('${job.describeJob}'),
+                                ),
+                              ),
+                          ],
                           const Padding(
                             padding: EdgeInsets.only(top: 15),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Bạn đã có công ty thực tập không thể ứng tuyển được nữa.',
+                                  'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.red,
@@ -859,288 +921,305 @@ class _ListFirmState extends State<ListFirm> {
                               ],
                             ),
                           )
-                        ] else if (loadRegis.status == TrangThai.wait ||
-                            loadRegis.userId == null) ...[
-                          const Text('Vị trí tuyển dụng:'),
-                          for (var data in firm.listJob!)
-                            Obx(
-                              () => CustomRadio(
-                                title:
-                                    '${data.jobName} - SL còn lai: ${data.quantity}',
-                                onTap: () =>
-                                    currentUser.selectedJob.value = data,
-                                subtitle: '${data.describeJob}',
-                                selected: currentUser.selectedJob.value == data,
-                              ),
-                            ),
-                        ],
+                        ]
                       ],
                     ),
                   ),
                 ),
-                actions: isTrainee
+                actions: setting.settingId != null &&
+                        setting.term != trainee.term &&
+                        setting.traineeStart != trainee.traineeStart
                     ? null
-                    : (loadRegis.status == null ||
-                                loadRegis.status == TrangThai.wait) &&
-                            isTrainee == false &&
-                            isRegistered
-                        ? [
-                            ElevatedButton(
-                              child: const Text(
-                                "Ứng tuyển",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              onPressed: () async {
-                                if (firm.listRegis!
-                                    .where(
-                                        (element) => element.userId == userId)
-                                    .isNotEmpty) {
-                                  for (var d in firm.listRegis!) {
-                                    if (d.userId == userId) {
-                                      if (d.jobId ==
-                                          currentUser.selectedJob.value.jobId) {
-                                        GV.warning(
-                                            context: context,
-                                            message: 'Không có gì thay đổi.');
-                                      } else if (currentUser
-                                              .selectedJob.value.jobId ==
-                                          null) {
-                                        GV.error(
-                                            context: context,
-                                            message:
-                                                'Vui lòng chọn vị trí ứng tuyển.');
-                                      } else {
-                                        var listRegis = firm.listRegis;
-                                        for (int i = 0;
-                                            i < listRegis!.length;
-                                            i++) {
-                                          if (listRegis[i].userId ==
-                                              currentUser.userId.value) {
-                                            if (listRegis[i].jobId !=
-                                                currentUser
-                                                    .selectedJob.value.jobId) {
-                                              listRegis[i].jobId = currentUser
-                                                  .selectedJob.value.jobId;
-                                              listRegis[i].jobName = currentUser
-                                                  .selectedJob.value.jobName;
-                                            }
-                                          }
-                                        }
-
-                                        firestore
-                                            .collection('firms')
-                                            .doc(firm.firmId)
-                                            .update({
-                                          'listRegis': listRegis
-                                              .map((i) => i.toMap())
-                                              .toList()
-                                        });
-                                        var loadListRegis = await firestore
-                                            .collection('trainees')
-                                            .doc(userId)
-                                            .get();
-
-                                        final listUserRegis =
-                                            RegisterTraineeModel.fromMap(
-                                                    loadListRegis.data()!)
-                                                .listRegis;
-                                        for (int i = 0;
-                                            i < listUserRegis!.length;
-                                            i++) {
-                                          if (listUserRegis[i].firmId ==
-                                              firm.firmId) {
-                                            if (listUserRegis[i].jobId !=
-                                                currentUser
-                                                    .selectedJob.value.jobId) {
-                                              listUserRegis[i].jobId =
-                                                  currentUser
-                                                      .selectedJob.value.jobId;
-                                              listUserRegis[i].jobName =
+                    : DateTime.now().isBeforeTimestamp(setting.traineeStart!)
+                        ? isTrainee
+                            ? null
+                            : (loadRegis.status == null ||
+                                        loadRegis.status == TrangThai.wait) &&
+                                    isTrainee == false &&
+                                    isRegistered
+                                ? [
+                                    ElevatedButton(
+                                      child: const Text(
+                                        "Ứng tuyển",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        if (firm.listRegis!
+                                            .where((element) =>
+                                                element.userId == userId)
+                                            .isNotEmpty) {
+                                          for (var d in firm.listRegis!) {
+                                            if (d.userId == userId) {
+                                              if (d.jobId ==
                                                   currentUser.selectedJob.value
-                                                      .jobName;
+                                                      .jobId) {
+                                                GV.warning(
+                                                    context: context,
+                                                    message:
+                                                        'Không có gì thay đổi.');
+                                              } else if (currentUser.selectedJob
+                                                      .value.jobId ==
+                                                  null) {
+                                                GV.error(
+                                                    context: context,
+                                                    message:
+                                                        'Vui lòng chọn vị trí ứng tuyển.');
+                                              } else {
+                                                var listRegis = firm.listRegis;
+                                                for (int i = 0;
+                                                    i < listRegis!.length;
+                                                    i++) {
+                                                  if (listRegis[i].userId ==
+                                                      currentUser
+                                                          .userId.value) {
+                                                    if (listRegis[i].jobId !=
+                                                        currentUser.selectedJob
+                                                            .value.jobId) {
+                                                      listRegis[i].jobId =
+                                                          currentUser
+                                                              .selectedJob
+                                                              .value
+                                                              .jobId;
+                                                      listRegis[i].jobName =
+                                                          currentUser
+                                                              .selectedJob
+                                                              .value
+                                                              .jobName;
+                                                    }
+                                                  }
+                                                }
+
+                                                firestore
+                                                    .collection('firms')
+                                                    .doc(firm.firmId)
+                                                    .update({
+                                                  'listRegis': listRegis
+                                                      .map((i) => i.toMap())
+                                                      .toList()
+                                                });
+                                                var loadListRegis =
+                                                    await firestore
+                                                        .collection('trainees')
+                                                        .doc(userId)
+                                                        .get();
+
+                                                final listUserRegis =
+                                                    RegisterTraineeModel
+                                                            .fromMap(
+                                                                loadListRegis
+                                                                    .data()!)
+                                                        .listRegis;
+                                                for (int i = 0;
+                                                    i < listUserRegis!.length;
+                                                    i++) {
+                                                  if (listUserRegis[i].firmId ==
+                                                      firm.firmId) {
+                                                    if (listUserRegis[i]
+                                                            .jobId !=
+                                                        currentUser.selectedJob
+                                                            .value.jobId) {
+                                                      listUserRegis[i].jobId =
+                                                          currentUser
+                                                              .selectedJob
+                                                              .value
+                                                              .jobId;
+                                                      listUserRegis[i].jobName =
+                                                          currentUser
+                                                              .selectedJob
+                                                              .value
+                                                              .jobName;
+                                                    }
+                                                  }
+                                                }
+                                                firestore
+                                                    .collection('trainees')
+                                                    .doc(userId)
+                                                    .update({
+                                                  'listRegis': listUserRegis
+                                                      .map((i) => i.toMap())
+                                                      .toList(),
+                                                });
+                                                Navigator.pop(context);
+                                                GV.success(
+                                                    context: context,
+                                                    message:
+                                                        'Đã cập nhật thành công.');
+                                              }
                                             }
                                           }
+                                        } else {
+                                          if (currentUser
+                                                  .selectedJob.value.jobId ==
+                                              null) {
+                                            GV.error(
+                                                context: context,
+                                                message:
+                                                    'Vui lòng chọn vị trí ứng tuyển.');
+                                          } else {
+                                            final regis = JobRegisterModel(
+                                              userId: userId,
+                                              jobId: currentUser
+                                                  .selectedJob.value.jobId,
+                                              userName:
+                                                  currentUser.userName.value,
+                                              jobName: currentUser
+                                                  .selectedJob.value.jobName,
+                                              status: TrangThai.wait,
+                                              createdAt: Timestamp.now(),
+                                            );
+                                            var listRegis = firm.listRegis;
+                                            listRegis!.add(regis);
+                                            firestore
+                                                .collection('firms')
+                                                .doc(firm.firmId)
+                                                .update({
+                                              'listRegis': listRegis
+                                                  .map((i) => i.toMap())
+                                                  .toList()
+                                            });
+                                            final userRegis = UserRegisterModel(
+                                              firmId: firm.firmId,
+                                              firmName: firm.firmName,
+                                              jobId: regis.jobId,
+                                              jobName: regis.jobName,
+                                              status: TrangThai.wait,
+                                              createdAt: Timestamp.now(),
+                                            );
+                                            var loadListRegis = await firestore
+                                                .collection('trainees')
+                                                .doc(userId)
+                                                .get();
+                                            final listUserRegis =
+                                                RegisterTraineeModel.fromMap(
+                                                        loadListRegis.data()!)
+                                                    .listRegis;
+                                            listUserRegis!.add(userRegis);
+                                            firestore
+                                                .collection('trainees')
+                                                .doc(userId)
+                                                .update({
+                                              'listRegis': listUserRegis
+                                                  .map((i) => i.toMap())
+                                                  .toList(),
+                                            });
+                                            Navigator.pop(context);
+                                            GV.success(
+                                                context: context,
+                                                message: 'Đăng ký thành công.');
+                                          }
                                         }
-                                        firestore
-                                            .collection('trainees')
-                                            .doc(userId)
-                                            .update({
-                                          'listRegis': listUserRegis
-                                              .map((i) => i.toMap())
-                                              .toList(),
-                                        });
-                                        Navigator.pop(context);
-                                        GV.success(
-                                            context: context,
-                                            message: 'Đã cập nhật thành công.');
-                                      }
-                                    }
-                                  }
-                                } else {
-                                  if (currentUser.selectedJob.value.jobId ==
-                                      null) {
-                                    GV.error(
-                                        context: context,
-                                        message:
-                                            'Vui lòng chọn vị trí ứng tuyển.');
-                                  } else {
-                                    final regis = JobRegisterModel(
-                                      userId: userId,
-                                      jobId:
-                                          currentUser.selectedJob.value.jobId,
-                                      userName: currentUser.userName.value,
-                                      jobName:
-                                          currentUser.selectedJob.value.jobName,
-                                      status: TrangThai.wait,
-                                      createdAt: Timestamp.now(),
-                                    );
-                                    var listRegis = firm.listRegis;
-                                    listRegis!.add(regis);
-                                    firestore
-                                        .collection('firms')
-                                        .doc(firm.firmId)
-                                        .update({
-                                      'listRegis': listRegis
-                                          .map((i) => i.toMap())
-                                          .toList()
-                                    });
-                                    final userRegis = UserRegisterModel(
-                                      firmId: firm.firmId,
-                                      firmName: firm.firmName,
-                                      jobId: regis.jobId,
-                                      jobName: regis.jobName,
-                                      status: TrangThai.wait,
-                                      createdAt: Timestamp.now(),
-                                    );
-                                    var loadListRegis = await firestore
-                                        .collection('trainees')
-                                        .doc(userId)
-                                        .get();
-                                    final listUserRegis =
-                                        RegisterTraineeModel.fromMap(
-                                                loadListRegis.data()!)
-                                            .listRegis;
-                                    listUserRegis!.add(userRegis);
-                                    firestore
-                                        .collection('trainees')
-                                        .doc(userId)
-                                        .update({
-                                      'listRegis': listUserRegis
-                                          .map((i) => i.toMap())
-                                          .toList(),
-                                    });
-                                    Navigator.pop(context);
-                                    GV.success(
-                                        context: context,
-                                        message: 'Đăng ký thành công.');
-                                  }
-                                }
-                              },
-                            ),
-                          ]
-                        : loadRegis.status == TrangThai.accept &&
-                                loadRegis.isConfirmed == false
-                            ? [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    var loadCBHD = await firestore
-                                        .collection('users')
-                                        .doc(firm.firmId)
-                                        .get();
-                                    final cbhdName =
-                                        UserModel.fromMap(loadCBHD.data()!)
-                                            .userName;
-                                    final plan = PlanWorkModel(
-                                      cbhdId: firm.firmId,
-                                      cbhdName: cbhdName,
-                                      listWork: [],
-                                      userId: userId,
-                                    );
-                                    var listRegis = firm.listRegis;
-                                    for (int i = 0;
-                                        i < listRegis!.length;
-                                        i++) {
-                                      if (listRegis[i].userId ==
-                                          currentUser.userId.value) {
-                                        if (listRegis[i].jobId ==
-                                            currentUser
-                                                .selectedJob.value.jobId) {
-                                          listRegis[i].isConfirmed = true;
-                                          plan.traineeStart =
-                                              trainee.traineeStart;
-                                          plan.traineeEnd = trainee.traineeEnd;
-                                        }
-                                      }
-                                    }
-                                    firestore
-                                        .collection('plans')
-                                        .doc(userId)
-                                        .set(plan.toMap());
-                                    firestore
-                                        .collection('firms')
-                                        .doc(firm.firmId)
-                                        .update({
-                                      'listRegis': listRegis
-                                          .map((i) => i.toMap())
-                                          .toList()
-                                    });
-                                    var loadListRegis =
-                                        await GV.traineesCol.doc(userId).get();
-                                    final listUserRegis =
-                                        RegisterTraineeModel.fromMap(
-                                                loadListRegis.data()!)
-                                            .listRegis;
-                                    for (int i = 0;
-                                        i < listUserRegis!.length;
-                                        i++) {
-                                      if (listUserRegis[i].firmId ==
-                                          firm.firmId) {
-                                        if (listUserRegis[i].jobId ==
-                                            currentUser
-                                                .selectedJob.value.jobId) {
-                                          listUserRegis[i].isConfirmed = true;
-                                        }
-                                      }
-                                    }
-                                    firestore
-                                        .collection('trainees')
-                                        .doc(userId)
-                                        .update({
-                                      'listRegis': listUserRegis
-                                          .map((i) => i.toMap())
-                                          .toList(),
-                                    });
-                                    Navigator.pop(context);
-                                    GV.success(
-                                        context: context,
-                                        message:
-                                            'Đã xác nhận công ty thực tập');
-                                  },
-                                  child: const Text(
-                                    'Xác nhận',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                      },
                                     ),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text(
-                                    'Để sau',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ]
-                            : null,
+                                  ]
+                                : loadRegis.status == TrangThai.accept &&
+                                        loadRegis.isConfirmed == false
+                                    ? [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            var loadCBHD = await firestore
+                                                .collection('users')
+                                                .doc(firm.firmId)
+                                                .get();
+                                            final cbhdName = UserModel.fromMap(
+                                                    loadCBHD.data()!)
+                                                .userName;
+                                            final plan = PlanWorkModel(
+                                              cbhdId: firm.firmId,
+                                              cbhdName: cbhdName,
+                                              listWork: [],
+                                              userId: userId,
+                                            );
+                                            var listRegis = firm.listRegis;
+                                            for (int i = 0;
+                                                i < listRegis!.length;
+                                                i++) {
+                                              if (listRegis[i].userId ==
+                                                  currentUser.userId.value) {
+                                                if (listRegis[i].jobId ==
+                                                    currentUser.selectedJob
+                                                        .value.jobId) {
+                                                  listRegis[i].isConfirmed =
+                                                      true;
+                                                  plan.traineeStart =
+                                                      trainee.traineeStart;
+                                                  plan.traineeEnd =
+                                                      trainee.traineeEnd;
+                                                }
+                                              }
+                                            }
+                                            firestore
+                                                .collection('plans')
+                                                .doc(userId)
+                                                .set(plan.toMap());
+                                            firestore
+                                                .collection('firms')
+                                                .doc(firm.firmId)
+                                                .update({
+                                              'listRegis': listRegis
+                                                  .map((i) => i.toMap())
+                                                  .toList()
+                                            });
+                                            var loadListRegis = await GV
+                                                .traineesCol
+                                                .doc(userId)
+                                                .get();
+                                            final listUserRegis =
+                                                RegisterTraineeModel.fromMap(
+                                                        loadListRegis.data()!)
+                                                    .listRegis;
+                                            for (int i = 0;
+                                                i < listUserRegis!.length;
+                                                i++) {
+                                              if (listUserRegis[i].firmId ==
+                                                  firm.firmId) {
+                                                if (listUserRegis[i].jobId ==
+                                                    currentUser.selectedJob
+                                                        .value.jobId) {
+                                                  listUserRegis[i].isConfirmed =
+                                                      true;
+                                                }
+                                              }
+                                            }
+                                            firestore
+                                                .collection('trainees')
+                                                .doc(userId)
+                                                .update({
+                                              'listRegis': listUserRegis
+                                                  .map((i) => i.toMap())
+                                                  .toList(),
+                                            });
+                                            Navigator.pop(context);
+                                            GV.success(
+                                                context: context,
+                                                message:
+                                                    'Đã xác nhận công ty thực tập');
+                                          },
+                                          child: const Text(
+                                            'Xác nhận',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Để sau',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ]
+                                    : null
+                        : null,
               ),
             ],
           ),

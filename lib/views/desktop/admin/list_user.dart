@@ -8,10 +8,10 @@ import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 
@@ -269,7 +269,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 3,
+                                            flex: 4,
                                             child: Text(
                                               'Email',
                                               textAlign: TextAlign.center,
@@ -352,7 +352,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                             .userId!
                                                                             .toUpperCase(),
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
                                                                     flex: 3,
@@ -360,16 +360,16 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                         listUser[index]
                                                                             .userName!,
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                   Expanded(
-                                                                    flex: 3,
+                                                                    flex: 4,
                                                                     child: Text(
                                                                         listUser[index].email!.isNotEmpty
                                                                             ? '${listUser[index].email}'
                                                                             : "-",
                                                                         textAlign:
-                                                                            TextAlign.center),
+                                                                            TextAlign.justify),
                                                                   ),
                                                                 ],
                                                               ),
@@ -448,7 +448,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                                 .userId!
                                                                                 .toUpperCase(),
                                                                             textAlign:
-                                                                                TextAlign.center),
+                                                                                TextAlign.justify),
                                                                       ),
                                                                       Expanded(
                                                                         flex: 3,
@@ -456,16 +456,16 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                             listUser[index]
                                                                                 .userName!,
                                                                             textAlign:
-                                                                                TextAlign.center),
+                                                                                TextAlign.justify),
                                                                       ),
                                                                       Expanded(
-                                                                        flex: 3,
+                                                                        flex: 4,
                                                                         child: Text(
                                                                             listUser[index].email!.isNotEmpty
                                                                                 ? '${listUser[index].email}'
                                                                                 : "-",
                                                                             textAlign:
-                                                                                TextAlign.center),
+                                                                                TextAlign.justify),
                                                                       ),
                                                                     ],
                                                                   ),

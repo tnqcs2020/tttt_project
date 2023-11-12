@@ -115,7 +115,7 @@ List<String> pageSinhVien = [
   RouteGenerator.home,
   RouteGenerator.info,
   RouteGenerator.register,
-  RouteGenerator.firm,
+  RouteGenerator.firmSV,
 ];
 
 List<String> menuQuanTri = [
@@ -151,6 +151,7 @@ List<String> menuGiaoVu = [
   "Quản lý kế hoạch thực tập",
   "Quản lý các mốc thời gian thực tập",
   "Danh sách thực tập",
+  "Danh sách công ty",
 ];
 List<String> pageGiaoVu = [
   RouteGenerator.home,
@@ -158,18 +159,21 @@ List<String> pageGiaoVu = [
   RouteGenerator.manageCredit,
   RouteGenerator.managePlan,
   RouteGenerator.settingTrainee,
-  RouteGenerator.dstttt
+  RouteGenerator.dstttt,
+  RouteGenerator.firmCommon,
 ];
 
 List<String> menuCoVan = [
   'Trang chủ',
   "Thông tin",
   "Quản lý sinh viên",
+  "Danh sách công ty",
 ];
 List<String> pageCoVan = [
   RouteGenerator.home,
   RouteGenerator.infoCV,
   RouteGenerator.dssv,
+  RouteGenerator.firmCommon,
 ];
 
 class NguoiDung {

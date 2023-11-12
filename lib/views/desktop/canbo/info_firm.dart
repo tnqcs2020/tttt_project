@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class InfoFirm extends StatefulWidget {
   const InfoFirm({
@@ -33,7 +33,7 @@ class _InfoFirmState extends State<InfoFirm> {
   final TextEditingController describeCtrl = TextEditingController();
   final ValueNotifier totalJob = ValueNotifier(1);
   List<TextEditingController> positions = [TextEditingController()];
-  List<TextEditingController> quantities = [TextEditingController()];
+  // List<TextEditingController> quantities = [TextEditingController()];
   List<TextEditingController> describes = [TextEditingController()];
   List<JobPositionModel> jobs = [];
   int temp = 0;
@@ -101,12 +101,12 @@ class _InfoFirmState extends State<InfoFirm> {
         if (loadFirm.listJob != null && loadFirm.listJob!.isNotEmpty) {
           setState(() {
             positions = [];
-            quantities = [];
+            // quantities = [];
             describes = [];
             temp = 0;
             loadFirm.listJob!.forEach((element) {
               positions.add(TextEditingController(text: element.jobName));
-              quantities.add(TextEditingController(text: element.quantity));
+              // quantities.add(TextEditingController(text: element.quantity));
               describes.add(TextEditingController(text: element.describeJob));
               temp++;
             });
@@ -135,7 +135,7 @@ class _InfoFirmState extends State<InfoFirm> {
     addressCtrl.dispose();
     describeCtrl.dispose();
     positions.forEach((element) => element.dispose());
-    quantities.forEach((element) => element.dispose());
+    // quantities.forEach((element) => element.dispose());
     describes.forEach((element) => element.dispose());
     totalJob.dispose();
     super.dispose();
@@ -249,73 +249,67 @@ class _InfoFirmState extends State<InfoFirm> {
                                 shrinkWrap: true,
                                 scrollDirection: Axis.vertical,
                                 itemBuilder: (context, index) {
-                                  return Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      LineDetail(
-                                        field: 'Vị trí',
-                                        widthField: 0.03,
-                                        widthForm: 0.1,
-                                        ctrl: positions[index],
-                                      ),
-                                      SizedBox(width: screenWidth * 0.015),
-                                      LineDetail(
-                                        field: 'Số lượng',
-                                        widthField: 0.05,
-                                        widthForm: 0.03,
-                                        ctrl: quantities[index],
-                                        textFormat: [
-                                          FilteringTextInputFormatter.allow(
-                                            RegExp(r'[0-9]'),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(width: screenWidth * 0.015),
-                                      LineDetail(
-                                        field: 'Mô tả',
-                                        widthField: 0.03,
-                                        widthForm: 0.2,
-                                        ctrl: describes[index],
-                                      ),
-                                      SizedBox(width: screenWidth * 0.015),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                totalJob.value--;
-                                                quantities.removeAt(index);
-                                                positions.removeAt(index);
-                                                describes.removeAt(index);
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.remove_circle_outlined,
-                                              size: 30,
-                                              color: Colors.red,
-                                            )),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                totalJob.value++;
-                                                quantities.insert(index + 1,
-                                                    TextEditingController());
-                                                positions.insert(index + 1,
-                                                    TextEditingController());
-                                                describes.insert(index + 1,
-                                                    TextEditingController());
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.add_circle_outlined,
-                                              size: 30,
-                                              color: Colors.green,
-                                            )),
-                                      ),
-                                    ],
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        LineDetail(
+                                          field: 'Vị trí',
+                                          widthField: 0.03,
+                                          widthForm: 0.1,
+                                          ctrl: positions[index],
+                                        ),
+                                        SizedBox(width: screenWidth * 0.015),
+                                        LineDetail(
+                                          field: 'Mô tả/Yêu cầu',
+                                          widthField: 0.05,
+                                          widthForm: 0.25,
+                                          ctrl: describes[index],
+                                        ),
+                                        SizedBox(width: screenWidth * 0.015),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalJob.value--;
+                                                  // quantities.removeAt(index);
+                                                  positions.removeAt(index);
+                                                  describes.removeAt(index);
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.remove_circle_outlined,
+                                                size: 30,
+                                                color: Colors.red,
+                                              )),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
+                                          child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalJob.value++;
+                                                  // quantities.insert(index + 1,
+                                                  //     TextEditingController());
+                                                  positions.insert(index + 1,
+                                                      TextEditingController());
+                                                  describes.insert(index + 1,
+                                                      TextEditingController());
+                                                });
+                                              },
+                                              icon: const Icon(
+                                                Icons.add_circle_outlined,
+                                                size: 30,
+                                                color: Colors.green,
+                                              )),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 });
                           }),
@@ -328,15 +322,12 @@ class _InfoFirmState extends State<InfoFirm> {
                           onTap: () async {
                             if (firmFormKey.currentState!.validate()) {
                               jobs = [];
-                              if (positions.length == quantities.length &&
-                                  positions.length == describes.length) {
+                              if (positions.length == describes.length) {
                                 for (int i = 0; i < totalJob.value; i++) {
                                   if (positions[i].text != '' ||
-                                      quantities[i].text != '' ||
                                       describes[i].text != '') {
                                     jobs.add(JobPositionModel(
                                         jobName: positions[i].text,
-                                        quantity: quantities[i].text,
                                         describeJob: describes[i].text,
                                         jobId: GV.generateRandomString(10)));
                                   }

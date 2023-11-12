@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:tttt_project/views/login/form_sign_in.dart';
 import 'package:tttt_project/widgets/announcement.dart';
 import 'package:tttt_project/widgets/footer.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class LogInScreen extends StatelessWidget {
   LogInScreen({Key? key}) : super(key: key);

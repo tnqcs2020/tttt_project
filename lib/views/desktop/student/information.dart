@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/footer.dart';
@@ -80,6 +80,8 @@ class _InfoScreenState extends State<InfoScreen> {
           setPhone: loadUser.phone,
           setClassId: loadUser.classId,
           setCVClass: loadUser.cvClass,
+          setKhoa: loadUser.khoa,
+          setMajorId: loadUser.majorId,
         );
       }
     }
@@ -204,13 +206,38 @@ class _InfoScreenState extends State<InfoScreen> {
                                               CrossAxisAlignment.center,
                                           children: [
                                             LineDetail(
-                                                field: "Khóa",
+                                                field: "Mã ngành",
                                                 display:
-                                                    currentUser.course.value),
+                                                    currentUser.majorId.value),
                                             LineDetail(
                                                 field: "Ngành",
                                                 display:
                                                     currentUser.major.value,
+                                                widthForm: 0.19),
+                                          ],
+                                        ),
+                                      ),
+                                      const Divider(
+                                        thickness: 0.2,
+                                        height: 0,
+                                        color: Colors.black,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 15),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            LineDetail(
+                                                field: "Khóa",
+                                                display:
+                                                    currentUser.course.value),
+                                            LineDetail(
+                                                field: "Khoa",
+                                                display: currentUser.khoa.value,
                                                 widthForm: 0.19),
                                           ],
                                         ),
@@ -237,6 +264,32 @@ class _InfoScreenState extends State<InfoScreen> {
                                                 field: "Lớp",
                                                 display:
                                                     currentUser.className.value,
+                                                widthForm: 0.19),
+                                          ],
+                                        ),
+                                      ),
+                                      const Divider(
+                                        thickness: 0.2,
+                                        height: 0,
+                                        color: Colors.black,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 15),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            LineDetail(
+                                                field: "Mã cố vấn",
+                                                display: currentUser.cvId.value
+                                                    .toUpperCase()),
+                                            LineDetail(
+                                                field: "Lớp",
+                                                display:
+                                                    currentUser.cvName.value,
                                                 widthForm: 0.19),
                                           ],
                                         ),

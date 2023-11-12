@@ -6,10 +6,10 @@ import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/views/desktop/covan/list_student_class.dart';
 import 'package:tttt_project/views/desktop/covan/list_student_class_trainee.dart';
 import 'package:tttt_project/widgets/header.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 
@@ -25,7 +25,7 @@ class _ListUserScreenState extends State<ManageListStudent> {
   final currentUser = Get.put(UserController());
   ValueNotifier<String> selectedND = ValueNotifier<String>(NguoiDung.empty);
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
-  ValueNotifier selectedMenu = ValueNotifier(1);
+  ValueNotifier selectedMenu = ValueNotifier(0);
   List manageClass = [
     'Danh sách lớp',
     'Danh sách thực tập',

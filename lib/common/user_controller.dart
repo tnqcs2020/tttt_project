@@ -22,6 +22,8 @@ class UserController extends GetxController {
   RxString cvId = "".obs;
   RxString cvName = "".obs;
   RxString cvChucVu = "".obs;
+  RxString majorId = "".obs;
+  RxString khoa = "".obs;
   RxList<ClassModel> cvClass = RxList();
   RxInt menuSelected = 0.obs;
   RxInt selectedStep = 0.obs;
@@ -37,7 +39,7 @@ class UserController extends GetxController {
   RxDouble finalTotal = 0.0.obs;
   RxString selectedCourse = ''.obs;
   RxString selectedMajor = ''.obs;
-  
+
   setCurrentUser({
     String? setUid,
     String? setUserName,
@@ -56,6 +58,8 @@ class UserController extends GetxController {
     String? setCvName,
     List<ClassModel>? setCVClass,
     String? setCvChucVu,
+    String? setMajorId,
+    String? setKhoa,
     int? setMenuSelected,
     int? setReachedStep,
     bool? setLoadIn,
@@ -77,6 +81,8 @@ class UserController extends GetxController {
     cvName.value = setCvName ?? cvName.value;
     cvChucVu.value = setCvChucVu ?? cvChucVu.value;
     cvClass = setCVClass != null ? RxList(setCVClass) : cvClass;
+    majorId.value = setMajorId ?? majorId.value;
+    khoa.value = setKhoa ?? khoa.value;
     menuSelected.value = setMenuSelected ?? menuSelected.value;
     reachedStep.value = setReachedStep ?? reachedStep.value;
     loadIn.value = setLoadIn ?? false;
@@ -100,6 +106,8 @@ class UserController extends GetxController {
     cvName.value = "";
     cvChucVu.value = "";
     cvClass.value = [];
+    majorId.value = '';
+    khoa.value = '';
     menuSelected.value = 0;
     reachedStep.value = 0;
     selectedStep.value = 0;

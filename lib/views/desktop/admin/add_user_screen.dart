@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tiengviet/tiengviet.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_textfield.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
@@ -41,15 +41,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final TextEditingController _cvIdCtrl = TextEditingController();
   final TextEditingController _cvChucVuCtrl = TextEditingController();
   final TextEditingController _cvNameCtrl = TextEditingController();
+  final TextEditingController _khoaCtrl = TextEditingController();
+  final TextEditingController _majorIdCtrl = TextEditingController();
+
   ValueNotifier idEmail = ValueNotifier("");
   ValueNotifier nameEmail = ValueNotifier("");
-  List<String> dsnd = [
-    NguoiDung.giaovu,
-    NguoiDung.covan,
-    // NguoiDung.congty,
-    NguoiDung.cbhd,
-    NguoiDung.sinhvien,
-  ];
   String? selectedND;
 
   @override
@@ -73,6 +69,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
     _cvNameCtrl.dispose();
     idEmail.dispose();
     nameEmail.dispose();
+    _khoaCtrl.dispose();
+    _majorIdCtrl.dispose();
     super.dispose();
   }
 
@@ -524,7 +522,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                           0.07,
                                                                   child:
                                                                       const Text(
-                                                                    "Ngành:",
+                                                                    "Mã ngành:",
                                                                     style: TextStyle(
                                                                         fontWeight:
                                                                             FontWeight.bold),
@@ -532,9 +530,68 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                 ),
                                                                 CustomTextField(
                                                                   hintText:
-                                                                      "Ngành",
+                                                                      "Mã ngành",
+                                                                  controller:
+                                                                      _majorIdCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Tên ngành:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Tên ngành",
                                                                   controller:
                                                                       _majorCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Khoa:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Tên khoa",
+                                                                  controller:
+                                                                      _khoaCtrl,
                                                                   validator: (p0) =>
                                                                       p0!.isEmpty
                                                                           ? 'Không được để trống'
@@ -774,6 +831,65 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                           0.07,
                                                                   child:
                                                                       const Text(
+                                                                    "Khoa:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Tên khoa",
+                                                                  controller:
+                                                                      _khoaCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Chức vụ:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Chức vụ của giảng viên",
+                                                                  controller:
+                                                                      _cvChucVuCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
                                                                     "Mã lớp cố vấn:",
                                                                     style: TextStyle(
                                                                         fontWeight:
@@ -822,10 +938,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                         ),
                                                       ],
                                                       if (selectedND ==
-                                                              NguoiDung.cbhd ||
-                                                          selectedND ==
-                                                              NguoiDung
-                                                                  .giaovu) ...[
+                                                          NguoiDung.cbhd) ...[
                                                         Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
@@ -944,6 +1057,131 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                           ],
                                                         ),
                                                       ],
+                                                      if (selectedND ==
+                                                          NguoiDung.giaovu) ...[
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Tài khoản:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Mã số",
+                                                                  controller:
+                                                                      _userIdCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                  onChanged:
+                                                                      (p0) {
+                                                                    _emailCtrl
+                                                                        .text = getEmail(
+                                                                            p0!) +
+                                                                        '@ctu.edu.vn';
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Mật khẩu:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Mật khẩu",
+                                                                  controller:
+                                                                      _pwdCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Họ tên:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  hintText:
+                                                                      "Họ tên",
+                                                                  controller:
+                                                                      _userNameCtrl,
+                                                                  validator: (p0) =>
+                                                                      p0!.isEmpty
+                                                                          ? 'Không được để trống'
+                                                                          : null,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                SizedBox(
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.07,
+                                                                  child:
+                                                                      const Text(
+                                                                    "Email:",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                CustomTextField(
+                                                                  controller:
+                                                                      _emailCtrl,
+                                                                  hintText:
+                                                                      _emailCtrl
+                                                                          .text,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                       const SizedBox(
                                                           height: 35),
                                                       if (selectedND != null)
@@ -1047,6 +1285,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                       cvName: _cvNameCtrl
                                                                           .text,
                                                                       cvClass: [],
+                                                                      majorId:
+                                                                          _majorIdCtrl
+                                                                              .text,
+                                                                      khoa: _khoaCtrl
+                                                                          .text,
                                                                     );
                                                                   } else if (selectedND ==
                                                                       NguoiDung
@@ -1086,6 +1329,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                           selectedND,
                                                                       cvClass:
                                                                           cvClass,
+                                                                      cvChucVu:
+                                                                          _cvChucVuCtrl
+                                                                              .text,
+                                                                      khoa: _khoaCtrl
+                                                                          .text,
                                                                     );
                                                                   } else {
                                                                     userModel =
@@ -1108,10 +1356,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                       group:
                                                                           selectedND,
                                                                       cvClass: [],
-                                                                      email: selectedND ==
-                                                                              NguoiDung.giaovu
-                                                                          ? "${nameEmail.value}@ctu.edu.vn"
-                                                                          : _emailCtrl.text,
+                                                                      email: _emailCtrl
+                                                                          .text,
                                                                     );
                                                                   }
                                                                   final docUser = GV
@@ -1153,6 +1399,10 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                         "";
                                                                     nameEmail
                                                                         .value = "";
+                                                                    _khoaCtrl
+                                                                        .text = "";
+                                                                    _majorIdCtrl
+                                                                        .text = "";
                                                                   });
                                                                   GV.success(
                                                                       context:

@@ -10,10 +10,10 @@ import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 
@@ -682,7 +682,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                                     )
                                                   : const Center(
                                                       child: Text(
-                                                          'Vui lòng chọn khóa và học kỳ sau đó nhấn vào nút xem để tiếp tục.'),
+                                                          'Vui lòng chọn khóa và ngành sau đó nhấn vào nút xem để tiếp tục.'),
                                                     ),
                                     )
                                   ],
@@ -1059,10 +1059,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        firestore
-                            .collection('credits')
-                            .doc(creditId)
-                            .delete();
+                        firestore.collection('credits').doc(creditId).delete();
                         Navigator.of(context).pop();
                         GV.success(
                             context: context, message: 'Đã xóa học phần.');

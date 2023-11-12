@@ -7,19 +7,19 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
+import 'package:tttt_project/common/date_time_extension.dart';
 import 'package:tttt_project/models/appreciate_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
-import 'package:tttt_project/models/plan_work_model.dart';
-import 'package:tttt_project/views/desktop/student/register_trainee.dart';
+import 'package:tttt_project/models/plan_work_model.dart'; 
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class ListStudentTrainee extends StatefulWidget {
   const ListStudentTrainee({

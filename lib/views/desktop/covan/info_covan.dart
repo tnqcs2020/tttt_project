@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/data/constant.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/widgets/line_detail.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class InfoCV extends StatefulWidget {
   const InfoCV({
@@ -72,6 +72,8 @@ class _InfoCVState extends State<InfoCV> {
           setPhone: loadUser.phone,
           setClassId: loadUser.classId,
           setCVClass: loadUser.cvClass,
+          setKhoa: loadUser.khoa,
+          setMajorId: loadUser.majorId,
         );
         nameCVCtrl.text = currentUser.userName.value;
         phoneCVCtrl.text = currentUser.phone.value;

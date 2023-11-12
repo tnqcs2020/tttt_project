@@ -7,7 +7,7 @@ import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
 import 'package:tttt_project/widgets/loading.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 
 class ListStudentClass extends StatefulWidget {
   const ListStudentClass({Key? key}) : super(key: key);
@@ -184,7 +184,7 @@ class _ListStudentClassState extends State<ListStudentClass> {
               children: [
                 Container(
                   color: Colors.green,
-                  height: screenHeight * 0.035,
+                  height: screenHeight * 0.04,
                   child: const Row(
                     children: [
                       Expanded(

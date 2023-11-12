@@ -8,7 +8,7 @@ import 'package:tttt_project/views/desktop/student/regisFirm/list_firm_regis.dar
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:tttt_project/views/desktop/student/regisFirm/my_cv.dart';
-import 'package:tttt_project/widgets/user_controller.dart';
+import 'package:tttt_project/common/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/widgets/menu/menu_left.dart';
@@ -78,29 +78,7 @@ class _FirmLinkState extends State<FirmLink> {
     'Công ty đã đăng ký'
   ];
 
-  // List firmQuanTri = ['Danh sách công ty', 'Thêm công ty'];
-
   List firmContentSV = [const MyCV(), const ListFirm(), const ListFirmRegis()];
-  // List firmContentQT = [const Text('ds'), const Text('...')];
-  // List checkFirmTitle() {
-  //   List titles = [];
-  //   if (currentUser.group.value == NguoiDung.sinhvien) {
-  //     titles = firmSinhVien;
-  //   } else if (currentUser.group.value == NguoiDung.quantri) {
-  //     titles = firmQuanTri;
-  //   }
-  //   return titles;
-  // }
-
-  // List checkFirmContent() {
-  //   List pages = [];
-  //   if (currentUser.group.value == NguoiDung.sinhvien) {
-  //     pages = firmContentSV;
-  //   } else if (currentUser.group.value == NguoiDung.quantri) {
-  //     pages = firmContentSV;
-  //   }
-  //   return pages;
-  // }
 
   @override
   void dispose() {
@@ -158,7 +136,7 @@ class _FirmLinkState extends State<FirmLink> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Tìm Kiếm Công Ty Và Vị Trí Thực Tập",
+                                  "Tìm kiếm công ty và vị trí thực tập",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -171,10 +149,7 @@ class _FirmLinkState extends State<FirmLink> {
                           ValueListenableBuilder(
                             valueListenable: selectedMenu,
                             builder: (context, value, child) {
-                              return
-                                  //  Obx(
-                                  //   () =>
-                                  Column(
+                              return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
@@ -220,7 +195,6 @@ class _FirmLinkState extends State<FirmLink> {
                                   ),
                                   firmContentSV[selectedMenu.value],
                                 ],
-                                // ),
                               );
                             },
                           ),

@@ -6,6 +6,7 @@ import 'package:tttt_project/views/desktop/canbo/manage_info_canbo.dart';
 import 'package:tttt_project/views/desktop/canbo/manage_trainee.dart';
 import 'package:tttt_project/views/desktop/covan/info_covan.dart';
 import 'package:tttt_project/views/desktop/covan/manage_list_student.dart';
+import 'package:tttt_project/views/desktop/giaovu/list_firm_common.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_announcement.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_credit_screen.dart';
 import 'package:tttt_project/views/desktop/giaovu/manage_setting_trainee.dart';
@@ -19,11 +20,11 @@ import 'package:tttt_project/views/login/login_screen.dart';
 class RouteGenerator {
   static const String login = '/dang-nhap';
   static const String info = '/thong-tin';
-  static const String register = '/dky-tttt';
-  static const String firm = '/cong-ty';
+  static const String register = '/thuc-tap';
+  static const String firmSV = '/cong-ty';
   static const String home = '/trang-chu';
   static const String addUser = '/tao-tk';
-  static const String dstttt = '/ds-tttt';
+  static const String dstttt = '/ds-thuc-tap';
   static const String manageCredit = '/ql-hoc-phan';
   static const String manageInfoCB = '/ql-thong-tin';
   static const String manageTraineeCB = '/ql-thuc-tap';
@@ -33,6 +34,7 @@ class RouteGenerator {
   static const String infoCV = '/thong-tin-cv';
   static const String dssv = '/ds-sinh-vien';
   static const String settingTrainee = '/ql-thoi-gian';
+  static const String firmCommon = '/ds-cong-ty';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -56,7 +58,7 @@ class RouteGenerator {
           settings: routeSettings,
           builder: (_) => const RegisterTrainee(),
         );
-      case firm:
+      case firmSV:
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const FirmLink(),
@@ -121,6 +123,11 @@ class RouteGenerator {
           settings: routeSettings,
           builder: (_) => const SettingTraineeScreen(),
         );
+      case firmCommon:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ListFirmCommon(),
+        );  
       default:
         return MaterialPageRoute(
           settings: routeSettings,

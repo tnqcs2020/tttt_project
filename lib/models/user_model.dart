@@ -19,7 +19,9 @@ class UserModel {
       group,
       cvId,
       cvName,
-      cvChucVu;
+      cvChucVu,
+      majorId,
+      khoa;
   List<ClassModel>? cvClass;
 
   UserModel({
@@ -41,6 +43,8 @@ class UserModel {
     this.cvName,
     this.cvChucVu,
     this.cvClass,
+    this.majorId,
+    this.khoa,
   });
 
   Map<String, dynamic> toMap() {
@@ -63,6 +67,8 @@ class UserModel {
       'cvName': cvName,
       'cvChucVu': cvChucVu,
       'cvClass': cvClass!.map((e) => e.toMap()).toList(),
+      'majorId': majorId,
+      'khoa': khoa,
     };
   }
 
@@ -87,6 +93,8 @@ class UserModel {
       cvChucVu: map['cvChucVu'] ?? '',
       cvClass:
           map['cvClass'].map<ClassModel>((i) => ClassModel.fromMap(i)).toList(),
+      majorId: map['majorId'] ?? '',
+      khoa: map['khoa'],
     );
   }
 
