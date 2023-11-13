@@ -524,13 +524,31 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                               );
                                                             },
                                                           )
-                                                        : const Center(
-                                                            child: Text(
-                                                                'Chưa có sinh viên đăng ký.'),
+                                                        : SizedBox(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.45,
+                                                            width: screenWidth *
+                                                                0.55,
+                                                            child: const Center(
+                                                              child: Text(
+                                                                  'Chưa có sinh viên đăng ký.'),
+                                                            ),
                                                           );
                                                   } else {
-                                                    return const Center(
-                                                        child: Loading());
+                                                    return SizedBox(
+                                                      height:
+                                                          screenHeight * 0.45,
+                                                      width: screenWidth * 0.55,
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Loading(),
+                                                        ],
+                                                      ),
+                                                    );
                                                   }
                                                 },
                                               ),
@@ -657,13 +675,34 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                   );
                                                                 },
                                                               )
-                                                            : const Center(
-                                                                child: Text(
-                                                                    'Chưa có kế hoạch nào trong khoản thời gian bạn chọn.'),
+                                                            : SizedBox(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.45,
+                                                                width:
+                                                                    screenWidth *
+                                                                        0.55,
+                                                                child:
+                                                                    const Center(
+                                                                  child: Text(
+                                                                      'Chưa có kế hoạch nào trong khoản thời gian bạn chọn.'),
+                                                                ),
                                                               );
                                                       } else {
-                                                        return const Center(
-                                                            child: Loading());
+                                                        return SizedBox(
+                                                          height: screenHeight *
+                                                              0.45,
+                                                          width: screenWidth *
+                                                              0.55,
+                                                          child: const Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Loading(),
+                                                            ],
+                                                          ),
+                                                        );
                                                       }
                                                     },
                                                   ),
@@ -689,84 +728,6 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
         ),
       ),
     );
-  }
-
-  showSetTime({
-    required BuildContext context,
-    required String creditId,
-  }) async {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    showDialog(
-        context: context,
-        barrierColor: Colors.black12,
-        builder: (context) {
-          return Padding(
-            padding: EdgeInsets.only(
-              top: screenHeight * 0.06,
-              bottom: screenHeight * 0.02,
-              left: screenWidth * 0.27,
-              right: screenWidth * 0.08,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AlertDialog(
-                  title: Container(
-                    color: Colors.blue.shade600,
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Thiết lập thời gian thực tập',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                      ],
-                    ),
-                  ),
-                  titlePadding: EdgeInsets.zero,
-                  shape: Border.all(width: 0.5),
-                  content:
-                      const Text("Bạn có chắc chắn muốn xóa kế hoạch này?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        "Hủy",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        firestore
-                            .collection('planTrainees')
-                            .doc(creditId)
-                            .delete();
-                        Navigator.of(context).pop();
-                        GV.success(
-                            context: context, message: 'Đã xóa kế hoạch.');
-                      },
-                      child: const Text(
-                        "Đồng ý",
-                        style: TextStyle(
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        });
   }
 
   editPlanTrainee({

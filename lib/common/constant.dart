@@ -149,7 +149,7 @@ List<String> menuGiaoVu = [
   "Quản lý thông báo",
   "Quản lý học phần",
   "Quản lý kế hoạch thực tập",
-  "Quản lý các mốc thời gian thực tập",
+  "Quản lý các mốc thời gian",
   "Danh sách thực tập",
   "Danh sách công ty",
 ];
@@ -165,7 +165,7 @@ List<String> pageGiaoVu = [
 
 List<String> menuCoVan = [
   'Trang chủ',
-  "Thông tin",
+  "Thông tin cá nhân",
   "Quản lý sinh viên",
   "Danh sách công ty",
 ];

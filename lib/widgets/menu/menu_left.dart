@@ -108,7 +108,12 @@ class _MenuLeftState extends State<MenuLeft> {
                 return Column(
                   children: [
                     ListTile(
-                      title: Text(checkMenuTitle()[index]),
+                      title: Text(checkMenuTitle()[index],
+                          textAlign: TextAlign.justify),
+                      titleTextStyle: currentUser.menuSelected.value == index
+                          ? const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)
+                          : const TextStyle(fontSize: 15),
                       onTap: () async {
                         currentUser.menuSelected.value = index;
                         SharedPreferences prefs =

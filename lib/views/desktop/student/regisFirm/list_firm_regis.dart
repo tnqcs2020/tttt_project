@@ -429,7 +429,19 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                             ),
                                                                             if (setting.settingId != null &&
                                                                                 DateTime.now().isBeforeTimestamp(setting.traineeStart!)) ...[
-                                                                              if (isTrainee && listRegis[indexRegis].isConfirmed!) ...[
+                                                                              if (listRegis[indexRegis].status == TrangThai.reject) ...[
+                                                                                const Text('Vị trí tuyển dụng:'),
+                                                                                for (var job in firm.listJob!)
+                                                                                  Padding(
+                                                                                    padding: const EdgeInsets.only(left: 25),
+                                                                                    child: ListTile(
+                                                                                      dense: true,
+                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                      title: Text('${job.jobName}'),
+                                                                                      subtitle: job.describeJob != null ? Text('${job.describeJob}') : null,
+                                                                                    ),
+                                                                                  ),
+                                                                              ] else if (isTrainee && listRegis[indexRegis].isConfirmed!) ...[
                                                                                 Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                 Text('Ngày ứng tuyển: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}'),
                                                                                 Text('Ngày duyệt: ${GV.readTimestamp(listRegis[indexRegis].repliedAt!)}'),
@@ -468,7 +480,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                     () => CustomRadio(
                                                                                       title: '${data.jobName}',
                                                                                       onTap: () => currentUser.selectedJob.value = data,
-                                                                                      subtitle: '${data.describeJob}',
+                                                                                      subtitle: data.describeJob!.isNotEmpty ? data.describeJob : null,
                                                                                       selected: currentUser.selectedJob.value == data,
                                                                                     ),
                                                                                   ),
@@ -638,10 +650,23 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                     );
                                   },
                                 )
-                              : const Center(
-                                  child: Text('Bạn chưa đăng ký công ty.'));
+                              : SizedBox(
+                                  height: screenHeight * 0.45,
+                                  width: screenWidth * 0.55,
+                                  child: const Center(
+                                      child: Text('Bạn chưa đăng ký công ty.')),
+                                );
                         } else {
-                          return const Loading();
+                          return SizedBox(
+                            height: screenHeight * 0.45,
+                            width: screenWidth * 0.55,
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Loading(),
+                              ],
+                            ),
+                          );
                         }
                       },
                     ),

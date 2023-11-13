@@ -332,148 +332,157 @@ class _ListStudentClassState extends State<ListStudentClass> {
                                           );
                                         },
                                       )
-                                    : const Center(
-                                        child: Text('Chưa có thông báo.'),
+                                    : SizedBox(
+                                        height: screenHeight * 0.45,
+                                        width: screenWidth * 0.55,
+                                        child: const Center(
+                                          child: Text('Chưa có sinh viên.'),
+                                        ),
                                       );
                               } else {
-                                return const SizedBox.shrink();
+                                return SizedBox(
+                                  height: screenHeight * 0.45,
+                                  width: screenWidth * 0.55,
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Loading(),
+                                    ],
+                                  ),
+                                );
                               }
                             },
                           ),
                         )
                       : selectedClass.value == ClassModel.empty
-                          ? myClass.classId != null
-                              ? SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: StreamBuilder(
-                                    stream: firestore
-                                        .collection('users')
-                                        .where('classId',
-                                            isEqualTo: myClass.classId)
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      List<UserModel> listUser = [];
-                                      if (snapshot.hasData &&
-                                          snapshot.connectionState ==
-                                              ConnectionState.active) {
-                                        snapshot.data?.docs.forEach((element) {
-                                          listUser.add(UserModel.fromMap(
-                                              element.data()));
-                                        });
-                                        listUser.sort(
-                                          (a, b) =>
-                                              a.userId!.compareTo(b.userId!),
-                                        );
-                                        return listUser.isNotEmpty
-                                            ? ListView.builder(
-                                                itemCount: listUser.length,
-                                                shrinkWrap: true,
-                                                scrollDirection: Axis.vertical,
-                                                itemBuilder: (context, index) {
-                                                  return Container(
-                                                    height: screenHeight * 0.05,
-                                                    color: index % 2 == 0
-                                                        ? Colors.blue.shade50
-                                                        : null,
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          flex: 1,
-                                                          child: Text(
-                                                              '${index + 1}',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 2,
-                                                          child: Text(
-                                                              listUser[index]
-                                                                  .userId!
-                                                                  .toUpperCase(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .justify),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 3,
-                                                          child: Text(
-                                                              listUser[index]
-                                                                  .userName!,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .justify),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Text(
-                                                              listUser[index]
-                                                                      .email!
-                                                                      .isNotEmpty
-                                                                  ? '${listUser[index].email}'
-                                                                  : "-",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .justify),
-                                                        ),
-                                                        Expanded(
-                                                          flex: 2,
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              IconButton(
-                                                                tooltip:
-                                                                    'Xem thông tin',
-                                                                onPressed: () {
-                                                                  showInfo(
-                                                                      context:
-                                                                          context,
-                                                                      user: listUser[
-                                                                          index]);
-                                                                },
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        bottom:
-                                                                            1),
-                                                                icon:
-                                                                    const Icon(
-                                                                  Icons
-                                                                      .info_rounded,
-                                                                  color: Colors
-                                                                      .red,
-                                                                  size: 20,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
+                          ? SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: StreamBuilder(
+                                stream: firestore
+                                    .collection('users')
+                                    .where('classId',
+                                        isEqualTo: myClass.classId)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.connectionState ==
+                                          ConnectionState.active &&
+                                      myClass.classId != null) {
+                                    List<UserModel> listUser = [];
+                                    snapshot.data?.docs.forEach((element) {
+                                      listUser.add(
+                                          UserModel.fromMap(element.data()));
+                                    });
+                                    listUser.sort(
+                                      (a, b) => a.userId!.compareTo(b.userId!),
+                                    );
+                                    return listUser.isNotEmpty
+                                        ? ListView.builder(
+                                            itemCount: listUser.length,
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.vertical,
+                                            itemBuilder: (context, index) {
+                                              return Container(
+                                                height: screenHeight * 0.05,
+                                                color: index % 2 == 0
+                                                    ? Colors.blue.shade50
+                                                    : null,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Text(
+                                                          '${index + 1}',
+                                                          textAlign:
+                                                              TextAlign.center),
                                                     ),
-                                                  );
-                                                },
-                                              )
-                                            : const Center(
-                                                child:
-                                                    Text('Chưa có thông báo.'),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Text(
+                                                          listUser[index]
+                                                              .userId!
+                                                              .toUpperCase(),
+                                                          textAlign: TextAlign
+                                                              .justify),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Text(
+                                                          listUser[index]
+                                                              .userName!,
+                                                          textAlign: TextAlign
+                                                              .justify),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 4,
+                                                      child: Text(
+                                                          listUser[index]
+                                                                  .email!
+                                                                  .isNotEmpty
+                                                              ? '${listUser[index].email}'
+                                                              : "-",
+                                                          textAlign: TextAlign
+                                                              .justify),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          IconButton(
+                                                            tooltip:
+                                                                'Xem thông tin',
+                                                            onPressed: () {
+                                                              showInfo(
+                                                                  context:
+                                                                      context,
+                                                                  user: listUser[
+                                                                      index]);
+                                                            },
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    bottom: 1),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .info_rounded,
+                                                              color: Colors.red,
+                                                              size: 20,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               );
-                                      } else {
-                                        return const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Center(child: Loading()),
-                                          ],
-                                        );
-                                      }
-                                    },
-                                  ),
-                                )
-                              : const SizedBox.shrink()
+                                            },
+                                          )
+                                        : SizedBox(
+                                            height: screenHeight * 0.45,
+                                            width: screenWidth * 0.55,
+                                            child: const Center(
+                                              child: Text('Chưa có sinh viên.'),
+                                            ),
+                                          );
+                                  } else {
+                                    return SizedBox(
+                                      height: screenHeight * 0.45,
+                                      width: screenWidth * 0.55,
+                                      child: const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Loading(),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            )
                           : const Center(
                               child: Text(
                                   'Vui lòng nhấn vào nút xem để tiếp tục.'),

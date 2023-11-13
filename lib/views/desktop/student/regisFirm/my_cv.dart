@@ -553,11 +553,7 @@ class _MyCVState extends State<MyCV> {
                                                                                             '${job.jobName}',
                                                                                             style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                           ),
-                                                                                          subtitle: Text(
-                                                                                            '${job.describeJob}',
-                                                                                            textAlign: TextAlign.justify,
-                                                                                            overflow: TextOverflow.clip,
-                                                                                          ),
+                                                                                          subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -587,11 +583,7 @@ class _MyCVState extends State<MyCV> {
                                                                                             '${job.jobName}',
                                                                                             style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                           ),
-                                                                                          subtitle: Text(
-                                                                                            '${job.describeJob}',
-                                                                                            textAlign: TextAlign.justify,
-                                                                                            overflow: TextOverflow.clip,
-                                                                                          ),
+                                                                                          subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -609,6 +601,18 @@ class _MyCVState extends State<MyCV> {
                                                                                         ],
                                                                                       ),
                                                                                     )
+                                                                                  ] else if (loadRegis.status == TrangThai.reject) ...[
+                                                                                    const Text('Vị trí tuyển dụng:'),
+                                                                                    for (var job in firm.listJob!)
+                                                                                      Padding(
+                                                                                        padding: const EdgeInsets.only(left: 25),
+                                                                                        child: ListTile(
+                                                                                          dense: true,
+                                                                                          contentPadding: EdgeInsets.zero,
+                                                                                          title: Text('${job.jobName}'),
+                                                                                          subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
+                                                                                        ),
+                                                                                      ),
                                                                                   ] else if (isTrainee && loadRegis.isConfirmed!) ...[
                                                                                     Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                     Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
@@ -626,11 +630,7 @@ class _MyCVState extends State<MyCV> {
                                                                                             '${job.jobName}',
                                                                                             style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                           ),
-                                                                                          subtitle: Text(
-                                                                                            '${job.describeJob}',
-                                                                                            textAlign: TextAlign.justify,
-                                                                                            overflow: TextOverflow.clip,
-                                                                                          ),
+                                                                                          subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
                                                                                         ),
                                                                                       ),
                                                                                     const Padding(
@@ -655,13 +655,25 @@ class _MyCVState extends State<MyCV> {
                                                                                         () => CustomRadio(
                                                                                           title: '${data.jobName}',
                                                                                           onTap: () => currentUser.selectedJob.value = data,
-                                                                                          subtitle: '${data.describeJob}',
+                                                                                          subtitle: data.describeJob!.isNotEmpty ? data.describeJob : null,
                                                                                           selected: currentUser.selectedJob.value == data,
                                                                                         ),
                                                                                       ),
                                                                                   ],
                                                                                 ] else ...[
-                                                                                  if (isTrainee && loadRegis.isConfirmed!) ...[
+                                                                                  if (loadRegis.status == TrangThai.reject) ...[
+                                                                                    const Text('Vị trí tuyển dụng:'),
+                                                                                    for (var job in firm.listJob!)
+                                                                                      Padding(
+                                                                                        padding: const EdgeInsets.only(left: 25),
+                                                                                        child: ListTile(
+                                                                                          dense: true,
+                                                                                          contentPadding: EdgeInsets.zero,
+                                                                                          title: Text('${job.jobName}'),
+                                                                                          subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
+                                                                                        ),
+                                                                                      ),
+                                                                                  ] else if (isTrainee && loadRegis.isConfirmed!) ...[
                                                                                     Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                     Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
                                                                                     Text('Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
@@ -678,11 +690,11 @@ class _MyCVState extends State<MyCV> {
                                                                                             '${job.jobName}',
                                                                                             style: const TextStyle(fontWeight: FontWeight.bold),
                                                                                           ),
-                                                                                          subtitle: Text(
-                                                                                            '${job.describeJob}',
-                                                                                            textAlign: TextAlign.justify,
-                                                                                            overflow: TextOverflow.clip,
-                                                                                          ),
+                                                                                          subtitle: job.describeJob!.isNotEmpty
+                                                                                              ? Text(
+                                                                                                  '${job.describeJob}',
+                                                                                                )
+                                                                                              : null,
                                                                                         ),
                                                                                       ),
                                                                                   ],

@@ -52,8 +52,16 @@ class CustomRadio extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title),
-                if (subtitle != null) Text(subtitle!),
+                Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: const TextStyle(fontSize: 13),
+                  ),
               ],
             ),
           ],

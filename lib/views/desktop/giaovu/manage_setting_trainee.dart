@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/request_edit_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
@@ -160,141 +161,124 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Column(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Học kỳ",
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w900,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(width: 15),
-                                            DropdownButtonHideUnderline(
-                                              child: DropdownButton2<String>(
-                                                isExpanded: true,
-                                                hint: Center(
-                                                  child: Text(
-                                                    'Chọn',
-                                                    style:
-                                                        DropdownStyle.hintStyle,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                items: dshkAll
-                                                    .map((String hk) =>
-                                                        DropdownMenuItem<
-                                                            String>(
-                                                          value: hk,
-                                                          child: Text(
-                                                            hk,
-                                                            style: DropdownStyle
-                                                                .itemStyle,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ))
-                                                    .toList(),
-                                                value: selectedHK != HocKy.empty
-                                                    ? selectedHK
-                                                    : null,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    selectedHK = value!;
-                                                  });
-                                                  currentUser.isCompleted
-                                                      .value = false;
-                                                },
-                                                buttonStyleData: DropdownStyle
-                                                    .buttonStyleShort,
-                                                iconStyleData:
-                                                    DropdownStyle.iconStyleData,
-                                                dropdownStyleData: DropdownStyle
-                                                    .dropdownStyleShort,
-                                                menuItemStyleData: DropdownStyle
-                                                    .menuItemStyleData,
+                                        const Text(
+                                          "Học kỳ",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(width: 15),
+                                        DropdownButtonHideUnderline(
+                                          child: DropdownButton2<String>(
+                                            isExpanded: true,
+                                            hint: Center(
+                                              child: Text(
+                                                'Chọn',
+                                                style: DropdownStyle.hintStyle,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                          ],
+                                            items: dshkAll
+                                                .map((String hk) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: hk,
+                                                      child: Text(
+                                                        hk,
+                                                        style: DropdownStyle
+                                                            .itemStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            value: selectedHK != HocKy.empty
+                                                ? selectedHK
+                                                : null,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedHK = value!;
+                                              });
+                                              currentUser.isCompleted.value =
+                                                  false;
+                                            },
+                                            buttonStyleData:
+                                                DropdownStyle.buttonStyleShort,
+                                            iconStyleData:
+                                                DropdownStyle.iconStyleData,
+                                            dropdownStyleData: DropdownStyle
+                                                .dropdownStyleShort,
+                                            menuItemStyleData:
+                                                DropdownStyle.menuItemStyleData,
+                                          ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(width: 25),
-                                    Column(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Năm học",
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w900,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(width: 15),
-                                            DropdownButtonHideUnderline(
-                                              child: DropdownButton2<NamHoc>(
-                                                isExpanded: true,
-                                                hint: Center(
-                                                  child: Text(
-                                                    "Chọn",
-                                                    style:
-                                                        DropdownStyle.hintStyle,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                items: dsnhAll
-                                                    .map((NamHoc nh) =>
-                                                        DropdownMenuItem<
-                                                            NamHoc>(
-                                                          value: nh,
-                                                          child: Text(
-                                                            nh.start == nh.end
-                                                                ? nh.start
-                                                                : "${nh.start} - ${nh.end}",
-                                                            style: DropdownStyle
-                                                                .itemStyle,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ))
-                                                    .toList(),
-                                                value:
-                                                    selectedNH != NamHoc.empty
-                                                        ? selectedNH
-                                                        : null,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    selectedNH = value!;
-                                                  });
-                                                  currentUser.isCompleted
-                                                      .value = false;
-                                                },
-                                                buttonStyleData: DropdownStyle
-                                                    .buttonStyleMedium,
-                                                iconStyleData:
-                                                    DropdownStyle.iconStyleData,
-                                                dropdownStyleData: DropdownStyle
-                                                    .dropdownStyleMedium,
-                                                menuItemStyleData: DropdownStyle
-                                                    .menuItemStyleData,
+                                        const Text(
+                                          "Năm học",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(width: 15),
+                                        DropdownButtonHideUnderline(
+                                          child: DropdownButton2<NamHoc>(
+                                            isExpanded: true,
+                                            hint: Center(
+                                              child: Text(
+                                                "Chọn",
+                                                style: DropdownStyle.hintStyle,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                          ],
+                                            items: dsnhAll
+                                                .map((NamHoc nh) =>
+                                                    DropdownMenuItem<NamHoc>(
+                                                      value: nh,
+                                                      child: Text(
+                                                        nh.start == nh.end
+                                                            ? nh.start
+                                                            : "${nh.start} - ${nh.end}",
+                                                        style: DropdownStyle
+                                                            .itemStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            value: selectedNH != NamHoc.empty
+                                                ? selectedNH
+                                                : null,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedNH = value!;
+                                              });
+                                              currentUser.isCompleted.value =
+                                                  false;
+                                            },
+                                            buttonStyleData:
+                                                DropdownStyle.buttonStyleMedium,
+                                            iconStyleData:
+                                                DropdownStyle.iconStyleData,
+                                            dropdownStyleData: DropdownStyle
+                                                .dropdownStyleMedium,
+                                            menuItemStyleData:
+                                                DropdownStyle.menuItemStyleData,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -331,7 +315,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                 decoration:
                                     const BoxDecoration(color: Colors.white),
                                 height: screenHeight * 0.45,
-                                width: screenWidth * 0.55,
+                                width: screenWidth * 0.6,
                                 child: Column(
                                   children: [
                                     Container(
@@ -349,7 +333,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 2,
+                                            flex: 1,
                                             child: Text(
                                               'Học kỳ',
                                               textAlign: TextAlign.center,
@@ -378,7 +362,16 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                           Expanded(
                                             flex: 2,
                                             child: Text(
-                                              'Khóa điểm',
+                                              'Thời gian khóa điểm',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              'Yêu cầu sửa điểm',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold),
@@ -397,9 +390,205 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                       ),
                                     ),
                                     Expanded(
-                                      child:
-                                          isLook.value &&
-                                                  currentUser.isCompleted.isTrue
+                                      child: isLook.value &&
+                                              currentUser.isCompleted.isTrue
+                                          ? SingleChildScrollView(
+                                              scrollDirection: Axis.vertical,
+                                              child: StreamBuilder(
+                                                stream: firestore
+                                                    .collection(
+                                                        'settingTrainees')
+                                                    .snapshots(),
+                                                builder: (context, snapshot) {
+                                                  List<SettingTraineeModel>
+                                                      loadTrainee = [];
+                                                  List<SettingTraineeModel>
+                                                      setTrainees = [];
+                                                  if (snapshot.hasData &&
+                                                      snapshot.connectionState ==
+                                                          ConnectionState
+                                                              .active) {
+                                                    snapshot.data?.docs
+                                                        .forEach((element) {
+                                                      loadTrainee.add(
+                                                          SettingTraineeModel
+                                                              .fromMap(element
+                                                                  .data()));
+                                                    });
+                                                    if (selectedHK ==
+                                                            HocKy.tatca &&
+                                                        selectedNH ==
+                                                            NamHoc.tatca) {
+                                                      loadTrainee.forEach((e) {
+                                                        setTrainees.add(e);
+                                                      });
+                                                    } else if (selectedHK ==
+                                                        HocKy.tatca) {
+                                                      loadTrainee.forEach((e) {
+                                                        if (e.yearStart ==
+                                                            selectedNH.start) {
+                                                          setTrainees.add(e);
+                                                        }
+                                                      });
+                                                    } else if (selectedNH ==
+                                                        NamHoc.tatca) {
+                                                      loadTrainee.forEach((e) {
+                                                        if (e.term ==
+                                                            selectedHK) {
+                                                          setTrainees.add(e);
+                                                        }
+                                                      });
+                                                    } else {
+                                                      loadTrainee.forEach((e) {
+                                                        if (e.term ==
+                                                                selectedHK &&
+                                                            e.yearStart ==
+                                                                selectedNH
+                                                                    .start) {
+                                                          setTrainees.add(e);
+                                                        }
+                                                      });
+                                                    }
+                                                    setTrainees.sort((a, b) {
+                                                      final compare =
+                                                          Comparable.compare(
+                                                              a.yearStart!,
+                                                              b.yearStart!);
+                                                      return compare == 0
+                                                          ? Comparable.compare(
+                                                              a.term!, b.term!)
+                                                          : compare;
+                                                    });
+                                                    return setTrainees
+                                                            .isNotEmpty
+                                                        ? ListView.builder(
+                                                            itemCount:
+                                                                setTrainees
+                                                                    .length,
+                                                            shrinkWrap: true,
+                                                            scrollDirection:
+                                                                Axis.vertical,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return Container(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.05,
+                                                                color: index %
+                                                                            2 ==
+                                                                        0
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade50
+                                                                    : null,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      flex: 1,
+                                                                      child: Text(
+                                                                          '${index + 1}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          setTrainees[index]
+                                                                              .term!,
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child:
+                                                                          Text(
+                                                                        '${setTrainees[index].yearStart!} - ${setTrainees[index].yearEnd!}',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 3,
+                                                                      child: Text(
+                                                                          '${GV.readTimestamp(setTrainees[index].traineeStart!)} - ${GV.readTimestamp(setTrainees[index].traineeEnd!)}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          GV.readTimestamp(setTrainees[index]
+                                                                              .isClockPoint!),
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          IconButton(
+                                                                              tooltip: 'Chỉnh sửa các mốc thời gian',
+                                                                              onPressed: () async {
+                                                                                await addAndEditSetting(context: context, settingTrainee: setTrainees[index], isCreate: false);
+                                                                              },
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              icon: Icon(
+                                                                                Icons.edit_square,
+                                                                                color: Colors.blue.shade900,
+                                                                              )),
+                                                                          IconButton(
+                                                                              tooltip: 'Xóa thiết lập',
+                                                                              onPressed: () {
+                                                                                deleteSetting(context: context, settingId: setTrainees[index].settingId!);
+                                                                              },
+                                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                                              icon: const Icon(
+                                                                                Icons.delete,
+                                                                                color: Colors.red,
+                                                                              )),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : SizedBox(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.45,
+                                                            width: screenWidth *
+                                                                0.6,
+                                                            child: const Center(
+                                                              child: Text(
+                                                                  'Chưa có thiết lập thời gian.'),
+                                                            ),
+                                                          );
+                                                  } else {
+                                                    return SizedBox(
+                                                      height:
+                                                          screenHeight * 0.45,
+                                                      width: screenWidth * 0.6,
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Loading(),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            )
+                                          : selectedHK == HocKy.empty &&
+                                                  selectedNH == NamHoc.empty
                                               ? SingleChildScrollView(
                                                   scrollDirection:
                                                       Axis.vertical,
@@ -411,8 +600,6 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                     builder:
                                                         (context, snapshot) {
                                                       List<SettingTraineeModel>
-                                                          loadTrainee = [];
-                                                      List<SettingTraineeModel>
                                                           setTrainees = [];
                                                       if (snapshot.hasData &&
                                                           snapshot.connectionState ==
@@ -420,53 +607,11 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                   .active) {
                                                         snapshot.data?.docs
                                                             .forEach((element) {
-                                                          loadTrainee.add(
+                                                          setTrainees.add(
                                                               SettingTraineeModel
                                                                   .fromMap(element
                                                                       .data()));
                                                         });
-                                                        if (selectedHK ==
-                                                                HocKy.tatca &&
-                                                            selectedNH ==
-                                                                NamHoc.tatca) {
-                                                          loadTrainee
-                                                              .forEach((e) {
-                                                            setTrainees.add(e);
-                                                          });
-                                                        } else if (selectedHK ==
-                                                            HocKy.tatca) {
-                                                          loadTrainee
-                                                              .forEach((e) {
-                                                            if (e.yearStart ==
-                                                                selectedNH
-                                                                    .start) {
-                                                              setTrainees
-                                                                  .add(e);
-                                                            }
-                                                          });
-                                                        } else if (selectedNH ==
-                                                            NamHoc.tatca) {
-                                                          loadTrainee
-                                                              .forEach((e) {
-                                                            if (e.term ==
-                                                                selectedHK) {
-                                                              setTrainees
-                                                                  .add(e);
-                                                            }
-                                                          });
-                                                        } else {
-                                                          loadTrainee
-                                                              .forEach((e) {
-                                                            if (e.term ==
-                                                                    selectedHK &&
-                                                                e.yearStart ==
-                                                                    selectedNH
-                                                                        .start) {
-                                                              setTrainees
-                                                                  .add(e);
-                                                            }
-                                                          });
-                                                        }
                                                         setTrainees
                                                             .sort((a, b) {
                                                           final compare =
@@ -507,15 +652,11 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                     child: Row(
                                                                       children: [
                                                                         Expanded(
-                                                                          flex:
-                                                                              1,
                                                                           child: Text(
                                                                               '${index + 1}',
                                                                               textAlign: TextAlign.center),
                                                                         ),
                                                                         Expanded(
-                                                                          flex:
-                                                                              2,
                                                                           child: Text(
                                                                               setTrainees[index].term!,
                                                                               textAlign: TextAlign.center),
@@ -543,6 +684,35 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                           child: Text(
                                                                               GV.readTimestamp(setTrainees[index].isClockPoint!),
                                                                               textAlign: TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child: StreamBuilder(
+                                                                              stream: firestore.collection('requestEdits').where('term', isEqualTo: setTrainees[index].term).where('yearStart', isEqualTo: setTrainees[index].yearStart).snapshots(),
+                                                                              builder: (context, snapshot) {
+                                                                                if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                                                                  List<RequestEditModel> requestEdits = [];
+                                                                                  snapshot.data!.docs.forEach(
+                                                                                    (element) => requestEdits.add(RequestEditModel.fromMap(element.data())),
+                                                                                  );
+                                                                                  return InkWell(
+                                                                                      onTap: () {
+                                                                                        showRequest(requestEdits: requestEdits);
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'Xem',
+                                                                                        textAlign: TextAlign.center,
+                                                                                        style: TextStyle(
+                                                                                          color: Colors.blue.shade900,
+                                                                                          decoration: TextDecoration.underline,
+                                                                                        ),
+                                                                                      ));
+                                                                                } else if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                                                                                  return const Text('Chưa có', textAlign: TextAlign.center);
+                                                                                }
+                                                                                return const SizedBox.shrink();
+                                                                              }),
                                                                         ),
                                                                         Expanded(
                                                                           flex:
@@ -580,166 +750,42 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                   );
                                                                 },
                                                               )
-                                                            : const Center(
-                                                                child: Text(
-                                                                    'Chưa có thiết lập thời gian.'),
+                                                            : SizedBox(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.45,
+                                                                width:
+                                                                    screenWidth *
+                                                                        0.55,
+                                                                child:
+                                                                    const Center(
+                                                                  child: Text(
+                                                                      'Chưa có thiết lập thời gian.'),
+                                                                ),
                                                               );
                                                       } else {
-                                                        return const Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Loading(),
-                                                          ],
+                                                        return SizedBox(
+                                                          height: screenHeight *
+                                                              0.45,
+                                                          width:
+                                                              screenWidth * 0.6,
+                                                          child: const Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Loading(),
+                                                            ],
+                                                          ),
                                                         );
                                                       }
                                                     },
                                                   ),
                                                 )
-                                              : selectedHK == HocKy.empty &&
-                                                      selectedNH == NamHoc.empty
-                                                  ? SingleChildScrollView(
-                                                      scrollDirection:
-                                                          Axis.vertical,
-                                                      child: StreamBuilder(
-                                                        stream: firestore
-                                                            .collection(
-                                                                'settingTrainees')
-                                                            .snapshots(),
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          List<SettingTraineeModel>
-                                                              setTrainees = [];
-                                                          if (snapshot
-                                                                  .hasData &&
-                                                              snapshot.connectionState ==
-                                                                  ConnectionState
-                                                                      .active) {
-                                                            snapshot.data?.docs
-                                                                .forEach(
-                                                                    (element) {
-                                                              setTrainees.add(
-                                                                  SettingTraineeModel
-                                                                      .fromMap(
-                                                                          element
-                                                                              .data()));
-                                                            });
-                                                            setTrainees
-                                                                .sort((a, b) {
-                                                              final compare =
-                                                                  Comparable.compare(
-                                                                      a.yearStart!,
-                                                                      b.yearStart!);
-                                                              return compare ==
-                                                                      0
-                                                                  ? Comparable
-                                                                      .compare(
-                                                                          a.term!,
-                                                                          b.term!)
-                                                                  : compare;
-                                                            });
-                                                            return setTrainees
-                                                                    .isNotEmpty
-                                                                ? ListView
-                                                                    .builder(
-                                                                    itemCount:
-                                                                        setTrainees
-                                                                            .length,
-                                                                    shrinkWrap:
-                                                                        true,
-                                                                    scrollDirection:
-                                                                        Axis.vertical,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            index) {
-                                                                      return Container(
-                                                                        height: screenHeight *
-                                                                            0.05,
-                                                                        color: index % 2 ==
-                                                                                0
-                                                                            ? Colors.blue.shade50
-                                                                            : null,
-                                                                        child:
-                                                                            Row(
-                                                                          children: [
-                                                                            Expanded(
-                                                                              flex: 1,
-                                                                              child: Text('${index + 1}', textAlign: TextAlign.center),
-                                                                            ),
-                                                                            Expanded(
-                                                                              flex: 2,
-                                                                              child: Text(setTrainees[index].term!, textAlign: TextAlign.center),
-                                                                            ),
-                                                                            Expanded(
-                                                                              flex: 2,
-                                                                              child: Text(
-                                                                                '${setTrainees[index].yearStart!} - ${setTrainees[index].yearEnd!}',
-                                                                                textAlign: TextAlign.center,
-                                                                              ),
-                                                                            ),
-                                                                            Expanded(
-                                                                              flex: 3,
-                                                                              child: Text('${GV.readTimestamp(setTrainees[index].traineeStart!)} - ${GV.readTimestamp(setTrainees[index].traineeEnd!)}', textAlign: TextAlign.center),
-                                                                            ),
-                                                                            Expanded(
-                                                                              flex: 2,
-                                                                              child: Text(GV.readTimestamp(setTrainees[index].isClockPoint!), textAlign: TextAlign.center),
-                                                                            ),
-                                                                            Expanded(
-                                                                              flex: 2,
-                                                                              child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                                children: [
-                                                                                  IconButton(
-                                                                                      tooltip: 'Chỉnh sửa các mốc thời gian',
-                                                                                      onPressed: () async {
-                                                                                        await addAndEditSetting(context: context, settingTrainee: setTrainees[index], isCreate: false);
-                                                                                      },
-                                                                                      padding: const EdgeInsets.only(bottom: 1),
-                                                                                      icon: Icon(
-                                                                                        Icons.edit_square,
-                                                                                        color: Colors.blue.shade900,
-                                                                                      )),
-                                                                                  IconButton(
-                                                                                      tooltip: 'Xóa thiết lập',
-                                                                                      onPressed: () {
-                                                                                        deleteSetting(context: context, settingId: setTrainees[index].settingId!);
-                                                                                      },
-                                                                                      padding: const EdgeInsets.only(bottom: 1),
-                                                                                      icon: const Icon(
-                                                                                        Icons.delete,
-                                                                                        color: Colors.red,
-                                                                                      )),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  )
-                                                                : const Center(
-                                                                    child: Text(
-                                                                        'Chưa có thiết lập thời gian.'),
-                                                                  );
-                                                          } else {
-                                                            return const Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Loading(),
-                                                              ],
-                                                            );
-                                                          }
-                                                        },
-                                                      ),
-                                                    )
-                                                  : const Center(
-                                                      child: Text(
-                                                          'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
-                                                    ),
+                                              : const Center(
+                                                  child: Text(
+                                                      'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                                ),
                                     )
                                   ],
                                 ),
@@ -824,7 +870,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                       ),
                       Expanded(
                         child: Text(
-                            isCreate ? 'Thêm học phần' : 'Cập nhật học phần',
+                            isCreate ? 'Thêm thiết lập' : 'Cập nhật thiết lập',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center),
                       ),
@@ -1003,7 +1049,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                             ctrl1: pointCVEndCtrl),
                         const SizedBox(height: 10),
                         lineDetail(
-                            title: 'Thời gian khóa điểm',
+                            title: 'Thời gian khóa điểm tổng và trả kết quả',
                             ctrl1: isClockPointCtrl),
                       ],
                     ),
@@ -1418,5 +1464,287 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
             ),
           );
         });
+  }
+
+  showRequest({required List<RequestEditModel> requestEdits}) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    List<TextEditingController> dateCtrls = [];
+    requestEdits.forEach((element) {
+      if (element.delayAt != null) {
+        dateCtrls.add(
+            TextEditingController(text: GV.readTimestamp(element.delayAt!)));
+      } else {
+        dateCtrls.add(TextEditingController());
+      }
+    });
+    showDialog(
+      context: context,
+      barrierColor: Colors.black12,
+      barrierDismissible: false,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: screenHeight * 0.06,
+            bottom: screenHeight * 0.02,
+            left: screenWidth * 0.27,
+            right: screenWidth * 0.08,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AlertDialog(
+                scrollable: true,
+                title: Container(
+                  color: Colors.blue.shade600,
+                  height: screenHeight * 0.06,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      const Expanded(
+                        child: Text('Danh sách yêu cầu sửa điểm',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center),
+                      ),
+                      SizedBox(
+                        width: 30,
+                        child: IconButton(
+                            padding: const EdgeInsets.only(bottom: 1),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.close)),
+                      )
+                    ],
+                  ),
+                ),
+                titlePadding: EdgeInsets.zero,
+                shape: Border.all(width: 0.5),
+                content: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  constraints: BoxConstraints(
+                      minWidth: screenWidth * 0.5,
+                      minHeight: screenHeight * 0.3),
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Chỉ có thể cập nhật ngày gia hạn một lần cho mỗi giảng viên.',
+                              style: TextStyle(color: Colors.red, fontSize: 15),
+                            )
+                          ],
+                        ),
+                      ),
+                      Table(
+                        border: TableBorder.all(),
+                        columnWidths: Map.from({
+                          0: const FlexColumnWidth(1),
+                          1: const FlexColumnWidth(2),
+                          2: const FlexColumnWidth(3),
+                          3: const FlexColumnWidth(2),
+                          4: const FlexColumnWidth(2),
+                          5: const FlexColumnWidth(2),
+                        }),
+                        children: [
+                          const TableRow(children: [
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'STT',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Mã giảng viên',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Họ tên giảng viên',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Ngày yêu cầu',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Ngày duyệt',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                            TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Ngày gia hạn',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )),
+                          ]),
+                          for (var i = 0; i < requestEdits.length; i++)
+                            rowRequest(i, requestEdits[i], dateCtrls[i])
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            for (int i = 0; i < requestEdits.length; i++) {
+                              firestore
+                                  .collection('requestEdits')
+                                  .doc(requestEdits[i].requireId)
+                                  .update({
+                                'delayAt': dateCtrls[i].text.isNotEmpty
+                                    ? Timestamp.fromDate(
+                                        DateFormat('dd/MM/yyyy')
+                                            .parse(dateCtrls[i].text)
+                                            .add(const Duration(
+                                                hours: 23,
+                                                minutes: 59,
+                                                seconds: 59)))
+                                    : null,
+                                'repliedAt': dateCtrls[i].text.isNotEmpty
+                                    ? Timestamp.now()
+                                    : null,
+                              });
+                            }
+                            Navigator.of(context).pop();
+                            GV.success(
+                                context: context,
+                                message: "Đã cập nhật thành công.");
+                          },
+                          child: const Text('Cập nhật')),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  TableRow rowRequest(
+      int index, RequestEditModel request, TextEditingController dateCtrl) {
+    return TableRow(children: [
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          '${index + 1}',
+          textAlign: TextAlign.center,
+        ),
+      )),
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          request.cvId!.toUpperCase(),
+          textAlign: TextAlign.justify,
+        ),
+      )),
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          request.cvName!,
+          textAlign: TextAlign.justify,
+        ),
+      )),
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          request.createdAt != null
+              ? GV.readTimestamp(request.createdAt!)
+              : '-',
+          textAlign: TextAlign.center,
+        ),
+      )),
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          request.repliedAt != null
+              ? GV.readTimestamp(request.repliedAt!)
+              : '-',
+          textAlign: TextAlign.center,
+        ),
+      )),
+      TableCell(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+          controller: dateCtrl,
+          textAlign: TextAlign.center,
+          readOnly: dateCtrl.text.isNotEmpty,
+          decoration: const InputDecoration(
+              hintText: 'DD/MM/YYYY',
+              isDense: true,
+              contentPadding: EdgeInsets.all(5),
+              border: OutlineInputBorder(borderSide: BorderSide.none)),
+          validator: (value) =>
+              value!.length < 10 && value.isNotEmpty ? "Sai định dạng" : null,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp("[0-9/]")),
+            LengthLimitingTextInputFormatter(10),
+            DateFormatter(),
+          ],
+        ),
+      )),
+    ]);
   }
 }

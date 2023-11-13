@@ -33,7 +33,6 @@ class _InfoFirmState extends State<InfoFirm> {
   final TextEditingController describeCtrl = TextEditingController();
   final ValueNotifier totalJob = ValueNotifier(1);
   List<TextEditingController> positions = [TextEditingController()];
-  // List<TextEditingController> quantities = [TextEditingController()];
   List<TextEditingController> describes = [TextEditingController()];
   List<JobPositionModel> jobs = [];
   int temp = 0;
@@ -101,12 +100,10 @@ class _InfoFirmState extends State<InfoFirm> {
         if (loadFirm.listJob != null && loadFirm.listJob!.isNotEmpty) {
           setState(() {
             positions = [];
-            // quantities = [];
             describes = [];
             temp = 0;
             loadFirm.listJob!.forEach((element) {
               positions.add(TextEditingController(text: element.jobName));
-              // quantities.add(TextEditingController(text: element.quantity));
               describes.add(TextEditingController(text: element.describeJob));
               temp++;
             });
@@ -135,7 +132,6 @@ class _InfoFirmState extends State<InfoFirm> {
     addressCtrl.dispose();
     describeCtrl.dispose();
     positions.forEach((element) => element.dispose());
-    // quantities.forEach((element) => element.dispose());
     describes.forEach((element) => element.dispose());
     totalJob.dispose();
     super.dispose();
@@ -264,7 +260,7 @@ class _InfoFirmState extends State<InfoFirm> {
                                         SizedBox(width: screenWidth * 0.015),
                                         LineDetail(
                                           field: 'Mô tả/Yêu cầu',
-                                          widthField: 0.05,
+                                          widthField: 0.07,
                                           widthForm: 0.25,
                                           ctrl: describes[index],
                                         ),
@@ -276,7 +272,6 @@ class _InfoFirmState extends State<InfoFirm> {
                                               onPressed: () {
                                                 setState(() {
                                                   totalJob.value--;
-                                                  // quantities.removeAt(index);
                                                   positions.removeAt(index);
                                                   describes.removeAt(index);
                                                 });
@@ -294,8 +289,6 @@ class _InfoFirmState extends State<InfoFirm> {
                                               onPressed: () {
                                                 setState(() {
                                                   totalJob.value++;
-                                                  // quantities.insert(index + 1,
-                                                  //     TextEditingController());
                                                   positions.insert(index + 1,
                                                       TextEditingController());
                                                   describes.insert(index + 1,

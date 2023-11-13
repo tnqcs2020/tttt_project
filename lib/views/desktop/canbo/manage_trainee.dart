@@ -92,149 +92,124 @@ class _ManageTraineeState extends State<ManageTrainee> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.cyan.shade50,
-      body: Obx(
-        () => SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: currentUser.userId.isNotEmpty
-                ? Column(
-                    children: [
-                      const Header(),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: screenHeight * 0.02,
-                          bottom: screenHeight * 0.02,
-                          left: screenWidth * 0.08,
-                          right: screenWidth * 0.08,
-                        ),
-                        child: Row(
+      body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              const Header(),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.02,
+                  bottom: screenHeight * 0.02,
+                  left: screenWidth * 0.08,
+                  right: screenWidth * 0.08,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MenuLeft(),
+                    SizedBox(width: screenWidth * 0.03),
+                    Expanded(
+                      child: Container(
+                        constraints:
+                            BoxConstraints(minHeight: screenHeight * 0.67),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            MenuLeft(),
-                            SizedBox(width: screenWidth * 0.03),
-                            Expanded(
-                              child: Container(
-                                constraints: BoxConstraints(
-                                    minHeight: screenHeight * 0.67),
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    border: Border.all(
-                                      style: BorderStyle.solid,
-                                      width: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: screenHeight * 0.06,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade600,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(5.0),
-                                          topRight: Radius.circular(5.0),
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Quản lý thực tập",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ValueListenableBuilder(
-                                      valueListenable: selectedMenu,
-                                      builder: (context, value, child) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: screenHeight * 0.05,
-                                              child: ListView.builder(
-                                                itemCount: manageInfo.length,
-                                                shrinkWrap: true,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemBuilder: (context, index) {
-                                                  return Container(
-                                                    width: screenWidth * 0.13,
-                                                    constraints: BoxConstraints(
-                                                        minWidth:
-                                                            screenWidth * 0.01),
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          width: 0.1),
-                                                      color: value == index
-                                                          ? Colors.white
-                                                          : Colors
-                                                              .teal.shade100,
-                                                    ),
-                                                    child: InkWell(
-                                                      child: Center(
-                                                        child: Text(
-                                                          manageInfo[index],
-                                                          style: TextStyle(
-                                                            color: value ==
-                                                                    index
-                                                                ? Colors.blue
-                                                                    .shade900
-                                                                : null,
-                                                            fontWeight:
-                                                                value == index
-                                                                    ? FontWeight
-                                                                        .bold
-                                                                    : null,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                      ),
-                                                      onTap: () {
-                                                        setState(() {
-                                                          selectedMenu.value =
-                                                              index;
-                                                        });
-                                                      },
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            contentInfo[selectedMenu.value],
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
+                            Container(
+                              height: screenHeight * 0.06,
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade600,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(5.0),
+                                  topRight: Radius.circular(5.0),
                                 ),
                               ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Quản lý thực tập",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ValueListenableBuilder(
+                              valueListenable: selectedMenu,
+                              builder: (context, value, child) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: screenHeight * 0.05,
+                                      child: ListView.builder(
+                                        itemCount: manageInfo.length,
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            width: screenWidth * 0.13,
+                                            constraints: BoxConstraints(
+                                                minWidth: screenWidth * 0.01),
+                                            padding: const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(width: 0.1),
+                                              color: value == index
+                                                  ? Colors.white
+                                                  : Colors.teal.shade100,
+                                            ),
+                                            child: InkWell(
+                                              child: Center(
+                                                child: Text(
+                                                  manageInfo[index],
+                                                  style: TextStyle(
+                                                    color: value == index
+                                                        ? Colors.blue.shade900
+                                                        : null,
+                                                    fontWeight: value == index
+                                                        ? FontWeight.bold
+                                                        : null,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedMenu.value = index;
+                                                });
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    contentInfo[selectedMenu.value],
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),
                       ),
-                      const Footer(),
-                    ],
-                  )
-                : SizedBox(
-                    height: screenHeight,
-                    width: screenWidth,
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Loading(),
-                      ],
-                    ))),
-      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Footer(),
+            ],
+          )),
     );
   }
 }

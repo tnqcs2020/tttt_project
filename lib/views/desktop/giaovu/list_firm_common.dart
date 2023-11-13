@@ -165,6 +165,7 @@ class _FirmLinkState extends State<ListFirmCommon> {
                                           child: TextFormField(
                                             controller: searchCtrl,
                                             decoration: InputDecoration(
+                                              hintText: 'Tên công ty',
                                               isDense: false,
                                               contentPadding: EdgeInsets.zero,
                                               prefixIcon:

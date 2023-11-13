@@ -529,18 +529,33 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                                                   );
                                                                 },
                                                               )
-                                                            : const Center(
-                                                                child: Text(
-                                                                    'Chưa có học phần.'),
+                                                            : SizedBox(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.45,
+                                                                width:
+                                                                    screenWidth *
+                                                                        0.55,
+                                                                child:
+                                                                    const Center(
+                                                                  child: Text(
+                                                                      'Chưa có học phần.'),
+                                                                ),
                                                               );
                                                       } else {
-                                                        return const Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Loading(),
-                                                          ],
+                                                        return SizedBox(
+                                                          height: screenHeight *
+                                                              0.45,
+                                                          width: screenWidth *
+                                                              0.55,
+                                                          child: const Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Loading(),
+                                                            ],
+                                                          ),
                                                         );
                                                       }
                                                     },
@@ -657,18 +672,36 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                                                       );
                                                                     },
                                                                   )
-                                                                : const Center(
-                                                                    child: Text(
-                                                                        'Chưa có học phần.'),
+                                                                : SizedBox(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.45,
+                                                                    width:
+                                                                        screenWidth *
+                                                                            0.55,
+                                                                    child:
+                                                                        const Center(
+                                                                      child: Text(
+                                                                          'Chưa có học phần.'),
+                                                                    ),
                                                                   );
                                                           } else {
-                                                            return const Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Loading(),
-                                                              ],
+                                                            return SizedBox(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.45,
+                                                              width:
+                                                                  screenWidth *
+                                                                      0.55,
+                                                              child:
+                                                                  const Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Loading(),
+                                                                ],
+                                                              ),
                                                             );
                                                           }
                                                         },
@@ -932,15 +965,17 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                             isEqualTo: _selectedCourse.value)
                                         .get();
                                     if (isExist.docs.isEmpty) {
-                                      final credit = CreditModel(
-                                          creditId: idCtrl.text,
+                                      final docId = GV.generateRandomString(20);
+                                      final creditModel = CreditModel(
+                                          creditId: idCtrl.text.toUpperCase(),
                                           creditName: nameCtrl.text,
                                           course: _selectedCourse.value,
-                                          major: _selectedMajor.value);
+                                          major: _selectedMajor.value,
+                                          docId: docId);
                                       firestore
                                           .collection('credits')
-                                          .doc(idCtrl.text)
-                                          .set(credit.toMap());
+                                          .doc(docId)
+                                          .set(creditModel.toMap());
                                       Navigator.of(context).pop();
                                       GV.success(
                                           context: context,
@@ -966,15 +1001,16 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                           : ElevatedButton(
                               onPressed: () async {
                                 if (formKey.currentState!.validate()) {
-                                  final credit = CreditModel(
-                                      creditId: idCtrl.text,
+                                  final creditModel = CreditModel(
+                                      docId: credit!.docId,
+                                      creditId: idCtrl.text.toUpperCase(),
                                       creditName: nameCtrl.text,
                                       course: _selectedCourse.value,
                                       major: _selectedMajor.value);
                                   firestore
                                       .collection('credits')
-                                      .doc(idCtrl.text)
-                                      .update(credit.toMap());
+                                      .doc(credit.docId)
+                                      .update(creditModel.toMap());
                                   Navigator.of(context).pop();
                                   GV.success(
                                       context: context,
@@ -1053,7 +1089,10 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        firestore.collection('credits').doc(creditId).delete();
+                        firestore
+                            .collection('credits')
+                            .doc(creditId.toUpperCase())
+                            .delete();
                         Navigator.of(context).pop();
                         GV.success(
                             context: context, message: 'Đã xóa học phần.');

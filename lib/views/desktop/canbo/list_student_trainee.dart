@@ -356,9 +356,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                       .snapshots(),
                                   builder: (context, snapshotFirm) {
                                     if (snapshotFirm.hasData &&
-                                        snapshotFirm.data != null &&
-                                        snapshotFirm.connectionState ==
-                                            ConnectionState.active) {
+                                        snapshotFirm.data != null) {
                                       List<FirmModel> loadFirms = [];
                                       List<JobRegisterModel> listRegis = [];
                                       if (snapshotFirm.data!.docs.isNotEmpty) {
@@ -402,6 +400,10 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                           }
                                         });
                                       });
+                                      listRegis.sort(
+                                        (a, b) =>
+                                            a.userId!.compareTo(b.userId!),
+                                      );
                                       return listSelect.isNotEmpty
                                           ? ListView.builder(
                                               itemCount: listSelect.length,
@@ -710,18 +712,24 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                     });
                                               },
                                             )
-                                          : const Center(
-                                              child: Text(
-                                                  'Chưa có sinh viên thực tập.'));
+                                          : SizedBox(
+                                              height: screenHeight * 0.45,
+                                              width: screenWidth * 0.6,
+                                              child: const Center(
+                                                  child: Text(
+                                                      'Chưa có sinh viên thực tập.')),
+                                            );
                                     } else {
-                                      return const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Loading(),
-                                        ],
+                                      return SizedBox(
+                                        height: screenHeight * 0.45,
+                                        width: screenWidth * 0.6,
+                                        child: const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Loading(),
+                                          ],
+                                        ),
                                       );
                                     }
                                   },
@@ -742,9 +750,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                           .snapshots(),
                                       builder: (context, snapshotFirm) {
                                         if (snapshotFirm.hasData &&
-                                            snapshotFirm.data != null &&
-                                            snapshotFirm.connectionState ==
-                                                ConnectionState.active) {
+                                            snapshotFirm.data != null) {
                                           List<FirmModel> loadFirms = [];
                                           List<JobRegisterModel> listRegis = [];
                                           if (snapshotFirm
@@ -767,6 +773,10 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                               }
                                             }
                                           }
+                                          listRegis.sort(
+                                            (a, b) =>
+                                                a.userId!.compareTo(b.userId!),
+                                          );
                                           return listRegis.isNotEmpty
                                               ? ListView.builder(
                                                   itemCount: listRegis.length,
@@ -1039,19 +1049,25 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                         });
                                                   },
                                                 )
-                                              : const Center(
-                                                  child: Text(
-                                                      'Chưa có sinh viên thực tập.'),
+                                              : SizedBox(
+                                                  height: screenHeight * 0.45,
+                                                  width: screenWidth * 0.6,
+                                                  child: const Center(
+                                                    child: Text(
+                                                        'Chưa có sinh viên thực tập.'),
+                                                  ),
                                                 );
                                         } else {
-                                          return const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Loading(),
-                                            ],
+                                          return SizedBox(
+                                            height: screenHeight * 0.45,
+                                            width: screenWidth * 0.6,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Loading(),
+                                              ],
+                                            ),
                                           );
                                         }
                                       },

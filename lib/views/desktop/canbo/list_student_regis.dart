@@ -249,30 +249,32 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                   builder: (context, snapshotFirm) {
                                     List<FirmModel> loadFirms = [];
                                     if (snapshotFirm.hasData &&
-                                        snapshotFirm.data != null &&
-                                        snapshotFirm.connectionState ==
-                                            ConnectionState.active) {
+                                        snapshotFirm.data != null) {
                                       snapshotFirm.data?.docs
                                           .forEach((element) {
                                         loadFirms.add(
                                             FirmModel.fromMap(element.data()));
                                       });
                                       listRegis = [];
+                                      FirmModel firm = FirmModel();
                                       for (var element in loadFirms) {
                                         if (element.firmId == userId) {
+                                          firm = element;
                                           for (var e in element.listRegis!) {
-                                            if (selectedTT == TrangThai.tatca &&
-                                                e.isConfirmed == false) {
+                                            if (selectedTT == TrangThai.tatca) {
                                               listRegis.add(e);
                                             } else {
-                                              if (e.status == selectedTT &&
-                                                  e.isConfirmed == false) {
+                                              if (e.status == selectedTT) {
                                                 listRegis.add(e);
                                               }
                                             }
                                           }
                                         }
                                       }
+                                      listRegis.sort(
+                                        (a, b) =>
+                                            b.status!.compareTo(a.status!),
+                                      );
                                       return listRegis.isNotEmpty
                                           ? ListView.builder(
                                               itemCount: listRegis.length,
@@ -298,39 +300,54 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                             '${listRegis[indexRegis].userId}'
                                                                 .toUpperCase(),
                                                             textAlign: TextAlign
-                                                                .center),
+                                                                .justify,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
                                                       ),
                                                       Expanded(
                                                         flex: 4,
                                                         child: Text(
                                                             '${listRegis[indexRegis].userName}',
                                                             textAlign: TextAlign
-                                                                .center),
+                                                                .justify,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
                                                       ),
                                                       Expanded(
                                                         flex: 5,
                                                         child: Text(
                                                             '${listRegis[indexRegis].jobName}',
                                                             textAlign: TextAlign
-                                                                .center),
+                                                                .justify,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
                                                       ),
                                                       Expanded(
                                                         flex: 3,
                                                         child: Text(
                                                             listRegis[indexRegis]
-                                                                        .status! ==
-                                                                    TrangThai
-                                                                        .accept
-                                                                ? 'Chờ xác nhận'
-                                                                : listRegis[
-                                                                        indexRegis]
-                                                                    .status!,
+                                                                    .isConfirmed!
+                                                                ? 'Thực tập'
+                                                                : listRegis[indexRegis]
+                                                                            .status! ==
+                                                                        TrangThai
+                                                                            .accept
+                                                                    ? 'Chờ xác nhận'
+                                                                    : listRegis[
+                                                                            indexRegis]
+                                                                        .status!,
                                                             style:
                                                                 const TextStyle(
                                                                     color: Colors
                                                                         .red),
                                                             textAlign: TextAlign
-                                                                .center),
+                                                                .justify,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis),
                                                       ),
                                                       Expanded(
                                                         flex: 2,
@@ -360,12 +377,13 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                     }
                                                                   });
                                                                   showInfoAndReply(
-                                                                    context:
-                                                                        context,
-                                                                    jobRegister:
-                                                                        listRegis[
-                                                                            indexRegis],
-                                                                  );
+                                                                      context:
+                                                                          context,
+                                                                      jobRegister:
+                                                                          listRegis[
+                                                                              indexRegis],
+                                                                      firm:
+                                                                          firm);
                                                                 },
                                                                 icon: Icon(
                                                                     CupertinoIcons
@@ -382,18 +400,24 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                 );
                                               },
                                             )
-                                          : const Center(
-                                              child: Text(
-                                                  'Chưa có sinh viên đăng ký.'));
+                                          : SizedBox(
+                                              height: screenHeight * 0.45,
+                                              width: screenWidth * 0.55,
+                                              child: const Center(
+                                                  child: Text(
+                                                      'Chưa có sinh viên đăng ký.')),
+                                            );
                                     } else {
-                                      return const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Loading(),
-                                        ],
+                                      return SizedBox(
+                                        height: screenHeight * 0.45,
+                                        width: screenWidth * 0.55,
+                                        child: const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Loading(),
+                                          ],
+                                        ),
                                       );
                                     }
                                   },
@@ -412,30 +436,27 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                       builder: (context, snapshotFirm) {
                                         List<FirmModel> loadFirms = [];
                                         if (snapshotFirm.hasData &&
-                                            snapshotFirm.data != null &&
-                                            snapshotFirm.connectionState ==
-                                                ConnectionState.active) {
+                                            snapshotFirm.data != null) {
                                           snapshotFirm.data?.docs
                                               .forEach((element) {
                                             loadFirms.add(FirmModel.fromMap(
                                                 element.data()));
                                           });
                                           listRegis = [];
+                                          FirmModel firm = FirmModel();
                                           for (var element in loadFirms) {
                                             if (element.firmId == userId) {
+                                              firm = element;
                                               for (var e
                                                   in element.listRegis!) {
-                                                if (e.status ==
-                                                        TrangThai.wait ||
-                                                    e.status ==
-                                                            TrangThai.accept &&
-                                                        e.isConfirmed ==
-                                                            false) {
-                                                  listRegis.add(e);
-                                                }
+                                                listRegis.add(e);
                                               }
                                             }
                                           }
+                                          listRegis.sort(
+                                            (a, b) =>
+                                                b.status!.compareTo(a.status!),
+                                          );
                                           return listRegis.isNotEmpty
                                               ? ListView.builder(
                                                   itemCount: listRegis.length,
@@ -464,7 +485,10 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                     .toUpperCase(),
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis),
                                                           ),
                                                           Expanded(
                                                             flex: 4,
@@ -472,7 +496,10 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                 '${listRegis[indexRegis].userName}',
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis),
                                                           ),
                                                           Expanded(
                                                             flex: 5,
@@ -480,25 +507,32 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                 '${listRegis[indexRegis].jobName}',
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis),
                                                           ),
                                                           Expanded(
                                                             flex: 3,
                                                             child: Text(
                                                                 listRegis[indexRegis]
-                                                                            .status! ==
-                                                                        TrangThai
-                                                                            .accept
-                                                                    ? 'Chờ xác nhận'
-                                                                    : listRegis[
-                                                                            indexRegis]
-                                                                        .status!,
+                                                                        .isConfirmed!
+                                                                    ? 'Thực tập'
+                                                                    : listRegis[indexRegis].status! ==
+                                                                            TrangThai
+                                                                                .accept
+                                                                        ? 'Chờ xác nhận'
+                                                                        : listRegis[indexRegis]
+                                                                            .status!,
                                                                 style: const TextStyle(
                                                                     color: Colors
                                                                         .red),
                                                                 textAlign:
                                                                     TextAlign
-                                                                        .center),
+                                                                        .justify,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis),
                                                           ),
                                                           Expanded(
                                                             flex: 2,
@@ -529,12 +563,13 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                       }
                                                                     });
                                                                     showInfoAndReply(
-                                                                      context:
-                                                                          context,
-                                                                      jobRegister:
-                                                                          listRegis[
-                                                                              indexRegis],
-                                                                    );
+                                                                        context:
+                                                                            context,
+                                                                        jobRegister:
+                                                                            listRegis[
+                                                                                indexRegis],
+                                                                        firm:
+                                                                            firm);
                                                                   },
                                                                   icon: Icon(
                                                                       CupertinoIcons
@@ -552,18 +587,24 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                     );
                                                   },
                                                 )
-                                              : const Center(
-                                                  child: Text(
-                                                      'Chưa có sinh viên đăng ký.'));
+                                              : SizedBox(
+                                                  height: screenHeight * 0.45,
+                                                  width: screenWidth * 0.55,
+                                                  child: const Center(
+                                                      child: Text(
+                                                          'Chưa có sinh viên đăng ký.')),
+                                                );
                                         } else {
-                                          return const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Loading(),
-                                            ],
+                                          return SizedBox(
+                                            height: screenHeight * 0.45,
+                                            width: screenWidth * 0.55,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Loading(),
+                                              ],
+                                            ),
                                           );
                                         }
                                       },
@@ -588,6 +629,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
   showInfoAndReply({
     required BuildContext context,
     required JobRegisterModel jobRegister,
+    required FirmModel firm,
   }) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -705,8 +747,14 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                     });
                                     jobRegister.status = TrangThai.accept;
                                     jobRegister.repliedAt = Timestamp.now();
+                                    for (var d in firm.listRegis!) {
+                                      if (d.userId == jobRegister.userId) {
+                                        d.status = TrangThai.accept;
+                                        d.repliedAt = Timestamp.now();
+                                      }
+                                    }
                                     GV.firmsCol.doc(userId).update({
-                                      'listRegis': listRegis
+                                      'listRegis': firm.listRegis!
                                           .map((i) => i.toMap())
                                           .toList(),
                                     });
@@ -740,8 +788,14 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                     });
                                     jobRegister.status = TrangThai.reject;
                                     jobRegister.repliedAt = Timestamp.now();
+                                    for (var d in firm.listRegis!) {
+                                      if (d.userId == jobRegister.userId) {
+                                        d.status = TrangThai.reject;
+                                        d.repliedAt = Timestamp.now();
+                                      }
+                                    }
                                     GV.firmsCol.doc(userId).update({
-                                      'listRegis': listRegis
+                                      'listRegis': firm.listRegis!
                                           .map((i) => i.toMap())
                                           .toList(),
                                     });

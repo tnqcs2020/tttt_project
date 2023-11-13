@@ -791,7 +791,9 @@ class _ListFirmState extends State<ListFirm> {
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
                                   title: Text('${job.jobName}'),
-                                  subtitle: Text('${job.describeJob}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
                                 ),
                               ),
                             const Padding(
@@ -820,7 +822,9 @@ class _ListFirmState extends State<ListFirm> {
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
                                   title: Text('${job.jobName}'),
-                                  subtitle: Text('${job.describeJob}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
                                 ),
                               ),
                             const Padding(
@@ -838,6 +842,20 @@ class _ListFirmState extends State<ListFirm> {
                                 ],
                               ),
                             )
+                          ] else if (loadRegis.status == TrangThai.reject) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
+                                ),
+                              ),
                           ] else if (isTrainee && loadRegis.isConfirmed!) ...[
                             Text(
                                 'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
@@ -856,7 +874,9 @@ class _ListFirmState extends State<ListFirm> {
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
                                   title: Text('${job.jobName}'),
-                                  subtitle: Text('${job.describeJob}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
                                 ),
                               ),
                             const Padding(
@@ -883,14 +903,30 @@ class _ListFirmState extends State<ListFirm> {
                                   title: '${data.jobName}',
                                   onTap: () =>
                                       currentUser.selectedJob.value = data,
-                                  subtitle: '${data.describeJob}',
+                                  subtitle: data.describeJob!.isNotEmpty
+                                      ? data.describeJob
+                                      : null,
                                   selected:
                                       currentUser.selectedJob.value == data,
                                 ),
                               ),
                           ]
                         ] else ...[
-                          if (isTrainee && loadRegis.isConfirmed!) ...[
+                          if (loadRegis.status == TrangThai.reject) ...[
+                            const Text('Vị trí tuyển dụng:'),
+                            for (var job in firm.listJob!)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
+                                child: ListTile(
+                                  dense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  title: Text('${job.jobName}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
+                                ),
+                              ),
+                          ] else if (isTrainee && loadRegis.isConfirmed!) ...[
                             Text(
                                 'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                             Text(
@@ -908,7 +944,9 @@ class _ListFirmState extends State<ListFirm> {
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
                                   title: Text('${job.jobName}'),
-                                  subtitle: Text('${job.describeJob}'),
+                                  subtitle: job.describeJob!.isNotEmpty
+                                      ? Text('${job.describeJob}')
+                                      : null,
                                 ),
                               ),
                           ],

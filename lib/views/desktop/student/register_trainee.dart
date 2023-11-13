@@ -150,8 +150,15 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
               loadTrainee.traineeEnd = settingTrainee.traineeEnd;
             }
           }
+          var isHasFirm = false;
+          loadTrainee.listRegis!.forEach((element) {
+            if (element.isConfirmed!) {
+              isHasFirm = true;
+            }
+          });
           if (DateTime.now().isAfterTimestamp(setting.traineeEnd) &&
-              DateTime.now().isAfterTimestamp(loadTrainee.traineeEnd)) {
+              DateTime.now().isAfterTimestamp(loadTrainee.traineeEnd) &&
+              isHasFirm) {
             if (DateTime.now().isAfterTimestamp(setting.traineeEnd) &&
                 DateTime.now().isBeforeOrEqual(setting.submitEnd)) {
               loadTrainee.reachedStep = 3;
@@ -850,424 +857,420 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   Widget _regisFirm() {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return StreamBuilder(
-        stream: firestore
-            .collection('trainees')
-            .doc(currentUser.userId.value)
-            .snapshots(),
-        builder: (context, snapshotTrainee) {
-          if (snapshotTrainee.hasData &&
-              snapshotTrainee.data != null &&
-              snapshotTrainee.connectionState == ConnectionState.active) {
-            RegisterTraineeModel loadTrainee =
-                RegisterTraineeModel.fromMap(snapshotTrainee.data!.data()!);
-            List<UserRegisterModel> listAccepted = [];
-            bool isTrainee = false;
-            UserRegisterModel firmConfirm = UserRegisterModel();
-            if (loadTrainee.listRegis != null &&
-                loadTrainee.listRegis!.isNotEmpty) {
-              listAccepted = loadTrainee.listRegis!
-                  .where((element) => element.status == TrangThai.accept)
-                  .toList();
-              loadTrainee.listRegis!.forEach((e) {
-                if (e.isConfirmed == true) {
-                  isTrainee = true;
-                  firmConfirm = e;
+    return setting.traineeStart != null &&
+            DateTime.now().isBeforeTimestamp(setting.traineeStart)
+        ? StreamBuilder(
+            stream: firestore
+                .collection('trainees')
+                .doc(currentUser.userId.value)
+                .snapshots(),
+            builder: (context, snapshotTrainee) {
+              if (snapshotTrainee.hasData &&
+                  snapshotTrainee.data != null &&
+                  snapshotTrainee.connectionState == ConnectionState.active) {
+                RegisterTraineeModel loadTrainee =
+                    RegisterTraineeModel.fromMap(snapshotTrainee.data!.data()!);
+                List<UserRegisterModel> listAccepted = [];
+                bool isTrainee = false;
+                UserRegisterModel firmConfirm = UserRegisterModel();
+                if (loadTrainee.listRegis != null &&
+                    loadTrainee.listRegis!.isNotEmpty) {
+                  listAccepted = loadTrainee.listRegis!
+                      .where((element) => element.status == TrangThai.accept)
+                      .toList();
+                  loadTrainee.listRegis!.forEach((e) {
+                    if (e.isConfirmed == true) {
+                      isTrainee = true;
+                      firmConfirm = e;
+                    }
+                  });
                 }
-              });
-            }
-            return isTrainee && firmConfirm.firmId != null
-                ? StreamBuilder(
-                    stream: firestore
-                        .collection('firms')
-                        .doc(firmConfirm.firmId)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null &&
-                          snapshot.data!.data() != null) {
-                        FirmModel firm =
-                            FirmModel.fromMap(snapshot.data!.data()!);
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: Column(
-                            children: [
-                              const Text(
-                                'Thông tin công ty',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                width: screenWidth * 0.35,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    LineDetail(
-                                        field: 'Tên công ty',
-                                        display: firm.firmName,
-                                        widthForm: 0.28),
-                                    if (firm.owner != '')
-                                      LineDetail(
-                                          field: 'Người đại diện',
-                                          display: firm.owner,
-                                          widthForm: 0.28),
-                                    if (firm.phone != '')
-                                      LineDetail(
-                                          field: 'Số điện thoại',
-                                          display: firm.phone,
-                                          widthForm: 0.28),
-                                    if (firm.email != "")
-                                      LineDetail(
-                                          field: 'Email',
-                                          display: firm.email,
-                                          widthForm: 0.28),
-                                    if (firm.address != '')
-                                      LineDetail(
-                                          field: 'Địa chỉ',
-                                          display: firm.address,
-                                          widthForm: 0.28),
-                                    LineDetail(
-                                        field: 'Mô tả',
-                                        display: firm.describe,
-                                        widthForm: 0.28),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      return const Padding(
-                        padding: EdgeInsets.only(top: 150),
-                        child: Loading(),
-                      );
-                    })
-                : loadTrainee.listRegis != null &&
-                        loadTrainee.listRegis!.isNotEmpty
-                    ? listAccepted.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 15),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Các công ty chấp nhận thực tập',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                return isTrainee && firmConfirm.firmId != null
+                    ? StreamBuilder(
+                        stream: firestore
+                            .collection('firms')
+                            .doc(firmConfirm.firmId)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null &&
+                              snapshot.data!.data() != null) {
+                            FirmModel firm =
+                                FirmModel.fromMap(snapshot.data!.data()!);
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Thông tin công ty',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
-                                if (setting.traineeStart != null)
-                                  Text(
-                                      'Bạn cần xác nhận trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
-                                const SizedBox(height: 15),
-                                SizedBox(
-                                  width: screenWidth * 0.5,
-                                  child: ListView.separated(
-                                    itemCount: listAccepted.length,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      return StreamBuilder(
-                                          stream: firestore
-                                              .collection('firms')
-                                              .doc(listAccepted[index].firmId)
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.data != null &&
-                                                snapshot.data!.data() != null) {
-                                              FirmModel firm =
-                                                  FirmModel.fromMap(
-                                                      snapshot.data!.data()!);
-                                              return Card(
-                                                elevation: 5,
-                                                child: ListTile(
-                                                  title:
-                                                      Text('${firm.firmName}'),
-                                                  subtitle: Text(
-                                                    'Vị trí ứng tuyển: ${listAccepted[index].jobName}',
-                                                  ),
-                                                  trailing: listAccepted[index]
-                                                              .status ==
-                                                          TrangThai.accept
-                                                      ? const Text(
-                                                          'Chờ xác nhận',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.red),
-                                                        )
-                                                      : Text(listAccepted[index]
-                                                          .status!),
-                                                  onTap: () {
-                                                    if (DateTime.now()
-                                                        .isBeforeTimestamp(
-                                                            setting
-                                                                .traineeStart)) {
-                                                      showDialog(
-                                                        context: context,
-                                                        barrierColor:
-                                                            Colors.black12,
-                                                        builder: (context) {
-                                                          return Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                              top:
-                                                                  screenHeight *
-                                                                      0.06,
-                                                              bottom:
-                                                                  screenHeight *
-                                                                      0.02,
-                                                              left:
-                                                                  screenWidth *
-                                                                      0.27,
-                                                              right:
-                                                                  screenWidth *
-                                                                      0.08,
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                AlertDialog(
-                                                                  scrollable:
-                                                                      true,
-                                                                  title:
-                                                                      Container(
-                                                                    color: Colors
-                                                                        .blue
-                                                                        .shade600,
-                                                                    height:
-                                                                        screenHeight *
+                                  const SizedBox(height: 15),
+                                  SizedBox(
+                                    width: screenWidth * 0.35,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        LineDetail(
+                                            field: 'Tên công ty',
+                                            display: firm.firmName,
+                                            widthForm: 0.28),
+                                        if (firm.owner != '')
+                                          LineDetail(
+                                              field: 'Người đại diện',
+                                              display: firm.owner,
+                                              widthForm: 0.28),
+                                        if (firm.phone != '')
+                                          LineDetail(
+                                              field: 'Số điện thoại',
+                                              display: firm.phone,
+                                              widthForm: 0.28),
+                                        if (firm.email != "")
+                                          LineDetail(
+                                              field: 'Email',
+                                              display: firm.email,
+                                              widthForm: 0.28),
+                                        if (firm.address != '')
+                                          LineDetail(
+                                              field: 'Địa chỉ',
+                                              display: firm.address,
+                                              widthForm: 0.28),
+                                        LineDetail(
+                                            field: 'Mô tả',
+                                            display: firm.describe,
+                                            widthForm: 0.28),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return const Padding(
+                            padding: EdgeInsets.only(top: 150),
+                            child: Loading(),
+                          );
+                        })
+                    : loadTrainee.listRegis != null &&
+                            loadTrainee.listRegis!.isNotEmpty
+                        ? listAccepted.isNotEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'Các công ty chấp nhận thực tập',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    if (setting.traineeStart != null)
+                                      Text(
+                                          'Bạn cần xác nhận trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                    const SizedBox(height: 15),
+                                    SizedBox(
+                                      width: screenWidth * 0.5,
+                                      child: ListView.separated(
+                                        itemCount: listAccepted.length,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return StreamBuilder(
+                                              stream: firestore
+                                                  .collection('firms')
+                                                  .doc(listAccepted[index]
+                                                      .firmId)
+                                                  .snapshots(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.data != null &&
+                                                    snapshot.data!.data() !=
+                                                        null) {
+                                                  FirmModel firm =
+                                                      FirmModel.fromMap(snapshot
+                                                          .data!
+                                                          .data()!);
+                                                  return Card(
+                                                    elevation: 5,
+                                                    child: ListTile(
+                                                      title: Text(
+                                                          '${firm.firmName}'),
+                                                      subtitle: Text(
+                                                        'Vị trí ứng tuyển: ${listAccepted[index].jobName}',
+                                                      ),
+                                                      trailing:
+                                                          listAccepted[index]
+                                                                      .status ==
+                                                                  TrangThai
+                                                                      .accept
+                                                              ? const Text(
+                                                                  'Chờ xác nhận',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .red),
+                                                                )
+                                                              : Text(
+                                                                  listAccepted[
+                                                                          index]
+                                                                      .status!),
+                                                      onTap: () {
+                                                        if (DateTime.now()
+                                                            .isBeforeTimestamp(
+                                                                setting
+                                                                    .traineeStart)) {
+                                                          showDialog(
+                                                            context: context,
+                                                            barrierColor:
+                                                                Colors.black12,
+                                                            builder: (context) {
+                                                              return Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .only(
+                                                                  top:
+                                                                      screenHeight *
+                                                                          0.06,
+                                                                  bottom:
+                                                                      screenHeight *
+                                                                          0.02,
+                                                                  left:
+                                                                      screenWidth *
+                                                                          0.27,
+                                                                  right:
+                                                                      screenWidth *
+                                                                          0.08,
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    AlertDialog(
+                                                                      scrollable:
+                                                                          true,
+                                                                      title:
+                                                                          Container(
+                                                                        color: Colors
+                                                                            .blue
+                                                                            .shade600,
+                                                                        height: screenHeight *
                                                                             0.06,
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            10),
-                                                                    child: Row(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              30,
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                10),
+                                                                        child:
+                                                                            Row(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.center,
+                                                                          children: [
+                                                                            const SizedBox(
+                                                                              width: 30,
+                                                                            ),
+                                                                            const Expanded(
+                                                                              child: Text('Chi tiết tuyển dụng', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: 30,
+                                                                              child: IconButton(
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  icon: const Icon(Icons.close)),
+                                                                            )
+                                                                          ],
                                                                         ),
-                                                                        const Expanded(
-                                                                          child: Text(
-                                                                              'Chi tiết tuyển dụng',
-                                                                              style: TextStyle(fontWeight: FontWeight.bold),
-                                                                              textAlign: TextAlign.center),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              30,
-                                                                          child: IconButton(
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              icon: const Icon(Icons.close)),
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  titlePadding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  shape: Border
-                                                                      .all(
+                                                                      ),
+                                                                      titlePadding:
+                                                                          EdgeInsets
+                                                                              .zero,
+                                                                      shape: Border.all(
                                                                           width:
                                                                               0.5),
-                                                                  content:
-                                                                      ConstrainedBox(
-                                                                    constraints:
-                                                                        BoxConstraints(
-                                                                            minWidth:
-                                                                                screenWidth * 0.35),
-                                                                    child: Form(
-                                                                      child:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: <Widget>[
-                                                                          Text(
-                                                                              'Tên công ty: ${firm.firmName}'),
-                                                                          Text(
-                                                                              'Người đại diện: ${firm.owner}'),
-                                                                          Text(
-                                                                              'Số điện thoại: ${firm.phone}'),
-                                                                          Text(
-                                                                              'Email: ${firm.email}'),
-                                                                          Text(
-                                                                              'Địa chỉ: ${firm.address}'),
-                                                                          Text(
-                                                                              'Mô tả: ${firm.describe}'),
-                                                                          Text(
-                                                                              'Vị trí ứng tuyển: ${listAccepted[index].jobName} '),
-                                                                          if (listAccepted[index].createdAt !=
-                                                                              null)
-                                                                            Text('Ngày ứng tuyển: ${GV.readTimestamp(listAccepted[index].createdAt!)}'),
-                                                                          if (listAccepted[index].repliedAt !=
-                                                                              null)
-                                                                            Text('Ngày duyệt: ${GV.readTimestamp(listAccepted[index].repliedAt!)}'),
-                                                                          if (trainee.traineeStart != null &&
-                                                                              trainee.traineeEnd != null)
-                                                                            Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày  ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  actions: [
-                                                                    ElevatedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        var loadCBHD = await firestore
-                                                                            .collection('users')
-                                                                            .doc(firm.firmId)
-                                                                            .get();
-                                                                        final cbhdName =
-                                                                            UserModel.fromMap(loadCBHD.data()!).userName;
-                                                                        final plan =
-                                                                            PlanWorkModel(
-                                                                          cbhdId:
-                                                                              firm.firmId,
-                                                                          cbhdName:
-                                                                              cbhdName,
-                                                                          listWork: [],
-                                                                          userId:
-                                                                              userId,
-                                                                        );
-                                                                        var listRegis =
-                                                                            firm.listRegis;
-                                                                        for (int i =
-                                                                                0;
-                                                                            i < listRegis!.length;
-                                                                            i++) {
-                                                                          if (listRegis[i].userId ==
-                                                                              currentUser.userId.value) {
-                                                                            listRegis[i].isConfirmed =
-                                                                                true;
-                                                                            plan.traineeStart =
-                                                                                trainee.traineeStart;
-                                                                            plan.traineeEnd =
-                                                                                trainee.traineeEnd;
-                                                                          }
-                                                                        }
-                                                                        firestore
-                                                                            .collection('plans')
-                                                                            .doc(userId)
-                                                                            .set(plan.toMap());
-                                                                        firestore
-                                                                            .collection(
-                                                                                'firms')
-                                                                            .doc(firm
-                                                                                .firmId)
-                                                                            .update({
-                                                                          'listRegis': listRegis
-                                                                              .map((i) => i.toMap())
-                                                                              .toList()
-                                                                        });
-                                                                        final listUserRegis =
-                                                                            loadTrainee.listRegis;
-                                                                        for (int i =
-                                                                                0;
-                                                                            i < listUserRegis!.length;
-                                                                            i++) {
-                                                                          if (listUserRegis[i].firmId ==
-                                                                              firm.firmId) {
-                                                                            listUserRegis[i].isConfirmed =
-                                                                                true;
-                                                                          }
-                                                                        }
-                                                                        firestore
-                                                                            .collection('trainees')
-                                                                            .doc(userId)
-                                                                            .update({
-                                                                          'listRegis': listUserRegis
-                                                                              .map((i) => i.toMap())
-                                                                              .toList(),
-                                                                        });
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        _nextStep(
-                                                                            StepEnabling.sequential);
-                                                                        GV.success(
-                                                                            context:
-                                                                                context,
-                                                                            message:
-                                                                                'Đã xác nhận công ty thực tập');
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        'Xác nhận',
-                                                                        style: TextStyle(
-                                                                            fontWeight:
-                                                                                FontWeight.bold),
-                                                                      ),
-                                                                    ),
-                                                                    ElevatedButton(
-                                                                      onPressed:
-                                                                          () {
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        'Để sau',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.red,
+                                                                      content:
+                                                                          ConstrainedBox(
+                                                                        constraints:
+                                                                            BoxConstraints(minWidth: screenWidth * 0.35),
+                                                                        child:
+                                                                            Form(
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: <Widget>[
+                                                                              Text('Tên công ty: ${firm.firmName}'),
+                                                                              Text('Người đại diện: ${firm.owner}'),
+                                                                              Text('Số điện thoại: ${firm.phone}'),
+                                                                              Text('Email: ${firm.email}'),
+                                                                              Text('Địa chỉ: ${firm.address}'),
+                                                                              Text('Mô tả: ${firm.describe}'),
+                                                                              Text('Vị trí ứng tuyển: ${listAccepted[index].jobName} '),
+                                                                              if (listAccepted[index].createdAt != null)
+                                                                                Text('Ngày ứng tuyển: ${GV.readTimestamp(listAccepted[index].createdAt!)}'),
+                                                                              if (listAccepted[index].repliedAt != null)
+                                                                                Text('Ngày duyệt: ${GV.readTimestamp(listAccepted[index].repliedAt!)}'),
+                                                                              if (trainee.traineeStart != null && trainee.traineeEnd != null)
+                                                                                Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày  ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                                                                            ],
+                                                                          ),
                                                                         ),
                                                                       ),
+                                                                      actions: [
+                                                                        ElevatedButton(
+                                                                          onPressed:
+                                                                              () async {
+                                                                            var loadCBHD =
+                                                                                await firestore.collection('users').doc(firm.firmId).get();
+                                                                            final cbhdName =
+                                                                                UserModel.fromMap(loadCBHD.data()!).userName;
+                                                                            final plan =
+                                                                                PlanWorkModel(
+                                                                              cbhdId: firm.firmId,
+                                                                              cbhdName: cbhdName,
+                                                                              listWork: [],
+                                                                              userId: userId,
+                                                                            );
+                                                                            var listRegis =
+                                                                                firm.listRegis;
+                                                                            for (int i = 0;
+                                                                                i < listRegis!.length;
+                                                                                i++) {
+                                                                              if (listRegis[i].userId == currentUser.userId.value) {
+                                                                                listRegis[i].isConfirmed = true;
+                                                                                plan.traineeStart = trainee.traineeStart;
+                                                                                plan.traineeEnd = trainee.traineeEnd;
+                                                                              }
+                                                                            }
+                                                                            firestore.collection('plans').doc(userId).set(plan.toMap());
+                                                                            firestore.collection('firms').doc(firm.firmId).update({
+                                                                              'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                            });
+                                                                            final listUserRegis =
+                                                                                loadTrainee.listRegis;
+                                                                            for (int i = 0;
+                                                                                i < listUserRegis!.length;
+                                                                                i++) {
+                                                                              if (listUserRegis[i].firmId == firm.firmId) {
+                                                                                listUserRegis[i].isConfirmed = true;
+                                                                              }
+                                                                            }
+                                                                            firestore.collection('trainees').doc(userId).update({
+                                                                              'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                            _nextStep(StepEnabling.sequential);
+                                                                            GV.success(
+                                                                                context: context,
+                                                                                message: 'Đã xác nhận công ty thực tập');
+                                                                          },
+                                                                          child:
+                                                                              const Text(
+                                                                            'Xác nhận',
+                                                                            style:
+                                                                                TextStyle(fontWeight: FontWeight.bold),
+                                                                          ),
+                                                                        ),
+                                                                        ElevatedButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child:
+                                                                              const Text(
+                                                                            'Để sau',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.red,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
                                                                     ),
                                                                   ],
                                                                 ),
-                                                              ],
-                                                            ),
+                                                              );
+                                                            },
                                                           );
-                                                        },
-                                                      );
-                                                    } else {
-                                                      GV.error(
-                                                          context: context,
-                                                          message:
-                                                              'Đã quá thời gian không thể xác nhận');
-                                                    }
-                                                  },
-                                                ),
-                                              );
-                                            } else {
-                                              return const SizedBox.shrink();
-                                            }
-                                          });
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const Divider(),
-                                  ),
+                                                        } else {
+                                                          GV.error(
+                                                              context: context,
+                                                              message:
+                                                                  'Đã quá thời gian không thể xác nhận');
+                                                        }
+                                                      },
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return const SizedBox
+                                                      .shrink();
+                                                }
+                                              });
+                                        },
+                                        separatorBuilder: (context, index) =>
+                                            const Divider(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          )
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 100),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Chưa có công ty phê duyệt đăng ký của bạn.',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    if (setting.traineeStart != null)
+                                      Text(
+                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                    const SizedBox(height: 35),
+                                    CustomButton(
+                                      text: "Ứng tuyển thêm",
+                                      width: screenWidth * 0.1,
+                                      height: screenHeight * 0.07,
+                                      onTap: () async {
+                                        currentUser.menuSelected.value = 3;
+                                        SharedPreferences prefs =
+                                            await SharedPreferences
+                                                .getInstance();
+                                        prefs.setInt('menuSelected', 3);
+                                        Navigator.pushNamed(
+                                            context, pageSinhVien[3]);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              )
                         : Padding(
                             padding: const EdgeInsets.only(top: 100),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
-                                  'Chưa có công ty phê duyệt đăng ký của bạn.',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Bạn chưa đăng ký công ty',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    if (setting.traineeStart != null)
+                                      Text(
+                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})')
+                                  ],
                                 ),
-                                if (setting.traineeStart != null)
-                                  Text(
-                                      'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
                                 const SizedBox(height: 35),
                                 CustomButton(
-                                  text: "Ứng tuyển thêm",
+                                  text: "Tìm công ty ngay",
                                   width: screenWidth * 0.1,
                                   height: screenHeight * 0.07,
                                   onTap: () async {
@@ -1281,48 +1284,35 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                 ),
                               ],
                             ),
-                          )
-                    : Padding(
-                        padding: const EdgeInsets.only(top: 100),
-                        child: Column(
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Bạn chưa đăng ký công ty',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                if (setting.traineeStart != null)
-                                  Text(
-                                      'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})')
-                              ],
-                            ),
-                            const SizedBox(height: 35),
-                            CustomButton(
-                              text: "Tìm công ty ngay",
-                              width: screenWidth * 0.1,
-                              height: screenHeight * 0.07,
-                              onTap: () async {
-                                currentUser.menuSelected.value = 3;
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                prefs.setInt('menuSelected', 3);
-                                Navigator.pushNamed(context, pageSinhVien[3]);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-          }
-          return const Padding(
-            padding: EdgeInsets.only(top: 150),
-            child: Loading(),
+                          );
+              }
+              return const Padding(
+                padding: EdgeInsets.only(top: 150),
+                child: Loading(),
+              );
+            })
+        : Padding(
+            padding: const EdgeInsets.only(top: 100),
+            child: Column(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Bạn chưa đăng ký công ty',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (setting.traineeStart != null)
+                      Text(
+                          'Đã bắt đầu thời gian thực tập (${GV.readTimestamp(setting.traineeStart!)}) vui lòng liên hệ giảng viên cố vấn để được giải quyết.')
+                  ],
+                ),
+              ],
+            ),
           );
-        });
   }
 
   Widget _trainee() {
