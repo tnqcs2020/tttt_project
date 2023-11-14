@@ -271,7 +271,8 @@ class _ListFirmState extends State<ListFirm> {
                                   stream:
                                       firestore.collection('firms').snapshots(),
                                   builder: (context, snapshotFirm) {
-                                    if (snapshotFirm.hasData) {
+                                    if (snapshotFirm.hasData &&
+                                        snapshotFirm.data != null) {
                                       firms = [];
                                       for (var element
                                           in snapshotFirm.data!.docs) {
@@ -506,7 +507,8 @@ class _ListFirmState extends State<ListFirm> {
                                   stream:
                                       firestore.collection('firms').snapshots(),
                                   builder: (context, snapshotFirm) {
-                                    if (snapshotFirm.hasData) {
+                                    if (snapshotFirm.hasData &&
+                                        snapshotFirm.data != null) {
                                       firms = [];
                                       for (var element
                                           in snapshotFirm.data!.docs) {

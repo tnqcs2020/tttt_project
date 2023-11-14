@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/common/date_time_extension.dart';
 import 'package:tttt_project/models/appreciate_model.dart';
+import 'package:tttt_project/models/cv_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
@@ -138,6 +139,29 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
         builder: (context, value, child) {
           return Column(
             children: [
+              if (setting.traineeStart != null &&
+                  DateTime.now().isBetweenEqual(
+                      from: setting.traineeStart,
+                      to: Timestamp.fromDate(setting.traineeStart!.toDate().add(
+                          const Duration(
+                              days: 6, hours: 23, minutes: 59, seconds: 59)))))
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Text(
+                    'Bạn cần phân công công việc cho sinh viên từ ${GV.readTimestamp(setting.traineeStart!)} đến ${DateFormat('dd/MM/yyyy').format(setting.traineeStart!.toDate().add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59)))}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              if (setting.pointCBEnd != null &&
+                  DateTime.now().isBetweenEqual(
+                      from: setting.traineeEnd, to: setting.pointCBEnd))
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Text(
+                    'Bạn cần đánh giá sinh viên từ ${GV.readTimestamp(setting.traineeEnd!)} đến ${GV.readTimestamp(setting.pointCBEnd!)}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.only(top: 15),
                 child: Row(
@@ -275,7 +299,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15, bottom: 35),
+                padding: const EdgeInsets.only(top: 10, bottom: 35),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
@@ -356,7 +380,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                       .snapshots(),
                                   builder: (context, snapshotFirm) {
                                     if (snapshotFirm.hasData &&
-                                        snapshotFirm.data != null) {
+                                        snapshotFirm.data != null &&
+                                        snapshotFirm.connectionState ==
+                                            ConnectionState.active) {
                                       List<FirmModel> loadFirms = [];
                                       List<JobRegisterModel> listRegis = [];
                                       if (snapshotFirm.data!.docs.isNotEmpty) {
@@ -423,11 +449,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                       if (snapshotPlan
                                                               .hasData &&
                                                           snapshotPlan.data !=
-                                                              null &&
-                                                          snapshotPlan
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .active) {
+                                                              null) {
                                                         PlanWorkModel plan =
                                                             PlanWorkModel();
                                                         List<PlanWorkModel>
@@ -565,7 +587,15 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                               bottom:
                                                                                   1),
                                                                           onPressed:
-                                                                              () {
+                                                                              () async {
+                                                                            final loadCV =
+                                                                                await firestore.collection('cvs').doc(listRegis[indexRegis].userId).get();
+                                                                            CVModel?
+                                                                                cv;
+                                                                            if (loadCV.data() !=
+                                                                                null) {
+                                                                              cv = CVModel.fromMap(loadCV.data()!);
+                                                                            }
                                                                             loadUsers.forEach((element) {
                                                                               if (element.userId == listRegis[indexRegis].userId) {
                                                                                 user = element;
@@ -580,6 +610,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                               context: context,
                                                                               jobRegister: listRegis[indexRegis],
                                                                               trainee: trainee,
+                                                                              cv: cv,
                                                                             );
                                                                           },
                                                                           icon:
@@ -798,11 +829,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                   .hasData &&
                                                               snapshotPlan
                                                                       .data !=
-                                                                  null &&
-                                                              snapshotPlan
-                                                                      .connectionState ==
-                                                                  ConnectionState
-                                                                      .active) {
+                                                                  null) {
                                                             PlanWorkModel plan =
                                                                 PlanWorkModel();
                                                             List<PlanWorkModel>
@@ -925,7 +952,12 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                           IconButton(
                                                                               tooltip: 'Thông tin sinh viên',
                                                                               padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {
+                                                                              onPressed: () async {
+                                                                                final loadCV = await firestore.collection('cvs').doc(listRegis[indexRegis].userId).get();
+                                                                                CVModel? cv;
+                                                                                if (loadCV.data() != null) {
+                                                                                  cv = CVModel.fromMap(loadCV.data()!);
+                                                                                }
                                                                                 loadUsers.forEach((element) {
                                                                                   if (element.userId == listRegis[indexRegis].userId) {
                                                                                     user = element;
@@ -940,6 +972,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                   context: context,
                                                                                   jobRegister: listRegis[indexRegis],
                                                                                   trainee: trainee,
+                                                                                  cv: cv,
                                                                                 );
                                                                               },
                                                                               icon: const Icon(
@@ -1057,7 +1090,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                         'Chưa có sinh viên thực tập.'),
                                                   ),
                                                 );
-                                        } else {
+                                        } else if (snapshotFirm
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
                                           return SizedBox(
                                             height: screenHeight * 0.45,
                                             width: screenWidth * 0.6,
@@ -1069,6 +1104,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                               ],
                                             ),
                                           );
+                                        } else {
+                                          return const SizedBox.shrink();
                                         }
                                       },
                                     ),
@@ -1093,6 +1130,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
     required BuildContext context,
     required JobRegisterModel jobRegister,
     required RegisterTraineeModel trainee,
+    CVModel? cv,
   }) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -1153,6 +1191,14 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                         Text('Ngành: ${user.major}'),
                         Text('Email: ${user.email}'),
                         Text('Số điện thoại: ${user.phone}'),
+                        if (cv != null) ...[
+                          Text(
+                            'Kỹ năng: ${cv.skill}',
+                          ),
+                          Text(
+                            'Nguyện vọng: ${cv.wish}',
+                          ),
+                        ],
                         Text('Học kỳ thực tập: ${trainee.term}'),
                         Text(
                             'Năm học: ${trainee.yearStart} -  ${trainee.yearEnd}'),

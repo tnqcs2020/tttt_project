@@ -8,8 +8,7 @@ import 'package:tttt_project/views/desktop/canbo/info_firm.dart';
 import 'package:tttt_project/widgets/footer.dart';
 import 'package:tttt_project/widgets/header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tttt_project/widgets/loading.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
 import 'package:tttt_project/widgets/menu/menu_left.dart';
 import 'package:tttt_project/common/user_controller.dart';
 

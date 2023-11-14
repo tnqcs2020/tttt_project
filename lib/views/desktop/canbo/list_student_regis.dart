@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tttt_project/common/constant.dart';
+import 'package:tttt_project/common/date_time_extension.dart';
+import 'package:tttt_project/models/cv_model.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
@@ -33,6 +36,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
   UserModel user = UserModel();
   String selectedTT = TrangThai.empty;
   ValueNotifier<bool> isViewed = ValueNotifier(false);
+  SettingTraineeModel setting = SettingTraineeModel();
 
   @override
   void initState() {
@@ -52,11 +56,29 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
       loadUsers =
           loadData.docs.map((e) => UserModel.fromMap(e.data())).toList();
     }
+
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
       currentUser.setCurrentUser(
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
+      DocumentSnapshot<Map<String, dynamic>> atMoment =
+          await firestore.collection('atMoment').doc('now').get();
+      if (atMoment.data() != null) {
+        QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
+            await firestore
+                .collection('settingTrainees')
+                .where('term', isEqualTo: atMoment.data()!['term'])
+                .where('yearStart', isEqualTo: atMoment.data()!['yearStart'])
+                .get();
+        if (isExistSettingTrainee.docs.isNotEmpty) {
+          final settingTrainee = SettingTraineeModel.fromMap(
+              isExistSettingTrainee.docs.first.data());
+          setState(() {
+            setting = settingTrainee;
+          });
+        }
+      }
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
           await FirebaseFirestore.instance
               .collection('users')
@@ -96,6 +118,24 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
         builder: (context, value, child) {
           return Column(
             children: [
+              if (setting.traineeStart != null &&
+                  DateTime.now().isBeforeTimestamp(setting.traineeStart))
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Text(
+                    'Bạn cần phê duyệt trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              if (setting.traineeStart != null &&
+                  DateTime.now().isAfterOrEqual(setting.traineeStart))
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: Text(
+                    'Đã quá thời gian phê duyệt (${GV.readTimestamp(setting.traineeStart!)})',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.only(top: 15),
                 child: Row(
@@ -174,7 +214,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15, bottom: 35),
+                padding: const EdgeInsets.only(top: 10, bottom: 35),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   height: screenHeight * 0.45,
@@ -366,6 +406,21 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                             1),
                                                                 onPressed:
                                                                     () async {
+                                                                  final loadCV = await firestore
+                                                                      .collection(
+                                                                          'cvs')
+                                                                      .doc(listRegis[
+                                                                              indexRegis]
+                                                                          .userId)
+                                                                      .get();
+                                                                  CVModel? cv;
+                                                                  if (loadCV
+                                                                          .data() !=
+                                                                      null) {
+                                                                    cv = CVModel
+                                                                        .fromMap(
+                                                                            loadCV.data()!);
+                                                                  }
                                                                   loadUsers.forEach(
                                                                       (element) {
                                                                     if (element
@@ -383,7 +438,8 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                           listRegis[
                                                                               indexRegis],
                                                                       firm:
-                                                                          firm);
+                                                                          firm,
+                                                                      cv: cv);
                                                                 },
                                                                 icon: Icon(
                                                                     CupertinoIcons
@@ -551,6 +607,20 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                               1),
                                                                   onPressed:
                                                                       () async {
+                                                                    final loadCV = await firestore
+                                                                        .collection(
+                                                                            'cvs')
+                                                                        .doc(listRegis[indexRegis]
+                                                                            .userId)
+                                                                        .get();
+                                                                    CVModel? cv;
+                                                                    if (loadCV
+                                                                            .data() !=
+                                                                        null) {
+                                                                      cv = CVModel.fromMap(
+                                                                          loadCV
+                                                                              .data()!);
+                                                                    }
                                                                     loadUsers
                                                                         .forEach(
                                                                             (element) {
@@ -569,7 +639,8 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                             listRegis[
                                                                                 indexRegis],
                                                                         firm:
-                                                                            firm);
+                                                                            firm,
+                                                                        cv: cv);
                                                                   },
                                                                   icon: Icon(
                                                                       CupertinoIcons
@@ -626,11 +697,11 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
         });
   }
 
-  showInfoAndReply({
-    required BuildContext context,
-    required JobRegisterModel jobRegister,
-    required FirmModel firm,
-  }) {
+  showInfoAndReply(
+      {required BuildContext context,
+      required JobRegisterModel jobRegister,
+      required FirmModel firm,
+      CVModel? cv}) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     showDialog(
@@ -711,6 +782,14 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                               Text(
                                 'Số điện thoại: ${user.phone!}',
                               ),
+                              if (cv != null) ...[
+                                Text(
+                                  'Kỹ năng: ${cv.skill}',
+                                ),
+                                Text(
+                                  'Nguyện vọng: ${cv.wish}',
+                                ),
+                              ],
                               Text(
                                 'Ngày ứng tuyển: ${GV.readTimestamp(jobRegister.createdAt!)}',
                               ),

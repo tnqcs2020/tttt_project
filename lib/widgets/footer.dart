@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tttt_project/widgets/custom_devider.dart';
 
 class Footer extends StatelessWidget {
-  const Footer({Key? key}) : super(key: key);
+  const Footer({Key? key, this.isLogin}) : super(key: key);
+  final bool? isLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +26,9 @@ class Footer extends StatelessWidget {
             padding: EdgeInsets.only(
               top: 10,
               bottom: 10,
-              left: screenWidth * 0.27,
-              right: screenWidth * 0.08,
+              left: isLogin != null && isLogin == true ? 0 : screenWidth * 0.27,
+              right:
+                  isLogin != null && isLogin == true ? 0 : screenWidth * 0.08,
             ),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,

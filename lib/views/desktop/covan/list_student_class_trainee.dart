@@ -686,13 +686,17 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                               1),
                                                                       onPressed:
                                                                           () {
-                                                                        showAppreciateCB(
-                                                                            context:
-                                                                                context,
-                                                                            user:
-                                                                                user,
-                                                                            appreciate:
-                                                                                appreciate);
+                                                                        if (appreciate.userId !=
+                                                                            null) {
+                                                                          showAppreciateCB(
+                                                                              context: context,
+                                                                              user: user,
+                                                                              appreciate: appreciate);
+                                                                        } else {
+                                                                          GV.error(
+                                                                              context: context,
+                                                                              message: 'Chưa có đánh giá từ cán bộ');
+                                                                        }
                                                                       },
                                                                       icon:
                                                                           Icon(
@@ -1054,10 +1058,12 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                   1),
                                                                           onPressed:
                                                                               () {
-                                                                            showAppreciateCB(
-                                                                                context: context,
-                                                                                user: user,
-                                                                                appreciate: appreciate);
+                                                                            if (appreciate.userId !=
+                                                                                null) {
+                                                                              showAppreciateCB(context: context, user: user, appreciate: appreciate);
+                                                                            } else {
+                                                                              GV.error(context: context, message: 'Chưa có đánh giá từ cán bộ');
+                                                                            }
                                                                           },
                                                                           icon:
                                                                               Icon(
@@ -1976,7 +1982,8 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                 .snapshots(),
                             builder: (context, snapshotPlan) {
                               if (snapshotPlan.hasData &&
-                                  snapshotPlan.data != null) {
+                                  snapshotPlan.data != null &&
+                                  snapshotPlan.data!.data() != null) {
                                 final plan = PlanWorkModel.fromMap(
                                     snapshotPlan.data!.data()!);
                                 return SizedBox(
@@ -1994,180 +2001,192 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                           TableRow(children: [
                                             Text(
                                                 'Cán bộ hướng dẫn: ${plan.cbhdName}'),
-                                            Text(
-                                                'Ngày phân công:  ${GV.readTimestamp(plan.createdAt!)}'),
+                                            if (plan.createdAt != null)
+                                              Text(
+                                                  'Ngày phân công:  ${GV.readTimestamp(plan.createdAt!)}')
+                                            else
+                                              const Text(
+                                                  'Ngày phân công:  Chưa phân công.'),
                                           ]),
                                         ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Table(
-                                          border: TableBorder.all(),
-                                          columnWidths: Map.from({
-                                            0: const FlexColumnWidth(1),
-                                            1: const FlexColumnWidth(3),
-                                            2: const FlexColumnWidth(1),
-                                            3: const FlexColumnWidth(1)
-                                          }),
-                                          children: [
-                                            TableRow(
-                                              children: [
-                                                Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: const Text(
-                                                      'Tuần',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )),
-                                                Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: const Text(
-                                                      'Nội dung công việc',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    )),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: const Text(
-                                                    'Số buổi',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: const Text(
-                                                    'Nhận xét',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            for (int i = 0;
-                                                i < plan.listWork!.length;
-                                                i++)
+                                      if (plan.listWork!.isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Table(
+                                            border: TableBorder.all(),
+                                            columnWidths: Map.from({
+                                              0: const FlexColumnWidth(1),
+                                              1: const FlexColumnWidth(3),
+                                              2: const FlexColumnWidth(1),
+                                              3: const FlexColumnWidth(1)
+                                            }),
+                                            children: [
                                               TableRow(
                                                 children: [
-                                                  TableCell(
-                                                    verticalAlignment:
-                                                        TableCellVerticalAlignment
-                                                            .middle,
-                                                    child: Container(
+                                                  Container(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               10),
-                                                      child: Column(
-                                                        children: [
-                                                          Text(
-                                                            GV.readTimestamp(
-                                                                plan
-                                                                    .listWork![
-                                                                        i]
-                                                                    .dayStart!),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                          Text(
-                                                            '${i + 1}',
-                                                            style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                          Text(
-                                                            GV.readTimestamp(
-                                                                plan
-                                                                    .listWork![
-                                                                        i]
-                                                                    .dayEnd!),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  TableCell(
-                                                    verticalAlignment:
-                                                        TableCellVerticalAlignment
-                                                            .middle,
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            plan.listWork![i]
-                                                                .content!,
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  TableCell(
-                                                    verticalAlignment:
-                                                        TableCellVerticalAlignment
-                                                            .middle,
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10),
-                                                      child: Text(
-                                                        '${plan.listWork![i].totalDay}',
+                                                      child: const Text(
+                                                        'Tuần',
                                                         textAlign:
                                                             TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  TableCell(
-                                                    verticalAlignment:
-                                                        TableCellVerticalAlignment
-                                                            .middle,
-                                                    child: Container(
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                  Container(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               10),
-                                                      child: Text(
-                                                        '${plan.listWork![i].comment}',
+                                                      child: const Text(
+                                                        'Nội dung công việc',
                                                         textAlign:
                                                             TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: const Text(
+                                                      'Số buổi',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: const Text(
+                                                      'Nhận xét',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                          ],
+                                              for (int i = 0;
+                                                  i < plan.listWork!.length;
+                                                  i++)
+                                                TableRow(
+                                                  children: [
+                                                    TableCell(
+                                                      verticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              GV.readTimestamp(plan
+                                                                  .listWork![i]
+                                                                  .dayStart!),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            Text(
+                                                              '${i + 1}',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            Text(
+                                                              GV.readTimestamp(
+                                                                  plan
+                                                                      .listWork![
+                                                                          i]
+                                                                      .dayEnd!),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      verticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              plan.listWork![i]
+                                                                  .content!,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .start,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      verticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: Text(
+                                                          '${plan.listWork![i].totalDay}',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      verticalAlignment:
+                                                          TableCellVerticalAlignment
+                                                              .middle,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: Text(
+                                                          '${plan.listWork![i].comment}',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                 );
@@ -2336,6 +2355,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                     pointMax: pointAppreciateCV[5].toString(),
                                     point: points[3],
                                     isClock: isClock,
+                                    isCB: true,
                                   ),
                                   rowAppreciate(
                                     content: appreciateCV[6],
@@ -2672,6 +2692,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
     required String pointMax,
     TextEditingController? point,
     bool isClock = false,
+    bool isCB = false,
   }) {
     return TableRow(
       children: [
@@ -2717,8 +2738,9 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                 child: TextFormField(
                   controller: point,
                   minLines: 1,
-                  readOnly: isClock,
-                  style: const TextStyle(fontSize: 13),
+                  readOnly: isClock || isCB,
+                  style:
+                      TextStyle(fontSize: 13, color: isCB ? Colors.red : null),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,

@@ -121,7 +121,7 @@ class LogInScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Footer(),
+            const Footer(isLogin: true),
           ],
         ),
       ),
