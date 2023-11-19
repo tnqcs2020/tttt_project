@@ -257,7 +257,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                               CrossAxisAlignment.center,
                                           children: [
                                             LineDetail(
-                                                field: "Mã Lớp",
+                                                field: "Mã lớp",
                                                 display:
                                                     currentUser.classId.value),
                                             LineDetail(
@@ -287,7 +287,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                                 display: currentUser.cvId.value
                                                     .toUpperCase()),
                                             LineDetail(
-                                                field: "Lớp",
+                                                field: "Họ tên cố vấn",
                                                 display:
                                                     currentUser.cvName.value,
                                                 widthForm: 0.19),

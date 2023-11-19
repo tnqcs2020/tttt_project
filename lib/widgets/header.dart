@@ -32,11 +32,17 @@ class Header extends StatelessWidget {
             children: [
               Text(
                 "Hệ thống quản lý thực tập thực tế",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white),
               ),
               Text(
                 "Trường Công nghệ Thông tin và Truyền thông",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white),
               ),
             ],
           ),
@@ -57,9 +63,9 @@ class Header extends StatelessWidget {
                           await sharedPref.remove('menuSelected');
                           await GV.auth.signOut();
                           currentUser.resetUser();
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, RouteGenerator.login, (route) => false);
-                          // Get.toNamed(RouteGenerator.login);
+                          // Navigator.pushNamedAndRemoveUntil(
+                          //     context, RouteGenerator.login, (route) => false);
+                          Get.toNamed(RouteGenerator.login);
                         },
                         child: const Text("Thoát"))
                   ],

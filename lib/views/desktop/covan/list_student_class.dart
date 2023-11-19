@@ -3,6 +3,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tttt_project/common/constant.dart';
+import 'package:tttt_project/common/excel.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
@@ -183,7 +185,7 @@ class _ListStudentClassState extends State<ListStudentClass> {
             child: Column(
               children: [
                 Container(
-                  color: Colors.green,
+                  color: GV.fieldColor,
                   height: screenHeight * 0.04,
                   child: const Row(
                     children: [
@@ -492,6 +494,34 @@ class _ListStudentClassState extends State<ListStudentClass> {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 35),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomButton(
+                text: 'Xuất danh sách',
+                width: 100,
+                height: 40,
+                onTap: () async {
+                  List<UserModel> list = [];
+                  final loadUser = await firestore
+                      .collection('users')
+                      .where('classId', isEqualTo: myClass.classId)
+                      .get();
+                  loadUser.docs.forEach((element) {
+                    list.add(UserModel.fromMap(element.data()));
+                  });
+                  await xuatDSSVGV(
+                    classId: myClass.classId!,
+                    className: myClass.className!,
+                    users: list,
+                  );
+                },
+              ),
+            ],
+          ),
+        )
       ],
     );
   }

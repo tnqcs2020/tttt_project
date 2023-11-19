@@ -268,25 +268,14 @@ class _MyCVState extends State<MyCV> {
                                         : null,
                                   ),
                                   LineDetail(
-                                      field: "Thành tích", ctrl: achieveCtrl),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  LineDetail(
-                                      field: "Sở thích", ctrl: hobbyCtrl),
-                                  LineDetail(
                                       field: "Nguyện vọng", ctrl: wishCtrl),
                                 ],
                               ),
-                              const SizedBox(height: 55),
+                              const SizedBox(height: 45),
                               CustomButton(
-                                text: "Lưu",
+                                text: "Lưu và gợi ý công ty",
                                 width: screenWidth * 0.1,
-                                height: screenHeight * 0.07,
+                                height: screenHeight * 0.06,
                                 onTap: () async {
                                   if (formKey.currentState!.validate()) {
                                     DocumentSnapshot<Map<String, dynamic>>
@@ -337,6 +326,7 @@ class _MyCVState extends State<MyCV> {
                                   }
                                 },
                               ),
+                              const SizedBox(height: 25),
                               ValueListenableBuilder(
                                   valueListenable: firmSuggest,
                                   builder: (context, firmSuggestVal, child) {
@@ -498,7 +488,7 @@ class _MyCVState extends State<MyCV> {
                                                                               const Expanded(
                                                                                 child: Text(
                                                                                   'Chi tiết tuyển dụng',
-                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                                                                                   textAlign: TextAlign.center,
                                                                                 ),
                                                                               ),
@@ -571,7 +561,7 @@ class _MyCVState extends State<MyCV> {
                                                                                         ],
                                                                                       ),
                                                                                     ),
-                                                                                  ] else if (setting.settingId != null && setting.term != trainee.term && setting.traineeStart != trainee.traineeStart) ...[
+                                                                                  ] else if (setting.term != trainee.term && setting.traineeStart != trainee.traineeStart) ...[
                                                                                     const Text('Vị trí tuyển dụng:'),
                                                                                     for (var job in firm.listJob!)
                                                                                       Padding(
@@ -613,7 +603,22 @@ class _MyCVState extends State<MyCV> {
                                                                                           subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
                                                                                         ),
                                                                                       ),
-                                                                                  ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                                                                                    const Padding(
+                                                                                      padding: EdgeInsets.only(top: 15),
+                                                                                      child: Row(
+                                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                                        children: [
+                                                                                          Text(
+                                                                                            'Công ty đã từ chối bạn.',
+                                                                                            style: TextStyle(
+                                                                                              fontSize: 12,
+                                                                                              color: Colors.red,
+                                                                                            ),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    )
+                                                                                  ] else if (isTrainee && loadRegis.isConfirmed! || !isTrainee && !loadRegis.isConfirmed! && loadRegis.status == TrangThai.accept) ...[
                                                                                     Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                     Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
                                                                                     Text('Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),
@@ -673,7 +678,22 @@ class _MyCVState extends State<MyCV> {
                                                                                           subtitle: job.describeJob!.isNotEmpty ? Text('${job.describeJob}') : null,
                                                                                         ),
                                                                                       ),
-                                                                                  ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                                                                                    const Padding(
+                                                                                      padding: EdgeInsets.only(top: 15),
+                                                                                      child: Row(
+                                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                                        children: [
+                                                                                          Text(
+                                                                                            'Công ty đã từ chối bạn.',
+                                                                                            style: TextStyle(
+                                                                                              fontSize: 12,
+                                                                                              color: Colors.red,
+                                                                                            ),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    )
+                                                                                  ] else if (isTrainee && loadRegis.isConfirmed! || !isTrainee && !loadRegis.isConfirmed! && loadRegis.status == TrangThai.accept) ...[
                                                                                     Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                     Text('Ngày ứng tuyển: ${GV.readTimestamp(loadRegis.createdAt!)}'),
                                                                                     Text('Ngày duyệt: ${GV.readTimestamp(loadRegis.repliedAt!)}'),

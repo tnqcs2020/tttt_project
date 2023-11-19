@@ -14,6 +14,8 @@ class GV {
   static final traineesCol = FirebaseFirestore.instance.collection('trainees');
   static final cvsCol = FirebaseFirestore.instance.collection('cvs');
   static final firmsCol = FirebaseFirestore.instance.collection('firms');
+  static final Color primaryColor = Colors.blue.shade600;
+  static final Color fieldColor = Colors.blue.shade300;
 
   static String generateRandomString(int len) {
     var rd = Random();
@@ -123,14 +125,14 @@ List<String> menuQuanTri = [
   "Tạo tài khoản",
   "Danh sách người dùng",
   "Danh sách thực tập",
-  "Quản lý học phần",
+  // "Quản lý học phần",
 ];
 List<String> pageQuanTri = [
   RouteGenerator.home,
   RouteGenerator.addUser,
   RouteGenerator.dsNguoiDung,
   RouteGenerator.dstttt,
-  RouteGenerator.manageCredit,
+  // RouteGenerator.manageCredit,
 ];
 
 List<String> menuCanBo = [
@@ -229,6 +231,13 @@ class NamHoc {
   static NamHoc n2324 = NamHoc(start: "2023", end: "2024");
   static NamHoc n2425 = NamHoc(start: "2024", end: "2025");
   static NamHoc empty = NamHoc(start: "", end: "");
+
+  factory NamHoc.fromMap(Map<String, dynamic> map) {
+    return NamHoc(
+      start: map['yearStart'] ?? '',
+      end: map['yearEnd'] ?? '', 
+    );
+  }
 }
 
 List<NamHoc> dsnhAll = [

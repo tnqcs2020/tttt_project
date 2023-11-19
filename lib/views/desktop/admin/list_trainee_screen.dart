@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/common/excel.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 // import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
@@ -167,7 +168,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                'Chọn',
+                                                'Tất cả',
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -227,7 +228,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                "Chọn",
+                                                "Tất cả",
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -298,7 +299,7 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      color: Colors.green,
+                                      color: GV.fieldColor,
                                       height: screenHeight * 0.04,
                                       child: const Row(
                                         children: [
@@ -358,192 +359,9 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                       ),
                                     ),
                                     Expanded(
-                                      child: isLook.value &&
-                                              currentUser.isCompleted.isTrue
-                                          ? SingleChildScrollView(
-                                              scrollDirection: Axis.vertical,
-                                              child: StreamBuilder(
-                                                stream: firestore
-                                                    .collection('trainees')
-                                                    .snapshots(),
-                                                builder: (context, snapshot) {
-                                                  List<RegisterTraineeModel>
-                                                      loadTrainee = [];
-                                                  List<RegisterTraineeModel>
-                                                      dstttt = [];
-                                                  if (snapshot.hasData &&
-                                                      snapshot.connectionState ==
-                                                          ConnectionState
-                                                              .active) {
-                                                    snapshot.data?.docs
-                                                        .forEach((element) {
-                                                      loadTrainee.add(
-                                                          RegisterTraineeModel
-                                                              .fromMap(element
-                                                                  .data()));
-                                                    });
-                                                    if (selectedHK ==
-                                                            HocKy.tatca &&
-                                                        selectedNH ==
-                                                            NamHoc.tatca) {
-                                                      loadTrainee.forEach((e) {
-                                                        dstttt.add(e);
-                                                      });
-                                                    } else if (selectedHK ==
-                                                        HocKy.tatca) {
-                                                      loadTrainee.forEach((e) {
-                                                        if (e.yearStart ==
-                                                            selectedNH.start) {
-                                                          dstttt.add(e);
-                                                        }
-                                                      });
-                                                    } else if (selectedNH ==
-                                                        NamHoc.tatca) {
-                                                      loadTrainee.forEach((e) {
-                                                        if (e.term ==
-                                                            selectedHK) {
-                                                          dstttt.add(e);
-                                                        }
-                                                      });
-                                                    } else {
-                                                      loadTrainee.forEach((e) {
-                                                        if (e.term ==
-                                                                selectedHK &&
-                                                            e.yearStart ==
-                                                                selectedNH
-                                                                    .start) {
-                                                          dstttt.add(e);
-                                                        }
-                                                      });
-                                                    }
-                                                    dstttt.sort(
-                                                      (a, b) => a.userId!
-                                                          .compareTo(b.userId!),
-                                                    );
-                                                    return dstttt.isNotEmpty
-                                                        ? ListView.builder(
-                                                            itemCount:
-                                                                dstttt.length,
-                                                            shrinkWrap: true,
-                                                            scrollDirection:
-                                                                Axis.vertical,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              String firmName =
-                                                                  '';
-                                                              dstttt[index]
-                                                                  .listRegis!
-                                                                  .forEach(
-                                                                      (element) {
-                                                                if (element
-                                                                    .isConfirmed!) {
-                                                                  firmName = element
-                                                                      .firmName!;
-                                                                }
-                                                              });
-                                                              return Container(
-                                                                height:
-                                                                    screenHeight *
-                                                                        0.065,
-                                                                color: index %
-                                                                            2 ==
-                                                                        0
-                                                                    ? Colors
-                                                                        .blue
-                                                                        .shade50
-                                                                    : null,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: Text(
-                                                                          '${index + 1}',
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 2,
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .userId!
-                                                                              .toUpperCase(),
-                                                                          textAlign:
-                                                                              TextAlign.justify),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 3,
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .studentName!,
-                                                                          textAlign:
-                                                                              TextAlign.justify),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child:
-                                                                          Text(
-                                                                        '${dstttt[index].creditId} - ${dstttt[index].creditName}',
-                                                                        textAlign:
-                                                                            TextAlign.justify,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-                                                                    ),
-                                                                    Expanded(
-                                                                      child: Text(
-                                                                          dstttt[index]
-                                                                              .course!,
-                                                                          textAlign:
-                                                                              TextAlign.center),
-                                                                    ),
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child:
-                                                                          Text(
-                                                                        firmName,
-                                                                        textAlign:
-                                                                            TextAlign.justify,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              );
-                                                            },
-                                                          )
-                                                        : SizedBox(
-                                                            height:
-                                                                screenHeight *
-                                                                    0.45,
-                                                            width: screenWidth *
-                                                                0.6,
-                                                            child: const Center(
-                                                              child: Text(
-                                                                  'Chưa có sinh viên đăng ký.'),
-                                                            ),
-                                                          );
-                                                  } else {
-                                                    return SizedBox(
-                                                      height:
-                                                          screenHeight * 0.45,
-                                                      width: screenWidth * 0.6,
-                                                      child: const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Loading(),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            )
-                                          : selectedHK.isEmpty &&
-                                                  selectedNH.start.isEmpty &&
-                                                  selectedNH.end.isEmpty
+                                      child:
+                                          isLook.value &&
+                                                  currentUser.isCompleted.isTrue
                                               ? SingleChildScrollView(
                                                   scrollDirection:
                                                       Axis.vertical,
@@ -554,6 +372,8 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                     builder:
                                                         (context, snapshot) {
                                                       List<RegisterTraineeModel>
+                                                          loadTrainee = [];
+                                                      List<RegisterTraineeModel>
                                                           dstttt = [];
                                                       if (snapshot.hasData &&
                                                           snapshot.connectionState ==
@@ -561,11 +381,50 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                   .active) {
                                                         snapshot.data?.docs
                                                             .forEach((element) {
-                                                          dstttt.add(
+                                                          loadTrainee.add(
                                                               RegisterTraineeModel
                                                                   .fromMap(element
                                                                       .data()));
                                                         });
+                                                        if (selectedHK ==
+                                                                HocKy.tatca &&
+                                                            selectedNH ==
+                                                                NamHoc.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            dstttt.add(e);
+                                                          });
+                                                        } else if (selectedHK ==
+                                                            HocKy.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.yearStart ==
+                                                                selectedNH
+                                                                    .start) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        } else if (selectedNH ==
+                                                            NamHoc.tatca) {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.term ==
+                                                                selectedHK) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        } else {
+                                                          loadTrainee
+                                                              .forEach((e) {
+                                                            if (e.term ==
+                                                                    selectedHK &&
+                                                                e.yearStart ==
+                                                                    selectedNH
+                                                                        .start) {
+                                                              dstttt.add(e);
+                                                            }
+                                                          });
+                                                        }
                                                         dstttt.sort(
                                                           (a, b) => a.userId!
                                                               .compareTo(
@@ -625,12 +484,9 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                         Expanded(
                                                                           flex:
                                                                               3,
-                                                                          child:
-                                                                              Text(
-                                                                            dstttt[index].studentName!,
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                          ),
+                                                                          child: Text(
+                                                                              dstttt[index].studentName!,
+                                                                              textAlign: TextAlign.justify),
                                                                         ),
                                                                         Expanded(
                                                                           flex:
@@ -653,12 +509,15 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                                           flex:
                                                                               4,
                                                                           child:
-                                                                              Text(
-                                                                            firmName,
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                            overflow:
-                                                                                TextOverflow.clip,
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.symmetric(horizontal: 5),
+                                                                            child:
+                                                                                Text(
+                                                                              firmName,
+                                                                              textAlign: TextAlign.justify,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            ),
                                                                           ),
                                                                         ),
                                                                       ],
@@ -698,10 +557,157 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                     },
                                                   ),
                                                 )
-                                              : const Center(
-                                                  child: Text(
-                                                      'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
-                                                ),
+                                              : selectedHK.isEmpty &&
+                                                      selectedNH
+                                                          .start.isEmpty &&
+                                                      selectedNH.end.isEmpty
+                                                  ? SingleChildScrollView(
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      child: StreamBuilder(
+                                                        stream: firestore
+                                                            .collection(
+                                                                'trainees')
+                                                            .snapshots(),
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          List<RegisterTraineeModel>
+                                                              dstttt = [];
+                                                          if (snapshot
+                                                                  .hasData &&
+                                                              snapshot.connectionState ==
+                                                                  ConnectionState
+                                                                      .active) {
+                                                            snapshot.data?.docs
+                                                                .forEach(
+                                                                    (element) {
+                                                              dstttt.add(RegisterTraineeModel
+                                                                  .fromMap(element
+                                                                      .data()));
+                                                            });
+                                                            dstttt.sort(
+                                                              (a, b) => a
+                                                                  .userId!
+                                                                  .compareTo(b
+                                                                      .userId!),
+                                                            );
+                                                            return dstttt
+                                                                    .isNotEmpty
+                                                                ? ListView
+                                                                    .builder(
+                                                                    itemCount:
+                                                                        dstttt
+                                                                            .length,
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    scrollDirection:
+                                                                        Axis.vertical,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      String
+                                                                          firmName =
+                                                                          '';
+                                                                      dstttt[index]
+                                                                          .listRegis!
+                                                                          .forEach(
+                                                                              (element) {
+                                                                        if (element
+                                                                            .isConfirmed!) {
+                                                                          firmName =
+                                                                              element.firmName!;
+                                                                        }
+                                                                      });
+                                                                      return Container(
+                                                                        height: screenHeight *
+                                                                            0.065,
+                                                                        color: index % 2 ==
+                                                                                0
+                                                                            ? Colors.blue.shade50
+                                                                            : null,
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Text('${index + 1}', textAlign: TextAlign.center),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 2,
+                                                                              child: Text(dstttt[index].userId!.toUpperCase(), textAlign: TextAlign.justify),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 3,
+                                                                              child: Text(
+                                                                                dstttt[index].studentName!,
+                                                                                textAlign: TextAlign.justify,
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 4,
+                                                                              child: Text(
+                                                                                '${dstttt[index].creditId} - ${dstttt[index].creditName}',
+                                                                                textAlign: TextAlign.justify,
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(dstttt[index].course!, textAlign: TextAlign.center),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 4,
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                                                child: Text(
+                                                                                  firmName,
+                                                                                  textAlign: TextAlign.justify,
+                                                                                  overflow: TextOverflow.clip,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  )
+                                                                : SizedBox(
+                                                                    height:
+                                                                        screenHeight *
+                                                                            0.45,
+                                                                    width:
+                                                                        screenWidth *
+                                                                            0.6,
+                                                                    child:
+                                                                        const Center(
+                                                                      child: Text(
+                                                                          'Chưa có sinh viên đăng ký.'),
+                                                                    ),
+                                                                  );
+                                                          } else {
+                                                            return SizedBox(
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.45,
+                                                              width:
+                                                                  screenWidth *
+                                                                      0.6,
+                                                              child:
+                                                                  const Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Loading(),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
+                                                    )
+                                                  : const Center(
+                                                      child: Text(
+                                                          'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                                    ),
                                     )
                                   ],
                                 ),
@@ -738,10 +744,62 @@ class _ListTraineeScreenState extends State<ListTraineeScreen> {
                                                 year: selectedNH,
                                                 trainees: dstttt);
                                           } else {
-                                            GV.error(
-                                                context: context,
-                                                message:
-                                                    'Vui lòng chọn học kỳ, năm học và kiểm tra lại danh sách trước khi xuất file.');
+                                            SettingTraineeModel setting =
+                                                SettingTraineeModel();
+                                            DocumentSnapshot<
+                                                    Map<String, dynamic>>
+                                                atMoment = await firestore
+                                                    .collection('atMoment')
+                                                    .doc('now')
+                                                    .get();
+                                            if (atMoment.data() != null) {
+                                              QuerySnapshot<
+                                                      Map<String, dynamic>>
+                                                  isExistSettingTrainee =
+                                                  await firestore
+                                                      .collection(
+                                                          'settingTrainees')
+                                                      .where('term',
+                                                          isEqualTo: atMoment
+                                                              .data()!['term'])
+                                                      .where('yearStart',
+                                                          isEqualTo:
+                                                              atMoment.data()![
+                                                                  'yearStart'])
+                                                      .get();
+                                              if (isExistSettingTrainee
+                                                  .docs.isNotEmpty) {
+                                                final settingTrainee =
+                                                    SettingTraineeModel.fromMap(
+                                                        isExistSettingTrainee
+                                                            .docs.first
+                                                            .data());
+                                                setState(() {
+                                                  setting = settingTrainee;
+                                                });
+                                              }
+                                            }
+                                            List<RegisterTraineeModel> dstttt =
+                                                [];
+                                            final load = await firestore
+                                                .collection('trainees')
+                                                .where('term',
+                                                    isEqualTo: setting.term)
+                                                .where('yearStart',
+                                                    isEqualTo:
+                                                        setting.yearStart)
+                                                .get();
+                                            load.docs.forEach((element) {
+                                              dstttt.add(
+                                                  RegisterTraineeModel.fromMap(
+                                                      element.data()));
+                                            });
+                                            xuatDSTTGV(
+                                                term: setting.term!,
+                                                year: NamHoc(
+                                                    start: setting.yearStart!,
+                                                    end: setting.yearEnd!),
+                                                trainees: dstttt);
                                           }
                                         },
                                       )

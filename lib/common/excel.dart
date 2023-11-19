@@ -5,6 +5,7 @@ import 'package:tiengviet/tiengviet.dart';
 import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/appreciate_cv_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
+import 'package:tttt_project/models/user_model.dart';
 import 'package:universal_html/html.dart';
 
 Future<void> xuatKQTT(
@@ -337,6 +338,111 @@ Future<void> xuatDSTTGV(
       : '${TiengViet.parse(year.start).split(' ').join()}_${TiengViet.parse(year.end).split(' ').join()}';
   saveExcel(bytes,
       'DS_TTTT_HK_${TiengViet.parse(term).split(' ').join()}_NH_$nh.xlsx');
+}
+
+Future<void> xuatDSSVGV(
+    {required String classId,
+    required String className,
+    required List<UserModel> users}) async {
+  final Workbook workbook = Workbook();
+  final Worksheet sheet = workbook.worksheets[0];
+  Style styleLeft = workbook.styles.add('styleLeft');
+  styleLeft.fontName = 'Times New Roman';
+  styleLeft.hAlign = HAlignType.left;
+  styleLeft.vAlign = VAlignType.center;
+  styleLeft.borders.all.lineStyle = LineStyle.thin;
+
+  Style styleCenter = workbook.styles.add('styleCenter');
+  styleCenter.fontName = 'Times New Roman';
+  styleCenter.hAlign = HAlignType.center;
+  styleCenter.vAlign = VAlignType.center;
+  styleCenter.borders.all.lineStyle = LineStyle.thin;
+
+  Style styleRight = workbook.styles.add('styleRight');
+  styleRight.fontName = 'Times New Roman';
+  styleRight.hAlign = HAlignType.right;
+  styleRight.vAlign = VAlignType.center;
+  styleRight.borders.all.lineStyle = LineStyle.thin;
+
+  sheet.getRangeByName('A1:E1').setText('DANH SÁCH SINH VIÊN');
+  sheet.getRangeByName('A1:E1').merge();
+  sheet.getRangeByName('A1:E1').cellStyle = styleCenter;
+  sheet.getRangeByName('A1:E1').cellStyle.borders.all.lineStyle =
+      LineStyle.none;
+  sheet.getRangeByName('A1:F1').cellStyle.bold = true;
+
+  sheet.getRangeByName('A3:C3').setText('Mã lớp: ${classId.toUpperCase()}');
+  sheet.getRangeByName('A3:C3').merge();
+  sheet.getRangeByName('A3:C3').cellStyle = styleLeft;
+  sheet.getRangeByName('A3:C3').cellStyle.borders.all.lineStyle =
+      LineStyle.none;
+  sheet.getRangeByName('A3:C3').cellStyle.bold = true;
+
+  sheet.getRangeByName('D3:E3').setText('Tên lớp: $className');
+  sheet.getRangeByName('D3:E3').merge();
+  sheet.getRangeByName('D3:E3').cellStyle = styleLeft;
+  sheet.getRangeByName('D3:E3').cellStyle.borders.all.lineStyle =
+      LineStyle.none;
+  sheet.getRangeByName('D3:E3').cellStyle.bold = true;
+
+  sheet.getRangeByName('A5').setText('STT');
+  sheet.getRangeByName('A5').cellStyle = styleCenter;
+  sheet.getRangeByName('A5').cellStyle.bold = true;
+
+  sheet.getRangeByName('B5').setText('Mã sinh viên');
+  sheet.getRangeByName('B5').cellStyle = styleCenter;
+  sheet.getRangeByName('B5').cellStyle.bold = true;
+
+  sheet.getRangeByName('C5').setText('Họ tên sinh viên');
+  sheet.getRangeByName('C5').cellStyle = styleCenter;
+  sheet.getRangeByName('C5').cellStyle.bold = true;
+
+  sheet.getRangeByName('D5').setText('Email');
+  sheet.getRangeByName('D5').cellStyle = styleCenter;
+  sheet.getRangeByName('D5').cellStyle.bold = true;
+
+  sheet.getRangeByName('E5').setText('Số điện thoại');
+  sheet.getRangeByName('E5').cellStyle = styleCenter;
+  sheet.getRangeByName('E5').cellStyle.bold = true;
+
+  var rowIndex = 6;
+  for (int i = 0; i < users.length; i++) {
+    sheet.getRangeByName('A$rowIndex').setText('${i + 1}');
+    sheet.getRangeByName('A$rowIndex').cellStyle = styleCenter;
+    sheet.getRangeByName('B$rowIndex').setText(users[i].userId!.toUpperCase());
+    sheet.getRangeByName('B$rowIndex').cellStyle = styleLeft;
+    sheet.getRangeByName('C$rowIndex').setText('${users[i].userName}');
+    sheet.getRangeByName('C$rowIndex').cellStyle = styleLeft;
+    sheet.getRangeByName('D$rowIndex').setText('${users[i].email}');
+    sheet.getRangeByName('D$rowIndex').cellStyle = styleLeft;
+
+    sheet.getRangeByName('E$rowIndex').setText('${users[i].phone}');
+    sheet.getRangeByName('E$rowIndex').cellStyle = styleLeft;
+    rowIndex++;
+  }
+
+  sheet.getRangeByName('A$rowIndex:C$rowIndex').setText('TỔNG SỐ SINH VIÊN');
+  sheet.getRangeByName('A$rowIndex:C$rowIndex').merge();
+  sheet.getRangeByName('A$rowIndex:C$rowIndex').cellStyle = styleCenter;
+  sheet.getRangeByName('A$rowIndex:C$rowIndex').cellStyle.bold = true;
+
+  sheet
+      .getRangeByName('D$rowIndex:E$rowIndex')
+      .setText(users.length.toString());
+  sheet.getRangeByName('D$rowIndex:E$rowIndex').merge();
+  sheet.getRangeByName('D$rowIndex:E$rowIndex').cellStyle = styleCenter;
+  sheet.getRangeByName('D$rowIndex:E$rowIndex').cellStyle.bold = true;
+
+  sheet.autoFitColumn(1);
+  sheet.autoFitColumn(2);
+  sheet.autoFitColumn(3);
+  sheet.autoFitColumn(4);
+  sheet.autoFitColumn(5);
+
+  List<int> bytes = workbook.saveAsStream();
+  workbook.dispose();
+
+  saveExcel(bytes, 'DSSV_$classId.xlsx');
 }
 
 Future<void> saveExcel(List<int> bytes, String fileName) async {

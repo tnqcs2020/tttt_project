@@ -165,6 +165,7 @@ class _ListFirmState extends State<ListFirm> {
                     child: TextFormField(
                       controller: searchCtrl,
                       decoration: InputDecoration(
+                        hintText: 'Tên công ty',
                         isDense: false,
                         contentPadding: EdgeInsets.zero,
                         prefixIcon: const Icon(Icons.search),
@@ -213,8 +214,8 @@ class _ListFirmState extends State<ListFirm> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      color: Colors.green,
-                      height: screenHeight * 0.035,
+                      color: GV.fieldColor,
+                      height: screenHeight * 0.04,
                       child: const Row(
                         children: [
                           Expanded(
@@ -746,7 +747,9 @@ class _ListFirmState extends State<ListFirm> {
                       ),
                       const Expanded(
                         child: Text('Chi tiết tuyển dụng',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center),
                       ),
                       SizedBox(
@@ -813,8 +816,7 @@ class _ListFirmState extends State<ListFirm> {
                                 ],
                               ),
                             ),
-                          ] else if (setting.settingId != null &&
-                              setting.term != trainee.term &&
+                          ] else if (setting.term != trainee.term &&
                               setting.traineeStart != trainee.traineeStart) ...[
                             const Text('Vị trí tuyển dụng:'),
                             for (var job in firm.listJob!)
@@ -858,7 +860,25 @@ class _ListFirmState extends State<ListFirm> {
                                       : null,
                                 ),
                               ),
-                          ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Công ty đã từ chối bạn.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] else if (isTrainee && loadRegis.isConfirmed! ||
+                              !isTrainee &&
+                                  !loadRegis.isConfirmed! &&
+                                  loadRegis.status == TrangThai.accept) ...[
                             Text(
                                 'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                             Text(
@@ -928,7 +948,25 @@ class _ListFirmState extends State<ListFirm> {
                                       : null,
                                 ),
                               ),
-                          ] else if (isTrainee && loadRegis.isConfirmed!) ...[
+                            const Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Công ty đã từ chối bạn.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ] else if (isTrainee && loadRegis.isConfirmed! ||
+                              !isTrainee &&
+                                  !loadRegis.isConfirmed! &&
+                                  loadRegis.status == TrangThai.accept) ...[
                             Text(
                                 'Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                             Text(

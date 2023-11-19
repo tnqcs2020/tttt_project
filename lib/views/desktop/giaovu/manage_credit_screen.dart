@@ -169,7 +169,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                "Chọn",
+                                                "Tất cả",
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -229,7 +229,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                "Chọn",
+                                                "Tất cả",
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -305,7 +305,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      color: Colors.green,
+                                      color: GV.fieldColor,
                                       height: screenHeight * 0.04,
                                       child: const Row(
                                         children: [
@@ -778,7 +778,9 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                       Expanded(
                         child: Text(
                             isCreate ? 'Thêm học phần' : 'Cập nhật học phần',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center),
                       ),
                       SizedBox(
@@ -994,7 +996,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                               },
                               style: const ButtonStyle(
                                   elevation: MaterialStatePropertyAll(5)),
-                              child: const Text('Thêm',
+                              child: const Text('Thêm học phần',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
                             )
@@ -1064,7 +1066,7 @@ class _ManageCreditScreenState extends State<ManageCreditScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Xóa Kế Hoạch',
+                          'Xóa học phần',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),

@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,7 +54,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   String? appreciateCTDT;
   final _formKey = GlobalKey<FormState>();
   SettingTraineeModel setting = SettingTraineeModel();
-
+  ValueNotifier finalTotal = ValueNotifier(0);
   @override
   void initState() {
     getData();
@@ -134,641 +135,263 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return ValueListenableBuilder(
-        valueListenable: isViewed,
-        builder: (context, value, child) {
-          return Column(
-            children: [
-              if (setting.traineeStart != null &&
-                  DateTime.now().isBetweenEqual(
-                      from: setting.traineeStart,
-                      to: Timestamp.fromDate(setting.traineeStart!.toDate().add(
-                          const Duration(
-                              days: 6, hours: 23, minutes: 59, seconds: 59)))))
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Text(
-                    'Bạn cần phân công công việc cho sinh viên từ ${GV.readTimestamp(setting.traineeStart!)} đến ${DateFormat('dd/MM/yyyy').format(setting.traineeStart!.toDate().add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59)))}',
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              if (setting.pointCBEnd != null &&
-                  DateTime.now().isBetweenEqual(
-                      from: setting.traineeEnd, to: setting.pointCBEnd))
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: Text(
-                    'Bạn cần đánh giá sinh viên từ ${GV.readTimestamp(setting.traineeEnd!)} đến ${GV.readTimestamp(setting.pointCBEnd!)}',
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.only(top: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: screenWidth * 0.04,
-                          child: const Text(
-                            "Học Kỳ",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton2<String>(
-                            isExpanded: true,
-                            hint: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Chọn',
-                                    style: DropdownStyle.hintStyle,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            items: dshkAll
-                                .map((String hk) => DropdownMenuItem<String>(
-                                      value: hk,
-                                      child: Center(
-                                        child: Text(
-                                          hk,
-                                          style: DropdownStyle.itemStyle,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                            value:
-                                selectedHK != HocKy.empty ? selectedHK : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedHK = value!;
-                              });
-                              currentUser.isCompleted.value = false;
-                            },
-                            buttonStyleData: DropdownStyle.buttonStyleShort,
-                            iconStyleData: DropdownStyle.iconStyleData,
-                            dropdownStyleData: DropdownStyle.dropdownStyleShort,
-                            menuItemStyleData: DropdownStyle.menuItemStyleData,
-                          ),
-                        ),
-                      ],
+    return setting.settingId != null
+        ? ValueListenableBuilder(
+            valueListenable: isViewed,
+            builder: (context, value, child) {
+              return Column(
+                children: [
+                  if (setting.traineeStart != null &&
+                      DateTime.now().isBetweenEqual(
+                          from: setting.traineeStart,
+                          to: Timestamp.fromDate(setting.traineeStart!
+                              .toDate()
+                              .add(const Duration(
+                                  days: 6,
+                                  hours: 23,
+                                  minutes: 59,
+                                  seconds: 59)))))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Bạn cần phân công công việc cho sinh viên từ ${GV.readTimestamp(setting.traineeStart!)} đến ${DateFormat('dd/MM/yyyy').format(setting.traineeStart!.toDate().add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59)))}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
                     ),
-                    const SizedBox(width: 25),
-                    Row(
+                  if (setting.pointCBEnd != null &&
+                      DateTime.now().isBetweenEqual(
+                          from: setting.traineeEnd, to: setting.pointCBEnd))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Bạn cần đánh giá sinh viên từ ${GV.readTimestamp(setting.traineeEnd!)} đến ${GV.readTimestamp(setting.pointCBEnd!)}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: screenWidth * 0.05,
-                          child: const Text(
-                            "Năm Học",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton2<NamHoc>(
-                            isExpanded: true,
-                            hint: Center(
-                              child: Text(
-                                "Chọn",
-                                style: DropdownStyle.hintStyle,
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: screenWidth * 0.04,
+                              child: const Text(
+                                "Học kỳ",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            items: dsnhAll
-                                .map((NamHoc nh) => DropdownMenuItem<NamHoc>(
-                                      value: nh,
-                                      child: Center(
-                                        child: Text(
-                                          nh.start == nh.end
-                                              ? nh.start
-                                              : "${nh.start} - ${nh.end}",
-                                          style: DropdownStyle.itemStyle,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton2<String>(
+                                isExpanded: true,
+                                hint: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${setting.term}',
+                                        style: DropdownStyle.hintStyle,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ))
-                                .toList(),
-                            value:
-                                selectedNH != NamHoc.empty ? selectedNH : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedNH = value!;
-                              });
-                              currentUser.isCompleted.value = false;
-                            },
-                            buttonStyleData: DropdownStyle.buttonStyleMedium,
-                            iconStyleData: DropdownStyle.iconStyleData,
-                            dropdownStyleData:
-                                DropdownStyle.dropdownStyleMedium,
-                            menuItemStyleData: DropdownStyle.menuItemStyleData,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 35),
-                    CustomButton(
-                        text: 'Xem',
-                        width: 100,
-                        height: 45,
-                        onTap: () {
-                          if (selectedHK != HocKy.empty &&
-                              selectedNH != NamHoc.empty) {
-                            setState(() {
-                              isViewed.value = true;
-                            });
-                            currentUser.isCompleted.value = true;
-                          }
-                        })
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 35),
-                child: Container(
-                  decoration: const BoxDecoration(color: Colors.white),
-                  height: screenHeight * 0.45,
-                  width: screenWidth * 0.6,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        color: Colors.green,
-                        height: screenHeight * 0.04,
-                        child: const Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'STT',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'MSSV',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                'Họ tên',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Text(
-                                'Vị trí thực tập',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Phân việc',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Điểm',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                'Thao tác',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                    ],
+                                  ),
+                                ),
+                                items: dshkAll
+                                    .map((String hk) =>
+                                        DropdownMenuItem<String>(
+                                          value: hk,
+                                          child: Center(
+                                            child: Text(
+                                              hk,
+                                              style: DropdownStyle.itemStyle,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                value: selectedHK != HocKy.empty
+                                    ? selectedHK
+                                    : null,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedHK = value!;
+                                  });
+                                  currentUser.isCompleted.value = false;
+                                },
+                                buttonStyleData: DropdownStyle.buttonStyleShort,
+                                iconStyleData: DropdownStyle.iconStyleData,
+                                dropdownStyleData:
+                                    DropdownStyle.dropdownStyleShort,
+                                menuItemStyleData:
+                                    DropdownStyle.menuItemStyleData,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      isViewed.value && currentUser.isCompleted.isTrue
-                          ? Expanded(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: StreamBuilder(
-                                  stream: firestore
-                                      .collection('firms')
-                                      .where('firmId',
-                                          isEqualTo: currentUser.userId.value)
-                                      .snapshots(),
-                                  builder: (context, snapshotFirm) {
-                                    if (snapshotFirm.hasData &&
-                                        snapshotFirm.data != null &&
-                                        snapshotFirm.connectionState ==
-                                            ConnectionState.active) {
-                                      List<FirmModel> loadFirms = [];
-                                      List<JobRegisterModel> listRegis = [];
-                                      if (snapshotFirm.data!.docs.isNotEmpty) {
-                                        snapshotFirm.data!.docs.forEach(
-                                            (element) => loadFirms.add(
-                                                FirmModel.fromMap(
-                                                    element.data())));
-                                        for (var e
-                                            in loadFirms.first.listRegis!) {
-                                          if (e.isConfirmed == true) {
-                                            listRegis.add(e);
-                                          }
-                                        }
-                                      }
-                                      List<JobRegisterModel> listSelect = [];
-                                      listRegis.forEach((e1) {
-                                        trainees.forEach((e2) {
-                                          if (selectedHK == HocKy.tatca &&
-                                              selectedNH == NamHoc.tatca) {
-                                            if (e1.userId == e2.userId) {
-                                              listSelect.add(e1);
-                                            }
-                                          } else if (selectedHK ==
-                                              HocKy.tatca) {
-                                            if (e1.userId == e2.userId &&
-                                                e2.yearStart ==
-                                                    selectedNH.start) {
-                                              listSelect.add(e1);
-                                            }
-                                          } else if (selectedNH ==
-                                              NamHoc.tatca) {
-                                            if (e1.userId == e2.userId &&
-                                                e2.term == selectedHK) {
-                                              listSelect.add(e1);
-                                            }
-                                          } else if (e1.userId == e2.userId &&
-                                              e2.term == selectedHK &&
-                                              e2.yearStart ==
-                                                  selectedNH.start) {
-                                            listSelect.add(e1);
-                                          }
-                                        });
-                                      });
-                                      listRegis.sort(
-                                        (a, b) =>
-                                            a.userId!.compareTo(b.userId!),
-                                      );
-                                      return listSelect.isNotEmpty
-                                          ? ListView.builder(
-                                              itemCount: listSelect.length,
-                                              shrinkWrap: true,
-                                              itemBuilder:
-                                                  (context, indexRegis) {
-                                                return StreamBuilder(
-                                                    stream: firestore
-                                                        .collection('plans')
-                                                        .where('userId',
-                                                            isEqualTo: listRegis[
-                                                                    indexRegis]
-                                                                .userId)
-                                                        .snapshots(),
-                                                    builder: (context,
-                                                        snapshotPlan) {
-                                                      if (snapshotPlan
-                                                              .hasData &&
-                                                          snapshotPlan.data !=
-                                                              null) {
-                                                        PlanWorkModel plan =
-                                                            PlanWorkModel();
-                                                        List<PlanWorkModel>
-                                                            listPlan = [];
-                                                        RegisterTraineeModel
-                                                            trainee =
-                                                            RegisterTraineeModel();
-                                                        if (snapshotPlan.data!
-                                                            .docs.isNotEmpty) {
-                                                          snapshotPlan
-                                                              .data!.docs
-                                                              .forEach((element) =>
-                                                                  listPlan.add(
-                                                                      PlanWorkModel.fromMap(
-                                                                          element
-                                                                              .data())));
-                                                          listPlan.forEach(
-                                                              (element) {
-                                                            if (element
-                                                                    .userId ==
-                                                                listRegis[
-                                                                        indexRegis]
-                                                                    .userId) {
-                                                              plan = element;
-                                                            }
-                                                          });
-                                                        }
-                                                        return Container(
-                                                          height: screenHeight *
-                                                              0.05,
-                                                          color:
-                                                              indexRegis % 2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child: Text(
-                                                                    '${indexRegis + 1}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: Text(
-                                                                    '${listRegis[indexRegis].userId}'
-                                                                        .toUpperCase(),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 3,
-                                                                child: Text(
-                                                                    '${listRegis[indexRegis].userName}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 4,
-                                                                child: Text(
-                                                                  '${listRegis[indexRegis].jobName}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                  child: plan
-                                                                          .listWork!
-                                                                          .isEmpty
-                                                                      ? const Icon(
-                                                                          Icons
-                                                                              .not_interested_rounded,
-                                                                          color:
-                                                                              Colors.grey,
-                                                                        )
-                                                                      : const Icon(
-                                                                          Icons
-                                                                              .check_circle_rounded,
-                                                                          color:
-                                                                              Colors.green,
-                                                                        )),
-                                                              Expanded(
-                                                                child:
-                                                                    StreamBuilder(
-                                                                        stream: firestore
-                                                                            .collection(
-                                                                                'appreciates')
-                                                                            .doc(listRegis[indexRegis]
-                                                                                .userId)
-                                                                            .snapshots(),
-                                                                        builder:
-                                                                            (context,
-                                                                                snapshotA) {
-                                                                          if (snapshotA.hasData &&
-                                                                              snapshotA.data != null &&
-                                                                              snapshotA.data!.data() != null) {
-                                                                            final app =
-                                                                                AppreciateModel.fromMap(snapshotA.data!.data()!);
-                                                                            double
-                                                                                total =
-                                                                                0;
-                                                                            app.listContent!.forEach((element) {
-                                                                              total += element.point!;
-                                                                            });
-                                                                            return Text(
-                                                                              total > 70 ? '$total/100' : '$total/70',
-                                                                              style: const TextStyle(color: Colors.red),
-                                                                              textAlign: TextAlign.center,
-                                                                            );
-                                                                          }
-                                                                          return const Text(
-                                                                              '-',
-                                                                              textAlign: TextAlign.center);
-                                                                        }),
-                                                              ),
-                                                              Expanded(
-                                                                  flex: 2,
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom:
-                                                                                  1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            final loadCV =
-                                                                                await firestore.collection('cvs').doc(listRegis[indexRegis].userId).get();
-                                                                            CVModel?
-                                                                                cv;
-                                                                            if (loadCV.data() !=
-                                                                                null) {
-                                                                              cv = CVModel.fromMap(loadCV.data()!);
-                                                                            }
-                                                                            loadUsers.forEach((element) {
-                                                                              if (element.userId == listRegis[indexRegis].userId) {
-                                                                                user = element;
-                                                                              }
-                                                                            });
-                                                                            trainees.forEach((element) {
-                                                                              if (element.userId == listRegis[indexRegis].userId) {
-                                                                                trainee = element;
-                                                                              }
-                                                                            });
-                                                                            showInfo(
-                                                                              context: context,
-                                                                              jobRegister: listRegis[indexRegis],
-                                                                              trainee: trainee,
-                                                                              cv: cv,
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              const Icon(
-                                                                            Icons.info,
-                                                                            size:
-                                                                                22,
-                                                                            color:
-                                                                                Colors.grey,
-                                                                          )),
-                                                                      IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom:
-                                                                                  1),
-                                                                          onPressed:
-                                                                              () {
-                                                                            contents =
-                                                                                [];
-                                                                            comments =
-                                                                                [];
-                                                                            totalDay =
-                                                                                [];
-                                                                            isCompleted =
-                                                                                [];
-                                                                            weekStart =
-                                                                                [];
-                                                                            weekEnd =
-                                                                                [];
-                                                                            if (plan.listWork!.isEmpty) {
-                                                                              for (var i = 0; i < 8; i++) {
-                                                                                contents.add(TextEditingController());
-                                                                                totalDay.add(TextEditingController());
-
-                                                                                comments.add(TextEditingController());
-                                                                                isCompleted.add(ValueNotifier(false));
-                                                                                weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                                weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
-                                                                              }
-                                                                            } else {
-                                                                              for (var i = 0; i < 8; i++) {
-                                                                                contents.add(TextEditingController(text: plan.listWork![i].content));
-                                                                                totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
-                                                                                comments.add(TextEditingController(text: plan.listWork![i].comment));
-                                                                                isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
-                                                                                weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
-                                                                                weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
-                                                                              }
-                                                                            }
-                                                                            showAssignAndFollow(
-                                                                              context: context,
-                                                                              plan: plan,
-                                                                              jobRegister: listRegis[indexRegis],
-                                                                            );
-                                                                          },
-                                                                          icon:
-                                                                              Icon(
-                                                                            Icons.work_history_rounded,
-                                                                            size:
-                                                                                22,
-                                                                            color:
-                                                                                Colors.blue.shade900,
-                                                                          )),
-                                                                      IconButton(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom:
-                                                                                  1),
-                                                                          onPressed:
-                                                                              () async {
-                                                                            if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
-                                                                              GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
-                                                                            } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
-                                                                              GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
-                                                                            }
-                                                                            if (DateTime.now().isBetweenEqual(
-                                                                                from: setting.traineeEnd!,
-                                                                                to: setting.pointCBEnd!)) {
-                                                                              points = [];
-                                                                              loadUsers.forEach((element) {
-                                                                                if (element.userId == listRegis[indexRegis].userId) {
-                                                                                  user = element;
-                                                                                }
-                                                                              });
-                                                                              var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
-                                                                              if (loadAppeciate.docs.isNotEmpty) {
-                                                                                var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
-                                                                                var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
-                                                                                for (var i = 0; i < appreciate.listContent!.length; i++) {
-                                                                                  points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
-                                                                                }
-                                                                                for (var i = 0; i < appreciatesCTDT.length; i++) {
-                                                                                  if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
-                                                                                    appreciateCTDT = appreciate.appreciateCTDT!;
-                                                                                    currentUser.selected.value = i;
-                                                                                  }
-                                                                                }
-                                                                                commentCTDT.text = appreciate.commentCTDT!;
-                                                                                commentSV.text = appreciate.commentSV!;
-                                                                              } else {
-                                                                                for (var i = 0; i < 10; i++) {
-                                                                                  points.add(TextEditingController(text: '10'));
-                                                                                }
-                                                                                currentUser.selected.value = 5;
-                                                                              }
-                                                                              showAppreciate(
-                                                                                context: context,
-                                                                                plan: plan,
-                                                                                jobRegister: listRegis[indexRegis],
-                                                                                firms: loadFirms,
-                                                                              );
-                                                                            }
-                                                                          },
-                                                                          icon:
-                                                                              const Icon(
-                                                                            CupertinoIcons.pencil_ellipsis_rectangle,
-                                                                            size:
-                                                                                22,
-                                                                            color:
-                                                                                Colors.red,
-                                                                          ))
-                                                                    ],
-                                                                  )),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      }
-                                                      return const SizedBox
-                                                          .shrink();
-                                                    });
-                                              },
-                                            )
-                                          : SizedBox(
-                                              height: screenHeight * 0.45,
-                                              width: screenWidth * 0.6,
-                                              child: const Center(
-                                                  child: Text(
-                                                      'Chưa có sinh viên thực tập.')),
-                                            );
-                                    } else {
-                                      return SizedBox(
-                                        height: screenHeight * 0.45,
-                                        width: screenWidth * 0.6,
-                                        child: const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Loading(),
-                                          ],
-                                        ),
-                                      );
-                                    }
-                                  },
+                        const SizedBox(width: 25),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: screenWidth * 0.05,
+                              child: const Text(
+                                "Năm học",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            )
-                          : selectedHK == HocKy.empty &&
-                                  selectedNH == NamHoc.empty
+                            ),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton2<NamHoc>(
+                                isExpanded: true,
+                                hint: Center(
+                                  child: Text(
+                                    setting.yearStart == setting.yearEnd
+                                        ? "${setting.yearStart}"
+                                        : "${setting.yearStart} - ${setting.yearEnd}",
+                                    style: DropdownStyle.hintStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                items: dsnhAll
+                                    .map((NamHoc nh) =>
+                                        DropdownMenuItem<NamHoc>(
+                                          value: nh,
+                                          child: Center(
+                                            child: Text(
+                                              nh.start == nh.end
+                                                  ? nh.start
+                                                  : "${nh.start} - ${nh.end}",
+                                              style: DropdownStyle.itemStyle,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                value: selectedNH != NamHoc.empty
+                                    ? selectedNH
+                                    : null,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedNH = value!;
+                                  });
+                                  currentUser.isCompleted.value = false;
+                                },
+                                buttonStyleData:
+                                    DropdownStyle.buttonStyleMedium,
+                                iconStyleData: DropdownStyle.iconStyleData,
+                                dropdownStyleData:
+                                    DropdownStyle.dropdownStyleMedium,
+                                menuItemStyleData:
+                                    DropdownStyle.menuItemStyleData,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 35),
+                        CustomButton(
+                            text: 'Xem',
+                            width: 100,
+                            height: 45,
+                            onTap: () {
+                              if (selectedHK != HocKy.empty &&
+                                  selectedNH != NamHoc.empty) {
+                                setState(() {
+                                  isViewed.value = true;
+                                });
+                                currentUser.isCompleted.value = true;
+                              }
+                            })
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 35),
+                    child: Container(
+                      decoration: const BoxDecoration(color: Colors.white),
+                      height: screenHeight * 0.45,
+                      width: screenWidth * 0.6,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            color: GV.fieldColor,
+                            height: screenHeight * 0.04,
+                            child: const Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'STT',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'MSSV',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    'Họ tên',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 4,
+                                  child: Text(
+                                    'Vị trí thực tập',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    'Phân việc',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    'Điểm',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Thao tác',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          isViewed.value && currentUser.isCompleted.isTrue
                               ? Expanded(
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.vertical,
@@ -781,7 +404,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                           .snapshots(),
                                       builder: (context, snapshotFirm) {
                                         if (snapshotFirm.hasData &&
-                                            snapshotFirm.data != null) {
+                                            snapshotFirm.data != null &&
+                                            snapshotFirm.connectionState ==
+                                                ConnectionState.active) {
                                           List<FirmModel> loadFirms = [];
                                           List<JobRegisterModel> listRegis = [];
                                           if (snapshotFirm
@@ -790,27 +415,51 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                 (element) => loadFirms.add(
                                                     FirmModel.fromMap(
                                                         element.data())));
-                                            FirmModel firm = FirmModel();
-                                            loadFirms.forEach((element) {
-                                              if (element.firmId == userId) {
-                                                firm = element;
-                                              }
-                                            });
-                                            if (firm.listRegis != null) {
-                                              for (var e in firm.listRegis!) {
-                                                if (e.isConfirmed == true) {
-                                                  listRegis.add(e);
-                                                }
+                                            for (var e
+                                                in loadFirms.first.listRegis!) {
+                                              if (e.isConfirmed == true) {
+                                                listRegis.add(e);
                                               }
                                             }
                                           }
+                                          List<JobRegisterModel> listSelect =
+                                              [];
+                                          listRegis.forEach((e1) {
+                                            trainees.forEach((e2) {
+                                              if (selectedHK == HocKy.tatca &&
+                                                  selectedNH == NamHoc.tatca) {
+                                                if (e1.userId == e2.userId) {
+                                                  listSelect.add(e1);
+                                                }
+                                              } else if (selectedHK ==
+                                                  HocKy.tatca) {
+                                                if (e1.userId == e2.userId &&
+                                                    e2.yearStart ==
+                                                        selectedNH.start) {
+                                                  listSelect.add(e1);
+                                                }
+                                              } else if (selectedNH ==
+                                                  NamHoc.tatca) {
+                                                if (e1.userId == e2.userId &&
+                                                    e2.term == selectedHK) {
+                                                  listSelect.add(e1);
+                                                }
+                                              } else if (e1.userId ==
+                                                      e2.userId &&
+                                                  e2.term == selectedHK &&
+                                                  e2.yearStart ==
+                                                      selectedNH.start) {
+                                                listSelect.add(e1);
+                                              }
+                                            });
+                                          });
                                           listRegis.sort(
                                             (a, b) =>
                                                 a.userId!.compareTo(b.userId!),
                                           );
-                                          return listRegis.isNotEmpty
+                                          return listSelect.isNotEmpty
                                               ? ListView.builder(
-                                                  itemCount: listRegis.length,
+                                                  itemCount: listSelect.length,
                                                   shrinkWrap: true,
                                                   itemBuilder:
                                                       (context, indexRegis) {
@@ -950,7 +599,6 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                             MainAxisAlignment.center,
                                                                         children: [
                                                                           IconButton(
-                                                                              tooltip: 'Thông tin sinh viên',
                                                                               padding: const EdgeInsets.only(bottom: 1),
                                                                               onPressed: () async {
                                                                                 final loadCV = await firestore.collection('cvs').doc(listRegis[indexRegis].userId).get();
@@ -981,7 +629,6 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                 color: Colors.grey,
                                                                               )),
                                                                           IconButton(
-                                                                              tooltip: 'Phân công và theo dõi',
                                                                               padding: const EdgeInsets.only(bottom: 1),
                                                                               onPressed: () {
                                                                                 contents = [];
@@ -1022,7 +669,6 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                 color: Colors.blue.shade900,
                                                                               )),
                                                                           IconButton(
-                                                                              tooltip: 'Đánh giá',
                                                                               padding: const EdgeInsets.only(bottom: 1),
                                                                               onPressed: () async {
                                                                                 if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
@@ -1041,8 +687,12 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                   if (loadAppeciate.docs.isNotEmpty) {
                                                                                     var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
                                                                                     var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                                    finalTotal.value = 0;
                                                                                     for (var i = 0; i < appreciate.listContent!.length; i++) {
                                                                                       points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                                      setState(() {
+                                                                                        finalTotal.value += int.parse(appreciate.listContent![i].point!.toStringAsFixed(0));
+                                                                                      });
                                                                                     }
                                                                                     for (var i = 0; i < appreciatesCTDT.length; i++) {
                                                                                       if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
@@ -1053,8 +703,12 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                                                     commentCTDT.text = appreciate.commentCTDT!;
                                                                                     commentSV.text = appreciate.commentSV!;
                                                                                   } else {
+                                                                                    finalTotal.value = 0;
                                                                                     for (var i = 0; i < 10; i++) {
                                                                                       points.add(TextEditingController(text: '10'));
+                                                                                      setState(() {
+                                                                                        finalTotal.value += 10;
+                                                                                      });
                                                                                     }
                                                                                     currentUser.selected.value = 5;
                                                                                   }
@@ -1086,13 +740,10 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                   height: screenHeight * 0.45,
                                                   width: screenWidth * 0.6,
                                                   child: const Center(
-                                                    child: Text(
-                                                        'Chưa có sinh viên thực tập.'),
-                                                  ),
+                                                      child: Text(
+                                                          'Chưa có sinh viên thực tập.')),
                                                 );
-                                        } else if (snapshotFirm
-                                                .connectionState ==
-                                            ConnectionState.waiting) {
+                                        } else {
                                           return SizedBox(
                                             height: screenHeight * 0.45,
                                             width: screenWidth * 0.6,
@@ -1104,26 +755,397 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                               ],
                                             ),
                                           );
-                                        } else {
-                                          return const SizedBox.shrink();
                                         }
                                       },
                                     ),
                                   ),
                                 )
-                              : const Expanded(
-                                  child: Center(
-                                    child: Text(
-                                        'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
-                                  ),
-                                ),
-                    ],
+                              : selectedHK == HocKy.empty &&
+                                      selectedNH == NamHoc.empty
+                                  ? Expanded(
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: StreamBuilder(
+                                          stream: firestore
+                                              .collection('firms')
+                                              .where('firmId',
+                                                  isEqualTo:
+                                                      currentUser.userId.value)
+                                              .snapshots(),
+                                          builder: (context, snapshotFirm) {
+                                            if (snapshotFirm.hasData &&
+                                                snapshotFirm.data != null) {
+                                              List<FirmModel> loadFirms = [];
+                                              List<JobRegisterModel> listRegis =
+                                                  [];
+                                              List<JobRegisterModel> listR = [];
+                                              if (snapshotFirm
+                                                  .data!.docs.isNotEmpty) {
+                                                snapshotFirm.data!.docs.forEach(
+                                                    (element) => loadFirms.add(
+                                                        FirmModel.fromMap(
+                                                            element.data())));
+                                                FirmModel firm = FirmModel();
+                                                loadFirms.forEach((element) {
+                                                  if (element.firmId ==
+                                                      userId) {
+                                                    firm = element;
+                                                  }
+                                                });
+                                                if (firm.listRegis != null) {
+                                                  for (var e
+                                                      in firm.listRegis!) {
+                                                    if (e.isConfirmed == true) {
+                                                      listR.add(e);
+                                                    }
+                                                  }
+                                                }
+                                                listR.forEach((e1) {
+                                                  trainees.forEach((e2) {
+                                                    if (e1.userId ==
+                                                            e2.userId &&
+                                                        e2.term ==
+                                                            setting.term &&
+                                                        e2.yearStart ==
+                                                            setting.yearStart) {
+                                                      listRegis.add(e1);
+                                                    }
+                                                  });
+                                                });
+                                              }
+                                              listRegis.sort(
+                                                (a, b) => a.userId!
+                                                    .compareTo(b.userId!),
+                                              );
+                                              return listRegis.isNotEmpty
+                                                  ? ListView.builder(
+                                                      itemCount:
+                                                          listRegis.length,
+                                                      shrinkWrap: true,
+                                                      itemBuilder: (context,
+                                                          indexRegis) {
+                                                        return StreamBuilder(
+                                                            stream: firestore
+                                                                .collection(
+                                                                    'plans')
+                                                                .where('userId',
+                                                                    isEqualTo: listRegis[
+                                                                            indexRegis]
+                                                                        .userId)
+                                                                .snapshots(),
+                                                            builder: (context,
+                                                                snapshotPlan) {
+                                                              if (snapshotPlan
+                                                                      .hasData &&
+                                                                  snapshotPlan
+                                                                          .data !=
+                                                                      null) {
+                                                                PlanWorkModel
+                                                                    plan =
+                                                                    PlanWorkModel();
+                                                                List<PlanWorkModel>
+                                                                    listPlan =
+                                                                    [];
+                                                                RegisterTraineeModel
+                                                                    trainee =
+                                                                    RegisterTraineeModel();
+                                                                if (snapshotPlan
+                                                                    .data!
+                                                                    .docs
+                                                                    .isNotEmpty) {
+                                                                  snapshotPlan
+                                                                      .data!
+                                                                      .docs
+                                                                      .forEach((element) =>
+                                                                          listPlan
+                                                                              .add(PlanWorkModel.fromMap(element.data())));
+                                                                  listPlan.forEach(
+                                                                      (element) {
+                                                                    if (element
+                                                                            .userId ==
+                                                                        listRegis[indexRegis]
+                                                                            .userId) {
+                                                                      plan =
+                                                                          element;
+                                                                    }
+                                                                  });
+                                                                }
+                                                                return Container(
+                                                                  height:
+                                                                      screenHeight *
+                                                                          0.05,
+                                                                  color: indexRegis %
+                                                                              2 ==
+                                                                          0
+                                                                      ? Colors
+                                                                          .blue
+                                                                          .shade50
+                                                                      : null,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: Text(
+                                                                            '${indexRegis + 1}',
+                                                                            textAlign:
+                                                                                TextAlign.center),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 2,
+                                                                        child: Text(
+                                                                            '${listRegis[indexRegis].userId}'
+                                                                                .toUpperCase(),
+                                                                            textAlign:
+                                                                                TextAlign.justify),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 3,
+                                                                        child: Text(
+                                                                            '${listRegis[indexRegis].userName}',
+                                                                            textAlign:
+                                                                                TextAlign.justify),
+                                                                      ),
+                                                                      Expanded(
+                                                                        flex: 4,
+                                                                        child:
+                                                                            Text(
+                                                                          '${listRegis[indexRegis].jobName}',
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                          child: plan.listWork!.isEmpty
+                                                                              ? const Icon(
+                                                                                  Icons.not_interested_rounded,
+                                                                                  color: Colors.grey,
+                                                                                )
+                                                                              : const Icon(
+                                                                                  Icons.check_circle_rounded,
+                                                                                  color: Colors.green,
+                                                                                )),
+                                                                      Expanded(
+                                                                        child: StreamBuilder(
+                                                                            stream: firestore.collection('appreciates').doc(listRegis[indexRegis].userId).snapshots(),
+                                                                            builder: (context, snapshotA) {
+                                                                              if (snapshotA.hasData && snapshotA.data != null && snapshotA.data!.data() != null) {
+                                                                                final app = AppreciateModel.fromMap(snapshotA.data!.data()!);
+                                                                                double total = 0;
+                                                                                app.listContent!.forEach((element) {
+                                                                                  total += element.point!;
+                                                                                });
+                                                                                return Text(
+                                                                                  total > 70 ? '$total/100' : '$total/70',
+                                                                                  style: const TextStyle(color: Colors.red),
+                                                                                  textAlign: TextAlign.center,
+                                                                                );
+                                                                              }
+                                                                              return const Text('-', textAlign: TextAlign.center);
+                                                                            }),
+                                                                      ),
+                                                                      Expanded(
+                                                                          flex:
+                                                                              2,
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              IconButton(
+                                                                                  tooltip: 'Thông tin sinh viên',
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  onPressed: () async {
+                                                                                    final loadCV = await firestore.collection('cvs').doc(listRegis[indexRegis].userId).get();
+                                                                                    CVModel? cv;
+                                                                                    if (loadCV.data() != null) {
+                                                                                      cv = CVModel.fromMap(loadCV.data()!);
+                                                                                    }
+                                                                                    loadUsers.forEach((element) {
+                                                                                      if (element.userId == listRegis[indexRegis].userId) {
+                                                                                        user = element;
+                                                                                      }
+                                                                                    });
+                                                                                    trainees.forEach((element) {
+                                                                                      if (element.userId == listRegis[indexRegis].userId) {
+                                                                                        trainee = element;
+                                                                                      }
+                                                                                    });
+                                                                                    showInfo(
+                                                                                      context: context,
+                                                                                      jobRegister: listRegis[indexRegis],
+                                                                                      trainee: trainee,
+                                                                                      cv: cv,
+                                                                                    );
+                                                                                  },
+                                                                                  icon: const Icon(
+                                                                                    Icons.info,
+                                                                                    size: 22,
+                                                                                    color: Colors.grey,
+                                                                                  )),
+                                                                              IconButton(
+                                                                                  tooltip: 'Phân công và theo dõi',
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  onPressed: () {
+                                                                                    contents = [];
+                                                                                    comments = [];
+                                                                                    totalDay = [];
+                                                                                    isCompleted = [];
+                                                                                    weekStart = [];
+                                                                                    weekEnd = [];
+                                                                                    if (plan.listWork!.isEmpty) {
+                                                                                      for (var i = 0; i < 8; i++) {
+                                                                                        contents.add(TextEditingController());
+                                                                                        totalDay.add(TextEditingController());
+
+                                                                                        comments.add(TextEditingController());
+                                                                                        isCompleted.add(ValueNotifier(false));
+                                                                                        weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                        weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
+                                                                                      }
+                                                                                    } else {
+                                                                                      for (var i = 0; i < 8; i++) {
+                                                                                        contents.add(TextEditingController(text: plan.listWork![i].content));
+                                                                                        totalDay.add(TextEditingController(text: plan.listWork![i].totalDay));
+                                                                                        comments.add(TextEditingController(text: plan.listWork![i].comment));
+                                                                                        isCompleted.add(ValueNotifier(plan.listWork![i].isCompleted!));
+                                                                                        weekStart.add(getStartWeek((i + 1), plan.traineeStart!));
+                                                                                        weekEnd.add(getEndWeek((i + 1), plan.traineeStart!));
+                                                                                      }
+                                                                                    }
+                                                                                    showAssignAndFollow(
+                                                                                      context: context,
+                                                                                      plan: plan,
+                                                                                      jobRegister: listRegis[indexRegis],
+                                                                                    );
+                                                                                  },
+                                                                                  icon: Icon(
+                                                                                    Icons.work_history_rounded,
+                                                                                    size: 22,
+                                                                                    color: Colors.blue.shade900,
+                                                                                  )),
+                                                                              IconButton(
+                                                                                  tooltip: 'Đánh giá',
+                                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                                  onPressed: () async {
+                                                                                    if (DateTime.now().isBeforeTimestamp(setting.traineeEnd!)) {
+                                                                                      GV.error(context: context, message: 'Chưa đến thời gian đánh giá thực tập.');
+                                                                                    } else if (DateTime.now().isAfterTimestamp(setting.pointCBEnd!)) {
+                                                                                      GV.error(context: context, message: 'Đã quá thơi gian đánh giá.');
+                                                                                    }
+                                                                                    if (DateTime.now().isBetweenEqual(from: setting.traineeEnd!, to: setting.pointCBEnd!)) {
+                                                                                      points = [];
+                                                                                      loadUsers.forEach((element) {
+                                                                                        if (element.userId == listRegis[indexRegis].userId) {
+                                                                                          user = element;
+                                                                                        }
+                                                                                      });
+                                                                                      var loadAppeciate = await firestore.collection('appreciates').where('userId', isEqualTo: user.userId).get();
+                                                                                      if (loadAppeciate.docs.isNotEmpty) {
+                                                                                        var appreciates = loadAppeciate.docs.map((e) => AppreciateModel.fromMap(e.data())).toList();
+                                                                                        var appreciate = appreciates.firstWhere((element) => element.userId == listRegis[indexRegis].userId);
+                                                                                        finalTotal.value = 0;
+                                                                                        for (var i = 0; i < appreciate.listContent!.length; i++) {
+                                                                                          points.add(TextEditingController(text: appreciate.listContent![i].point.toString()));
+                                                                                          setState(() {
+                                                                                            finalTotal.value += int.parse(appreciate.listContent![i].point!.toStringAsFixed(0));
+                                                                                          });
+                                                                                        }
+                                                                                        for (var i = 0; i < appreciatesCTDT.length; i++) {
+                                                                                          if (appreciatesCTDT[i] == appreciate.appreciateCTDT) {
+                                                                                            appreciateCTDT = appreciate.appreciateCTDT!;
+                                                                                            currentUser.selected.value = i;
+                                                                                          }
+                                                                                        }
+                                                                                        commentCTDT.text = appreciate.commentCTDT!;
+                                                                                        commentSV.text = appreciate.commentSV!;
+                                                                                      } else {
+                                                                                        finalTotal.value = 0;
+                                                                                        for (var i = 0; i < 10; i++) {
+                                                                                          points.add(TextEditingController(text: '10'));
+                                                                                          setState(() {
+                                                                                            finalTotal.value += 10;
+                                                                                          });
+                                                                                        }
+                                                                                        currentUser.selected.value = 5;
+                                                                                      }
+                                                                                      showAppreciate(
+                                                                                        context: context,
+                                                                                        plan: plan,
+                                                                                        jobRegister: listRegis[indexRegis],
+                                                                                        firms: loadFirms,
+                                                                                      );
+                                                                                    }
+                                                                                  },
+                                                                                  icon: const Icon(
+                                                                                    CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                                    size: 22,
+                                                                                    color: Colors.red,
+                                                                                  ))
+                                                                            ],
+                                                                          )),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              }
+                                                              return const SizedBox
+                                                                  .shrink();
+                                                            });
+                                                      },
+                                                    )
+                                                  : SizedBox(
+                                                      height:
+                                                          screenHeight * 0.45,
+                                                      width: screenWidth * 0.6,
+                                                      child: const Center(
+                                                        child: Text(
+                                                            'Chưa có sinh viên thực tập.'),
+                                                      ),
+                                                    );
+                                            } else if (snapshotFirm
+                                                    .connectionState ==
+                                                ConnectionState.waiting) {
+                                              return SizedBox(
+                                                height: screenHeight * 0.45,
+                                                width: screenWidth * 0.6,
+                                                child: const Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Loading(),
+                                                  ],
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  : const Expanded(
+                                      child: Center(
+                                        child: Text(
+                                            'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                      ),
+                                    ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            })
+        : SizedBox(
+            height: screenHeight * 0.45,
+            width: screenWidth * 0.67,
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Loading(),
+              ],
+            ),
           );
-        });
   }
 
   showInfo({
@@ -1163,7 +1185,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                       ),
                       const Expanded(
                         child: Text('Thông tin thực tập',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center),
                       ),
                       SizedBox(
@@ -1255,8 +1279,10 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                         ),
                         const Expanded(
                           child: Text(
-                            'Phân công & theo dõi tiến độ công việc',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            'Phân công và theo dõi tiến độ công việc',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -1437,6 +1463,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   }) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     showDialog(
         context: context,
         barrierColor: Colors.black12,
@@ -1468,7 +1495,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                           const Expanded(
                             child: Text(
                               'Đánh giá thực tập',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -1594,6 +1623,41 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                         'III.3. Kết quả công việc có đóng góp cho cơ quan nơi thực tập',
                                     point: points[9],
                                   ),
+                                  TableRow(
+                                    children: [
+                                      const TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              'TỔNG',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )),
+                                      TableCell(
+                                          verticalAlignment:
+                                              TableCellVerticalAlignment.middle,
+                                          child: ValueListenableBuilder(
+                                            valueListenable: finalTotal,
+                                            builder: (context, value, child) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15),
+                                                child: Text(
+                                                  finalTotal.value.toString(),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                  textAlign: TextAlign.right,
+                                                ),
+                                              );
+                                            },
+                                          )),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -1967,6 +2031,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  textAlign: TextAlign.right,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
@@ -1977,6 +2042,14 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                       : double.parse(value!) < 1 || double.parse(value) > 10
                           ? 'Từ 1đ đến 10đ'
                           : null,
+                  onChanged: (value) {
+                    finalTotal.value = 0;
+                    for (var i = 0; i < points.length; i++) {
+                      setState(() {
+                        finalTotal.value += int.parse(points[i].text);
+                      });
+                    }
+                  },
                 ),
               )
             : const SizedBox.shrink(),

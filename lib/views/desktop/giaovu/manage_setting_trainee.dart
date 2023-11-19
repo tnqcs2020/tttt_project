@@ -180,7 +180,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                'Chọn',
+                                                'Tất cả',
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -240,7 +240,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                             isExpanded: true,
                                             hint: Center(
                                               child: Text(
-                                                "Chọn",
+                                                "Tất cả",
                                                 style: DropdownStyle.hintStyle,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -319,12 +319,11 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      color: Colors.green,
+                                      color: GV.fieldColor,
                                       height: screenHeight * 0.04,
                                       child: const Row(
                                         children: [
                                           Expanded(
-                                            flex: 1,
                                             child: Text(
                                               'STT',
                                               textAlign: TextAlign.center,
@@ -333,7 +332,6 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 1,
                                             child: Text(
                                               'Học kỳ',
                                               textAlign: TextAlign.center,
@@ -492,7 +490,6 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                               TextAlign.center),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 2,
                                                                       child: Text(
                                                                           setTrainees[index]
                                                                               .term!,
@@ -522,6 +519,35 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                                                                               .isClockPoint!),
                                                                           textAlign:
                                                                               TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: StreamBuilder(
+                                                                          stream: firestore.collection('requestEdits').where('term', isEqualTo: setTrainees[index].term).where('yearStart', isEqualTo: setTrainees[index].yearStart).snapshots(),
+                                                                          builder: (context, snapshot) {
+                                                                            if (snapshot.hasData &&
+                                                                                snapshot.data!.docs.isNotEmpty) {
+                                                                              List<RequestEditModel> requestEdits = [];
+                                                                              snapshot.data!.docs.forEach(
+                                                                                (element) => requestEdits.add(RequestEditModel.fromMap(element.data())),
+                                                                              );
+                                                                              return InkWell(
+                                                                                  onTap: () {
+                                                                                    showRequest(requestEdits: requestEdits);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Xem',
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.blue.shade900,
+                                                                                      decoration: TextDecoration.underline,
+                                                                                    ),
+                                                                                  ));
+                                                                            } else if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                                                                              return const Text('Chưa có', textAlign: TextAlign.center);
+                                                                            }
+                                                                            return const SizedBox.shrink();
+                                                                          }),
                                                                     ),
                                                                     Expanded(
                                                                       flex: 2,
@@ -871,7 +897,9 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                       Expanded(
                         child: Text(
                             isCreate ? 'Thêm thiết lập' : 'Cập nhật thiết lập',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center),
                       ),
                       SizedBox(
@@ -904,7 +932,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Text(
-                                  "Học Kỳ",
+                                  "Học kỳ",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w900,
@@ -966,7 +994,7 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Text(
-                                  "Năm Học",
+                                  "Năm học",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w900,
@@ -1507,7 +1535,9 @@ class _SettingTraineeScreenState extends State<SettingTraineeScreen> {
                       ),
                       const Expanded(
                         child: Text('Danh sách yêu cầu sửa điểm',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
                             textAlign: TextAlign.center),
                       ),
                       SizedBox(

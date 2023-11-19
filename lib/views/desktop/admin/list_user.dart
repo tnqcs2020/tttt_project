@@ -164,7 +164,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                 isExpanded: true,
                                                 hint: Center(
                                                   child: Text(
-                                                    "Chọn",
+                                                    "Tất cả",
                                                     style:
                                                         DropdownStyle.hintStyle,
                                                     overflow:
@@ -237,8 +237,8 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      color: Colors.green,
-                                      height: screenHeight * 0.035,
+                                      color: GV.fieldColor,
+                                      height: screenHeight * 0.04,
                                       child: const Row(
                                         children: [
                                           Expanded(
@@ -284,8 +284,8 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                       child: isLook.value &&
                                               currentUser.isCompleted.isTrue
                                           ? SingleChildScrollView(
-                                                scrollDirection: Axis.vertical,
-                                            child: StreamBuilder(
+                                              scrollDirection: Axis.vertical,
+                                              child: StreamBuilder(
                                                 stream: firestore
                                                     .collection('users')
                                                     .snapshots(),
@@ -304,11 +304,13 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                     });
                                                     if (selectedND.value ==
                                                         NguoiDung.tatca) {
-                                                      loadUser.forEach((element) {
+                                                      loadUser
+                                                          .forEach((element) {
                                                         listUser.add(element);
                                                       });
                                                     } else {
-                                                      loadUser.forEach((element) {
+                                                      loadUser
+                                                          .forEach((element) {
                                                         if (element.group ==
                                                             selectedND.value) {
                                                           listUser.add(element);
@@ -327,7 +329,8 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                             scrollDirection:
                                                                 Axis.vertical,
                                                             itemBuilder:
-                                                                (context, index) {
+                                                                (context,
+                                                                    index) {
                                                               return Container(
                                                                 height:
                                                                     screenHeight *
@@ -335,7 +338,8 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                 color: index %
                                                                             2 ==
                                                                         0
-                                                                    ? Colors.blue
+                                                                    ? Colors
+                                                                        .blue
                                                                         .shade50
                                                                     : null,
                                                                 child: Row(
@@ -388,15 +392,17 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                   }
                                                 },
                                               ),
-                                          )
+                                            )
                                           : selectedND.value.isEmpty
                                               ? SingleChildScrollView(
-                                                scrollDirection: Axis.vertical,
-                                                child: StreamBuilder(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  child: StreamBuilder(
                                                     stream: firestore
                                                         .collection('users')
                                                         .snapshots(),
-                                                    builder: (context, snapshot) {
+                                                    builder:
+                                                        (context, snapshot) {
                                                       List<UserModel> listUser =
                                                           [];
                                                       if (snapshot.hasData &&
@@ -415,12 +421,14 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                               .compareTo(
                                                                   b.userId!),
                                                         );
-                                                        return listUser.isNotEmpty
+                                                        return listUser
+                                                                .isNotEmpty
                                                             ? ListView.builder(
                                                                 itemCount:
                                                                     listUser
                                                                         .length,
-                                                                shrinkWrap: true,
+                                                                shrinkWrap:
+                                                                    true,
                                                                 scrollDirection:
                                                                     Axis.vertical,
                                                                 itemBuilder:
@@ -440,37 +448,32 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                                     child: Row(
                                                                       children: [
                                                                         Expanded(
-                                                                          flex: 1,
+                                                                          flex:
+                                                                              1,
                                                                           child: Text(
                                                                               '${index + 1}',
-                                                                              textAlign:
-                                                                                  TextAlign.center),
+                                                                              textAlign: TextAlign.center),
                                                                         ),
                                                                         Expanded(
-                                                                          flex: 2,
+                                                                          flex:
+                                                                              2,
                                                                           child: Text(
-                                                                              listUser[index]
-                                                                                  .userId!
-                                                                                  .toUpperCase(),
-                                                                              textAlign:
-                                                                                  TextAlign.justify),
+                                                                              listUser[index].userId!.toUpperCase(),
+                                                                              textAlign: TextAlign.justify),
                                                                         ),
                                                                         Expanded(
-                                                                          flex: 3,
+                                                                          flex:
+                                                                              3,
                                                                           child: Text(
-                                                                              listUser[index]
-                                                                                  .userName!,
-                                                                              textAlign:
-                                                                                  TextAlign.justify),
+                                                                              listUser[index].userName!,
+                                                                              textAlign: TextAlign.justify),
                                                                         ),
                                                                         Expanded(
-                                                                          flex: 4,
+                                                                          flex:
+                                                                              4,
                                                                           child: Text(
-                                                                              listUser[index].email!.isNotEmpty
-                                                                                  ? '${listUser[index].email}'
-                                                                                  : "-",
-                                                                              textAlign:
-                                                                                  TextAlign.justify),
+                                                                              listUser[index].email!.isNotEmpty ? '${listUser[index].email}' : "-",
+                                                                              textAlign: TextAlign.justify),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -487,7 +490,7 @@ class _ListUserScreenState extends State<ListUserScreen> {
                                                       }
                                                     },
                                                   ),
-                                              )
+                                                )
                                               : const Center(
                                                   child: Text(
                                                       'Vui lòng nhấn vào nút xem để tiếp tục.'),

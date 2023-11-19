@@ -282,7 +282,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                   child: Column(
                                     children: [
                                       Container(
-                                        color: Colors.green,
+                                        color: GV.fieldColor,
                                         height: screenHeight * 0.04,
                                         child: const Row(
                                           children: [
@@ -299,7 +299,7 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                             Expanded(
                                               flex: 5,
                                               child: Text(
-                                                'Nội dung',
+                                                'Tiêu đề',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     fontWeight:
@@ -478,34 +478,35 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                                                                     );
                                                                   },
                                                                 )
-                                                              : SizedBox(height:
-                                                                        screenHeight *
-                                                                            0.45,
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.55,
-                                                                child: const Center(
-                                                                  child: Text(
-                                                                      'Chưa có thông báo.'),
-                                                                ),
-                                                              );
+                                                              : SizedBox(
+                                                                  height:
+                                                                      screenHeight *
+                                                                          0.45,
+                                                                  width:
+                                                                      screenWidth *
+                                                                          0.55,
+                                                                  child:
+                                                                      const Center(
+                                                                    child: Text(
+                                                                        'Chưa có thông báo.'),
+                                                                  ),
+                                                                );
                                                         } else {
                                                           return SizedBox(
-                                                              height:
-                                                                  screenHeight *
-                                                                      0.45,
-                                                              width:
-                                                                  screenWidth *
-                                                                      0.55,
-                                                              child: const Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  Loading(),
-                                                                ],
-                                                              ),
-                                                            );
+                                                            height:
+                                                                screenHeight *
+                                                                    0.45,
+                                                            width: screenWidth *
+                                                                0.55,
+                                                            child: const Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Loading(),
+                                                              ],
+                                                            ),
+                                                          );
                                                         }
                                                       },
                                                     ),
@@ -722,9 +723,14 @@ class _ManageAnnouncementScreenState extends State<ManageAnnouncementScreen> {
                         const SizedBox(
                           width: 30,
                         ),
-                        const Expanded(
-                          child: Text('Chi tiết thông báo',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                              isCreate
+                                  ? 'Thêm thông báo'
+                                  : 'Chi tiết thông báo',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                               textAlign: TextAlign.center),
                         ),
                         SizedBox(

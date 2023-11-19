@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/firm_model.dart';
 import 'package:tttt_project/models/register_trainee_model.dart';
 import 'package:tttt_project/models/setting_trainee_model.dart';
@@ -218,7 +219,7 @@ class _FirmLinkState extends State<ListFirmCommon> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Container(
-                                            color: Colors.green,
+                                            color: GV.fieldColor,
                                             height: screenHeight * 0.04,
                                             child: const Row(
                                               children: [

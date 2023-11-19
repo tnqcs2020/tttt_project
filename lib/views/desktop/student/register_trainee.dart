@@ -523,7 +523,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     SizedBox(
                       width: screenWidth * 0.07,
                       child: const Text(
-                        "Học Phần",
+                        "Học phần",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
@@ -574,7 +574,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     SizedBox(
                       width: screenWidth * 0.07,
                       child: const Text(
-                        "Học Kỳ",
+                        "Học kỳ",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
@@ -623,7 +623,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                     SizedBox(
                       width: screenWidth * 0.07,
                       child: const Text(
-                        "Năm Học",
+                        "Năm học",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
@@ -668,7 +668,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                 ),
                 const SizedBox(height: 55),
                 CustomButton(
-                  text: "Đăng Ký",
+                  text: "Đăng ký",
                   width: screenWidth * 0.1,
                   height: screenHeight * 0.07,
                   onTap: () async {

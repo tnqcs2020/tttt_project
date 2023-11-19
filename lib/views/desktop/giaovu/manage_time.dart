@@ -176,7 +176,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         isExpanded: true,
                                         hint: Center(
                                           child: Text(
-                                            'Chọn',
+                                            'Tất cả',
                                             style: DropdownStyle.hintStyle,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -234,7 +234,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         isExpanded: true,
                                         hint: Center(
                                           child: Text(
-                                            "Chọn",
+                                            "Tất cả",
                                             style: DropdownStyle.hintStyle,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -312,12 +312,11 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                             child: Column(
                               children: [
                                 Container(
-                                  color: Colors.green,
+                                  color: GV.fieldColor,
                                   height: screenHeight * 0.04,
                                   child: const Row(
                                     children: [
                                       Expanded(
-                                        flex: 1,
                                         child: Text(
                                           'STT',
                                           textAlign: TextAlign.center,
@@ -326,16 +325,15 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 5,
+                                        flex: 4,
                                         child: Text(
-                                          'Nội dung',
+                                          'Tiêu đề',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 2,
                                         child: Text(
                                           'Ngày tạo',
                                           textAlign: TextAlign.center,
@@ -344,7 +342,22 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                         ),
                                       ),
                                       Expanded(
-                                        flex: 2,
+                                        child: Text(
+                                          'Học kỳ',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          'Năm học',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Expanded(
                                         child: Text(
                                           'Thao tác',
                                           textAlign: TextAlign.center,
@@ -448,14 +461,13 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                 child: Row(
                                                                   children: [
                                                                     Expanded(
-                                                                      flex: 1,
                                                                       child: Text(
                                                                           '${index + 1}',
                                                                           textAlign:
                                                                               TextAlign.center),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 5,
+                                                                      flex: 4,
                                                                       child: Text(
                                                                           dskh[index]
                                                                               .title!,
@@ -463,7 +475,6 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                               TextAlign.justify),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 2,
                                                                       child: Text(
                                                                           GV.readTimestamp(dskh[index]
                                                                               .createdAt!),
@@ -471,7 +482,18 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                               TextAlign.center),
                                                                     ),
                                                                     Expanded(
-                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          '${dskh[index].term}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      child: Text(
+                                                                          '${dskh[index].yearStart} - ${dskh[index].yearEnd}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
                                                                       child:
                                                                           Row(
                                                                         mainAxisAlignment:
@@ -608,29 +630,33 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                                     child: Row(
                                                                       children: [
                                                                         Expanded(
-                                                                          flex:
-                                                                              1,
                                                                           child: Text(
                                                                               '${index + 1}',
                                                                               textAlign: TextAlign.center),
                                                                         ),
                                                                         Expanded(
                                                                           flex:
-                                                                              5,
+                                                                              4,
                                                                           child: Text(
                                                                               dskh[index].title!,
                                                                               textAlign: TextAlign.justify),
                                                                         ),
                                                                         Expanded(
-                                                                          flex:
-                                                                              2,
                                                                           child: Text(
                                                                               GV.readTimestamp(dskh[index].createdAt!),
                                                                               textAlign: TextAlign.center),
                                                                         ),
                                                                         Expanded(
-                                                                          flex:
-                                                                              2,
+                                                                          child: Text(
+                                                                              '${dskh[index].term}',
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
+                                                                          child: Text(
+                                                                              '${dskh[index].yearStart} - ${dskh[index].yearEnd}',
+                                                                              textAlign: TextAlign.center),
+                                                                        ),
+                                                                        Expanded(
                                                                           child:
                                                                               Row(
                                                                             mainAxisAlignment:
@@ -812,7 +838,9 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                         ),
                         const Expanded(
                           child: Text('Chi tiết kế hoạch',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                               textAlign: TextAlign.center),
                         ),
                         SizedBox(
@@ -848,7 +876,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      "Học Kỳ",
+                                      "Học kỳ",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -913,7 +941,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      "Năm Học",
+                                      "Năm học",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -979,7 +1007,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                             ),
                             const SizedBox(height: 20),
                             LineDetail(
-                              field: 'Tiêu Đề',
+                              field: 'Tiêu đề',
                               ctrl: titleCtrl,
                               widthForm: 0.35,
                               validator: (p0) =>
@@ -1004,7 +1032,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: const Text(
-                                                  'Nội Dung',
+                                                  'Nội dung',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
@@ -1013,7 +1041,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                                             Container(
                                               padding: const EdgeInsets.all(10),
                                               child: const Text(
-                                                'Thời Gian',
+                                                'Thời  gian',
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
@@ -1392,7 +1420,7 @@ class _ManageTimeScreenState extends State<ManageTimeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Xóa Kế Hoạch',
+                          'Xóa kế hoạch',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),

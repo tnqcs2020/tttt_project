@@ -161,8 +161,8 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  color: Colors.green,
-                  height: screenHeight * 0.035,
+                  color: GV.fieldColor,
+                  height: screenHeight * 0.04,
                   child: const Row(
                     children: [
                       Expanded(
@@ -381,7 +381,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                           ),
                                                                           const Expanded(
                                                                             child: Text('Thông tin ứng tuyển',
-                                                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                                                                                 textAlign: TextAlign.center),
                                                                           ),
                                                                           SizedBox(
@@ -441,7 +441,7 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                       subtitle: job.describeJob != null ? Text('${job.describeJob}') : null,
                                                                                     ),
                                                                                   ),
-                                                                              ] else if (isTrainee && listRegis[indexRegis].isConfirmed!) ...[
+                                                                              ] else if (isTrainee && listRegis[indexRegis].isConfirmed! || !isTrainee && !listRegis[indexRegis].isConfirmed! && listRegis[indexRegis].status == TrangThai.accept) ...[
                                                                                 Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
                                                                                 Text('Ngày ứng tuyển: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}'),
                                                                                 Text('Ngày duyệt: ${GV.readTimestamp(listRegis[indexRegis].repliedAt!)}'),
