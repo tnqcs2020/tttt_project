@@ -73,7 +73,7 @@ class _FirmLinkState extends State<FirmLink> {
   }
 
   List firmSinhVien = [
-    'Hồ sơ xin việc',
+    'Gợi ý công ty',
     'Danh sách công ty',
     'Công ty đã đăng ký'
   ];

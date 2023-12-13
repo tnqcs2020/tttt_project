@@ -31,6 +31,20 @@ class GV {
     return date.toString();
   }
 
+  static String readTimestampBefore(Timestamp timestamp) {
+    var date = DateFormat('dd/MM/yyyy').format(
+        DateTime.fromMicrosecondsSinceEpoch(timestamp.microsecondsSinceEpoch)
+            .subtract(const Duration(days: 1)));
+    return date.toString();
+  }
+
+  static String readTimestampAfter(Timestamp timestamp) {
+    var date = DateFormat('dd/MM/yyyy').format(
+        DateTime.fromMicrosecondsSinceEpoch(timestamp.microsecondsSinceEpoch)
+            .add(const Duration(days: 1)));
+    return date.toString();
+  }
+
   //toast
   static warning(
       {required BuildContext context, String? title, required String message}) {
@@ -235,7 +249,7 @@ class NamHoc {
   factory NamHoc.fromMap(Map<String, dynamic> map) {
     return NamHoc(
       start: map['yearStart'] ?? '',
-      end: map['yearEnd'] ?? '', 
+      end: map['yearEnd'] ?? '',
     );
   }
 }

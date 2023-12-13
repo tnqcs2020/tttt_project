@@ -25,7 +25,7 @@ class _ListUserScreenState extends State<ManageListStudent> {
   final currentUser = Get.put(UserController());
   ValueNotifier<String> selectedND = ValueNotifier<String>(NguoiDung.empty);
   ValueNotifier<bool> isLook = ValueNotifier<bool>(false);
-  ValueNotifier selectedMenu = ValueNotifier(1);
+  ValueNotifier selectedMenu = ValueNotifier(0);
   List manageClass = [
     'Danh sách lớp',
     'Danh sách thực tập',

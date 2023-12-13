@@ -12,6 +12,7 @@ import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/models/plan_work_model.dart';
 import 'package:tttt_project/widgets/custom_radio.dart';
+import 'package:tttt_project/widgets/field_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/common/user_controller.dart';
 
@@ -319,11 +320,15 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                             currentUser
                                                                     .selectedJob
                                                                     .value =
-                                                                firm.listJob!.firstWhere(
-                                                                    (element) =>
-                                                                        element
-                                                                            .jobId ==
-                                                                        d.jobId);
+                                                                firm.listJob!
+                                                                    .firstWhere(
+                                                              (element) =>
+                                                                  element
+                                                                      .jobId ==
+                                                                  d.jobId,
+                                                              orElse: () =>
+                                                                  JobPositionModel(),
+                                                            );
                                                           }
                                                         }
                                                         showDialog(
@@ -417,47 +422,179 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
                                                                           children: <Widget>[
-                                                                            Text('Tên công ty: ${firm.firmName!}'),
-                                                                            Text('Người đại diện: ${firm.owner!}'),
-                                                                            Text('Số điện thoại: ${firm.phone!}'),
-                                                                            Text('Email: ${firm.email!}'),
-                                                                            Text('Địa chỉ: ${firm.address!}'),
-                                                                            Text(
-                                                                              'Mô tả: ${firm.describe!}',
-                                                                              overflow: TextOverflow.clip,
-                                                                              textAlign: TextAlign.justify,
+                                                                            FieldDetail(
+                                                                                field: 'Tên công ty',
+                                                                                content: '${firm.firmName!}'),
+                                                                            FieldDetail(
+                                                                                field: 'Người đại diện',
+                                                                                content: '${firm.owner != '' ? firm.owner : 'Chưa có thông tin'}'),
+                                                                            FieldDetail(
+                                                                                field: 'Số điện thoại',
+                                                                                content: '${firm.phone != '' ? firm.phone : 'Chưa có thông tin'}'),
+                                                                            FieldDetail(
+                                                                                field: 'Email',
+                                                                                content: '${firm.email != '' ? firm.email : 'Chưa có thông tin'}'),
+                                                                            FieldDetail(
+                                                                                field: 'Địa chỉ',
+                                                                                content: '${firm.address != '' ? firm.address : 'Chưa có thông tin'}'),
+                                                                            FieldDetail(
+                                                                                field: 'Mô tả',
+                                                                                content: '${firm.describe != '' ? firm.describe : 'Chưa có thông tin'}'),
+                                                                            const Text(
+                                                                              'Yêu cầu kỹ năng (mức độ thông thạo kỹ năng, được đánh giá trên thang điểm từ 1 đến 5)',
+                                                                              style: TextStyle(fontWeight: FontWeight.bold),
                                                                             ),
+                                                                            if (firm.tieuChi !=
+                                                                                null)
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 15),
+                                                                                child: Table(
+                                                                                  columnWidths: Map.from({
+                                                                                    0: const FlexColumnWidth(2),
+                                                                                    1: const FlexColumnWidth(2),
+                                                                                    2: const FlexColumnWidth(3),
+                                                                                  }),
+                                                                                  children: [
+                                                                                    TableRow(children: [
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Ngoại ngữ: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![0]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Kỹ năng lập trình: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![1]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Kỹ năng làm việc nhóm: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![2]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ]),
+                                                                                    TableRow(children: [
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Máy học, AI: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![3]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Website: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![4]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          const Text('Ứng dụng di động: '),
+                                                                                          Text(
+                                                                                            '${firm.tieuChi![5]}',
+                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ]),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
                                                                             if (setting.settingId != null &&
                                                                                 DateTime.now().isBeforeTimestamp(setting.traineeStart!)) ...[
                                                                               if (listRegis[indexRegis].status == TrangThai.reject) ...[
-                                                                                const Text('Vị trí tuyển dụng:'),
+                                                                                const Text(
+                                                                                  'Vị trí tuyển dụng:',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
                                                                                 for (var job in firm.listJob!)
                                                                                   Padding(
                                                                                     padding: const EdgeInsets.only(left: 25),
                                                                                     child: ListTile(
                                                                                       dense: true,
                                                                                       contentPadding: EdgeInsets.zero,
-                                                                                      title: Text('${job.jobName}'),
-                                                                                      subtitle: job.describeJob != null ? Text('${job.describeJob}') : null,
+                                                                                      title: Text(
+                                                                                        '${job.jobName}',
+                                                                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                      ),
+                                                                                      subtitle: job.describeJob != '' ? Text('${job.describeJob}') : null,
                                                                                     ),
                                                                                   ),
                                                                               ] else if (isTrainee && listRegis[indexRegis].isConfirmed! || !isTrainee && !listRegis[indexRegis].isConfirmed! && listRegis[indexRegis].status == TrangThai.accept) ...[
-                                                                                Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
-                                                                                Text('Ngày ứng tuyển: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}'),
-                                                                                Text('Ngày duyệt: ${GV.readTimestamp(listRegis[indexRegis].repliedAt!)}'),
-                                                                                Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                                                                              ] else if (isTrainee) ...[
-                                                                                const Text('Vị trí tuyển dụng:'),
+                                                                                const Text(
+                                                                                  'Vị trí tuyển dụng:',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
                                                                                 for (var job in firm.listJob!)
                                                                                   Padding(
                                                                                     padding: const EdgeInsets.only(left: 25),
                                                                                     child: ListTile(
                                                                                       dense: true,
                                                                                       contentPadding: EdgeInsets.zero,
-                                                                                      title: Text('${job.jobName}'),
-                                                                                      subtitle: Text('${job.describeJob}'),
+                                                                                      title: Text(
+                                                                                        '${job.jobName}',
+                                                                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                      ),
+                                                                                      subtitle: job.describeJob != '' ? Text('${job.describeJob}') : null,
                                                                                     ),
                                                                                   ),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Vị trí ứng tuyển', content: '${currentUser.selectedJob.value.jobName}'),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Ngày ứng tuyển', content: GV.readTimestamp(listRegis[indexRegis].createdAt!)),
+                                                                                if (listRegis[indexRegis].repliedAt != null) FieldDetail(field: 'Ngày duyệt', content: GV.readTimestamp(listRegis[indexRegis].repliedAt!)),
+                                                                                if (trainee.traineeStart != null) FieldDetail(field: 'Thời gian thực tập', content: 'Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                                                                                if (listRegis[indexRegis].isConfirmed!)
+                                                                                  const Padding(
+                                                                                    padding: EdgeInsets.only(top: 15),
+                                                                                    child: Row(
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          'Công ty bạn đang thực tập.',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: 12,
+                                                                                            color: Colors.red,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  )
+                                                                              ] else if (isTrainee) ...[
+                                                                                const Text(
+                                                                                  'Vị trí tuyển dụng:',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                                for (var job in firm.listJob!)
+                                                                                  Padding(
+                                                                                    padding: const EdgeInsets.only(left: 25),
+                                                                                    child: ListTile(
+                                                                                      dense: true,
+                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                      title: Text(
+                                                                                        '${job.jobName}',
+                                                                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                      ),
+                                                                                      subtitle: job.describeJob != '' ? Text('${job.describeJob}') : null,
+                                                                                    ),
+                                                                                  ),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Vị trí ứng tuyển', content: '${currentUser.selectedJob.value.jobName}'),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Ngày ứng tuyển', content: GV.readTimestamp(listRegis[indexRegis].createdAt!)),
+                                                                                if (listRegis[indexRegis].repliedAt != null && listRegis[indexRegis].status == TrangThai.accept) FieldDetail(field: 'Ngày duyệt', content: GV.readTimestamp(listRegis[indexRegis].repliedAt!)) else if (listRegis[indexRegis].status != null) FieldDetail(field: 'Trạng thái', content: '${listRegis[indexRegis].status}'),
                                                                                 const Padding(
                                                                                   padding: EdgeInsets.only(top: 15),
                                                                                   child: Row(
@@ -474,7 +611,10 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                   ),
                                                                                 )
                                                                               ] else if (listRegis[indexRegis].status == TrangThai.wait) ...[
-                                                                                const Text('Vị trí tuyển dụng:'),
+                                                                                const Text(
+                                                                                  'Vị trí tuyển dụng:',
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                                                                ),
                                                                                 for (var data in firm.listJob!)
                                                                                   Obx(
                                                                                     () => CustomRadio(
@@ -486,25 +626,46 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                   ),
                                                                               ],
                                                                             ] else ...[
-                                                                              Text('Vị trí ứng tuyển: ${currentUser.selectedJob.value.jobName} '),
-                                                                              Text('Ngày ứng tuyển: ${GV.readTimestamp(listRegis[indexRegis].createdAt!)}'),
-                                                                              Text('Ngày duyệt: ${GV.readTimestamp(listRegis[indexRegis].repliedAt!)}'),
-                                                                              Text('Thời gian thực tập: Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
-                                                                              const Padding(
-                                                                                padding: EdgeInsets.only(top: 15),
-                                                                                child: Row(
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      'Đã bắt đầu thực tập không thể đăng ký hoặc thay đổi vị trí ứng tuyển',
-                                                                                      style: TextStyle(
-                                                                                        fontSize: 12,
-                                                                                        color: Colors.red,
+                                                                              if (isTrainee && listRegis[indexRegis].isConfirmed!) ...[
+                                                                                FieldDetail(field: 'Vị trí ứng tuyển', content: '${currentUser.selectedJob.value.jobName}'),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Ngày ứng tuyển', content: GV.readTimestamp(listRegis[indexRegis].createdAt!)),
+                                                                                if (listRegis[indexRegis].repliedAt != null) FieldDetail(field: 'Ngày duyệt', content: GV.readTimestamp(listRegis[indexRegis].repliedAt!)),
+                                                                                if (trainee.traineeStart != null) FieldDetail(field: 'Thời gian thực tập', content: 'Từ ngày ${GV.readTimestamp(trainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(trainee.traineeEnd!)}'),
+                                                                                const Padding(
+                                                                                  padding: EdgeInsets.only(top: 15),
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        'Công ty bạn đang thực tập.',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 12,
+                                                                                          color: Colors.red,
+                                                                                        ),
                                                                                       ),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              )
+                                                                                    ],
+                                                                                  ),
+                                                                                )
+                                                                              ] else ...[
+                                                                                FieldDetail(field: 'Vị trí ứng tuyển', content: '${currentUser.selectedJob.value.jobName}'),
+                                                                                if (listRegis[indexRegis].createdAt != null) FieldDetail(field: 'Ngày ứng tuyển', content: GV.readTimestamp(listRegis[indexRegis].createdAt!)),
+                                                                                if (listRegis[indexRegis].repliedAt != null) FieldDetail(field: 'Ngày duyệt', content: GV.readTimestamp(listRegis[indexRegis].repliedAt!)),
+                                                                                const Padding(
+                                                                                  padding: EdgeInsets.only(top: 15),
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        'Bạn đã có công ty thực tập không thể ứng tuyển hoặc thay đổi vị trí ứng tuyển.',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 12,
+                                                                                          color: Colors.red,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                )
+                                                                              ]
                                                                             ]
                                                                           ],
                                                                         ),
@@ -537,11 +698,12 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                                     if (listRegis[i].jobId != currentUser.selectedJob.value.jobId) {
                                                                                                       listRegis[i].jobId = currentUser.selectedJob.value.jobId;
                                                                                                       listRegis[i].jobName = currentUser.selectedJob.value.jobName;
+                                                                                                      listRegis[i].createdAt = Timestamp.now();
                                                                                                     }
                                                                                                   }
                                                                                                 }
                                                                                                 firestore.collection('firms').doc(firm.firmId).update({
-                                                                                                  'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                                                  'listRegis': listRegis.map((i) => i.toMap()).toList(),
                                                                                                 });
                                                                                                 var loadListRegis = await GV.traineesCol.doc(userId).get();
                                                                                                 final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
@@ -550,12 +712,14 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                                     if (listUserRegis[i].jobId != currentUser.selectedJob.value.jobId) {
                                                                                                       listUserRegis[i].jobId = currentUser.selectedJob.value.jobId;
                                                                                                       listUserRegis[i].jobName = currentUser.selectedJob.value.jobName;
+                                                                                                      listUserRegis[i].createdAt = Timestamp.now();
                                                                                                     }
                                                                                                   }
                                                                                                 }
                                                                                                 firestore.collection('trainees').doc(userId).update({
                                                                                                   'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
                                                                                                 });
+                                                                                                Navigator.pop(context);
                                                                                                 Navigator.pop(context);
                                                                                                 GV.success(context: context, message: 'Đã cập nhật vị trí ứng tuyển.');
                                                                                               }
@@ -569,59 +733,132 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                     ? [
                                                                                         ElevatedButton(
                                                                                           onPressed: () async {
-                                                                                            var loadCBHD = await firestore.collection('users').doc(firm.firmId).get();
-                                                                                            final cbhdName = UserModel.fromMap(loadCBHD.data()!).userName;
-                                                                                            final plan = PlanWorkModel(
-                                                                                              cbhdId: firm.firmId,
-                                                                                              cbhdName: cbhdName,
-                                                                                              listWork: [],
-                                                                                              userId: userId,
-                                                                                            );
-                                                                                            var listRegis = firm.listRegis;
-                                                                                            for (int i = 0; i < listRegis!.length; i++) {
-                                                                                              if (listRegis[i].userId == currentUser.userId.value) {
-                                                                                                if (listRegis[i].jobId == currentUser.selectedJob.value.jobId) {
-                                                                                                  listRegis[i].isConfirmed = true;
-                                                                                                  plan.traineeStart = trainee.traineeStart;
-                                                                                                  plan.traineeEnd = trainee.traineeEnd;
-                                                                                                }
-                                                                                              }
-                                                                                            }
-                                                                                            firestore.collection('plans').doc(userId).set(plan.toMap());
-                                                                                            firestore.collection('firms').doc(firm.firmId).update({
-                                                                                              'listRegis': listRegis.map((i) => i.toMap()).toList()
-                                                                                            });
-                                                                                            var loadListRegis = await GV.traineesCol.doc(userId).get();
-                                                                                            final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
-                                                                                            for (int i = 0; i < listUserRegis!.length; i++) {
-                                                                                              if (listUserRegis[i].firmId == firm.firmId) {
-                                                                                                if (listUserRegis[i].jobId == currentUser.selectedJob.value.jobId) {
-                                                                                                  listUserRegis[i].isConfirmed = true;
-                                                                                                }
-                                                                                              }
-                                                                                            }
-                                                                                            firestore.collection('trainees').doc(userId).update({
-                                                                                              'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
-                                                                                            });
-                                                                                            Navigator.pop(context);
-                                                                                            GV.success(context: context, message: 'Đã xác nhận công ty thực tập');
+                                                                                            showDialog(
+                                                                                                context: context,
+                                                                                                barrierColor: Colors.black12,
+                                                                                                barrierDismissible: false,
+                                                                                                builder: (context) {
+                                                                                                  return Padding(
+                                                                                                    padding: EdgeInsets.only(
+                                                                                                      top: screenHeight * 0.06,
+                                                                                                      bottom: screenHeight * 0.02,
+                                                                                                      left: screenWidth * 0.27,
+                                                                                                      right: screenWidth * 0.08,
+                                                                                                    ),
+                                                                                                    child: Row(
+                                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                                      children: [
+                                                                                                        AlertDialog(
+                                                                                                          scrollable: true,
+                                                                                                          title: Container(
+                                                                                                            color: Colors.blue.shade600,
+                                                                                                            height: screenHeight * 0.06,
+                                                                                                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                                                                            child: Row(
+                                                                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                                              children: [
+                                                                                                                const SizedBox(
+                                                                                                                  width: 30,
+                                                                                                                ),
+                                                                                                                const Expanded(
+                                                                                                                  child: Text(
+                                                                                                                    'Xác nhận thực tập',
+                                                                                                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                                                                                                    textAlign: TextAlign.center,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                                SizedBox(
+                                                                                                                  width: 30,
+                                                                                                                  child: IconButton(
+                                                                                                                      padding: const EdgeInsets.only(bottom: 1),
+                                                                                                                      onPressed: () {
+                                                                                                                        Navigator.pop(context);
+                                                                                                                      },
+                                                                                                                      icon: const Icon(Icons.close)),
+                                                                                                                )
+                                                                                                              ],
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          titlePadding: EdgeInsets.zero,
+                                                                                                          shape: Border.all(width: 0.5),
+                                                                                                          content: ConstrainedBox(
+                                                                                                              constraints: BoxConstraints(
+                                                                                                                minWidth: screenWidth * 0.35,
+                                                                                                                maxWidth: screenWidth * 0.35,
+                                                                                                              ),
+                                                                                                              child: const Text('Bạn chỉ có thể xác nhận thực tập tại một công ty duy nhất và không thể thay đổi, bạn có chắc muốn thực tập tại công ty này?')),
+                                                                                                          actions: [
+                                                                                                            ElevatedButton(
+                                                                                                              onPressed: () async {
+                                                                                                                var loadCBHD = await firestore.collection('users').doc(firm.firmId).get();
+                                                                                                                final cbhdName = UserModel.fromMap(loadCBHD.data()!).userName;
+                                                                                                                final plan = PlanWorkModel(
+                                                                                                                  cbhdId: firm.firmId,
+                                                                                                                  cbhdName: cbhdName,
+                                                                                                                  listWork: [],
+                                                                                                                  userId: userId,
+                                                                                                                );
+                                                                                                                var listRegis = firm.listRegis;
+                                                                                                                for (int i = 0; i < listRegis!.length; i++) {
+                                                                                                                  if (listRegis[i].userId == currentUser.userId.value) {
+                                                                                                                    if (listRegis[i].jobId == currentUser.selectedJob.value.jobId) {
+                                                                                                                      listRegis[i].isConfirmed = true;
+                                                                                                                      plan.traineeStart = trainee.traineeStart;
+                                                                                                                      plan.traineeEnd = trainee.traineeEnd;
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                                firestore.collection('plans').doc(userId).set(plan.toMap());
+                                                                                                                firestore.collection('firms').doc(firm.firmId).update({
+                                                                                                                  'listRegis': listRegis.map((i) => i.toMap()).toList()
+                                                                                                                });
+                                                                                                                var loadListRegis = await GV.traineesCol.doc(userId).get();
+                                                                                                                final listUserRegis = RegisterTraineeModel.fromMap(loadListRegis.data()!).listRegis;
+                                                                                                                for (int i = 0; i < listUserRegis!.length; i++) {
+                                                                                                                  if (listUserRegis[i].firmId == firm.firmId) {
+                                                                                                                    if (listUserRegis[i].jobId == currentUser.selectedJob.value.jobId) {
+                                                                                                                      listUserRegis[i].isConfirmed = true;
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                                firestore.collection('trainees').doc(userId).update({
+                                                                                                                  'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                                                });
+                                                                                                                Navigator.pop(context);
+                                                                                                                Navigator.pop(context);
+                                                                                                                GV.success(context: context, message: 'Đã xác nhận công ty thực tập');
+                                                                                                              },
+                                                                                                              child: const Text(
+                                                                                                                'Chắc chắn',
+                                                                                                                style: TextStyle(
+                                                                                                                  fontWeight: FontWeight.bold,
+                                                                                                                  fontSize: 16,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                            ElevatedButton(
+                                                                                                              onPressed: () {
+                                                                                                                Navigator.pop(context);
+                                                                                                              },
+                                                                                                              child: const Text(
+                                                                                                                'Để sau',
+                                                                                                                style: TextStyle(
+                                                                                                                  color: Colors.red,
+                                                                                                                  fontSize: 16,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      ],
+                                                                                                    ),
+                                                                                                  );
+                                                                                                });
                                                                                           },
                                                                                           child: const Text(
-                                                                                            'Xác nhận',
+                                                                                            'Xác nhận thực tập',
                                                                                             style: TextStyle(
                                                                                               fontWeight: FontWeight.bold,
-                                                                                              fontSize: 16,
-                                                                                            ),
-                                                                                          ),
-                                                                                        ),
-                                                                                        ElevatedButton(
-                                                                                          onPressed: () {
-                                                                                            Navigator.pop(context);
-                                                                                          },
-                                                                                          child: const Text(
-                                                                                            'Để sau',
-                                                                                            style: TextStyle(
-                                                                                              color: Colors.red,
                                                                                               fontSize: 16,
                                                                                             ),
                                                                                           ),

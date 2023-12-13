@@ -48,7 +48,7 @@ class _HomeViewDesktopState extends State<HomeViewDesktop> {
         setMenuSelected: sharedPref.getInt('menuSelected'),
       );
       DocumentSnapshot<Map<String, dynamic>> isExistUser =
-          await FirebaseFirestore.instance
+          await firestore
               .collection('users')
               .doc(userId)
               .get();

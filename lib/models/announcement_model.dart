@@ -44,3 +44,27 @@ class AnnouncementModel {
   factory AnnouncementModel.fromJson(String source) =>
       AnnouncementModel.fromMap(json.decode(source));
 }
+
+class TBModel {
+  String? title;
+  Timestamp? createdAt;
+
+  TBModel({
+    this.title,
+    this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'createdAt': createdAt,
+    };
+  }
+
+  factory TBModel.fromMap(Map<String, dynamic> map) {
+    return TBModel(
+      title: map['title'] ?? '',
+      createdAt: map['createdAt'],
+    );
+  }
+}

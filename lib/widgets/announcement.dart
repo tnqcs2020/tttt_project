@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tttt_project/common/constant.dart';
 import 'package:tttt_project/models/announcement_model.dart';
-import 'package:tttt_project/models/plan_trainee_model.dart'; 
+import 'package:tttt_project/models/plan_trainee_model.dart';
 import 'package:tttt_project/common/user_controller.dart';
-import 'dart:html' as html;
 
 class Announcement extends StatefulWidget {
   const Announcement({
@@ -19,6 +18,37 @@ class Announcement extends StatefulWidget {
 class _AnnouncementState extends State<Announcement> {
   final firestore = FirebaseFirestore.instance;
   final currentUser = Get.put(UserController());
+  List<TBModel> thongbao = [];
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
+
+  getUserData() async {
+    List<TBModel> tb = [];
+    QuerySnapshot<Map<String, dynamic>> announcements =
+        await firestore.collection('announcements').get();
+    if (announcements.docs.isNotEmpty) {
+      for (int i = 0; i < announcements.docs.length; i++) {
+        final anct = AnnouncementModel.fromMap(announcements.docs[i].data());
+        tb.add(TBModel(title: anct.title, createdAt: anct.createdAt));
+      }
+    }
+    QuerySnapshot<Map<String, dynamic>> planTrainees =
+        await firestore.collection('planTrainees').get();
+    if (planTrainees.docs.isNotEmpty) {
+      for (int i = 0; i < planTrainees.docs.length; i++) {
+        final pt = PlanTraineeModel.fromMap(planTrainees.docs[i].data());
+        tb.add(TBModel(title: pt.title, createdAt: pt.createdAt));
+      }
+    }
+    tb.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+    setState(() {
+      thongbao = tb;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -55,134 +85,71 @@ class _AnnouncementState extends State<Announcement> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            child: Column(
-              children: [
-                StreamBuilder(
-                  stream: firestore.collection('announcements').snapshots(),
-                  builder: (context, snapshot) {
-                    final List<AnnouncementModel> listAnnouncement = [];
-                    if (snapshot.hasData &&
-                        snapshot.connectionState == ConnectionState.active) {
-                      snapshot.data?.docs.forEach((element) {
-                        listAnnouncement
-                            .add(AnnouncementModel.fromMap(element.data()));
-                      });
-                      return listAnnouncement.isNotEmpty
-                          ? ListView.builder(
-                              itemCount: listAnnouncement.length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * 0.04,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 10),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 5,
-                                          child: Text(
-                                            listAnnouncement[index].title!,
-                                            textAlign: TextAlign.justify,
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                            ),
-                                          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                child: Column(
+                  children: [
+                    ListView.builder(
+                      itemCount: thongbao.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {},
+                          child: Container(
+                            height: screenHeight * 0.04,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        thongbao[index].title!,
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          color: Colors.blue.shade900,
                                         ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            GV.readTimestamp(
-                                                listAnnouncement[index]
-                                                    .createdAt!),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
+                                      const Icon(
+                                        Icons.fiber_new_outlined,
+                                        color: Colors.red,
+                                        size: 25,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    GV.readTimestamp(
+                                        thongbao[index].createdAt!),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.blue.shade900,
                                     ),
                                   ),
-                                );
-                              },
-                            )
-                          : const SizedBox.shrink();
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  ],
                 ),
-                StreamBuilder(
-                  stream: firestore.collection('planTrainees').snapshots(),
-                  builder: (context, snapshot) {
-                    final List<PlanTraineeModel> listPlanTrainee = [];
-                    if (snapshot.hasData &&
-                        snapshot.connectionState == ConnectionState.active) {
-                      snapshot.data?.docs.forEach((element) {
-                        listPlanTrainee
-                            .add(PlanTraineeModel.fromMap(element.data()));
-                      });
-                      return listPlanTrainee.isNotEmpty
-                          ? ListView.builder(
-                              itemCount: listPlanTrainee.length,
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * 0.04,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 10),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 5,
-                                          child: Text(
-                                            listPlanTrainee[index].title!,
-                                            textAlign: TextAlign.justify,
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            GV.readTimestamp(
-                                                listPlanTrainee[index]
-                                                    .createdAt!),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.blue.shade900,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : const SizedBox.shrink();
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  openInANewTab(url) {
-    html.window.open(url, 'PlaceholderName');
   }
 }

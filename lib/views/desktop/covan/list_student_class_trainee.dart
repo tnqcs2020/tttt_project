@@ -48,7 +48,8 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
   List<SubmitModel> submits = [];
   List<AppreciateCVModel> appCV = [];
   SettingTraineeModel setting = SettingTraineeModel();
-
+  String hknow = HocKy.empty;
+  NamHoc nhnow = NamHoc.empty;
   @override
   void initState() {
     getData();
@@ -57,6 +58,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
 
   getData() async {
     final SharedPreferences sharedPref = await SharedPreferences.getInstance();
+    currentUser.loadIn.value = false;
     setState(() {
       userId = sharedPref
           .getString(
@@ -75,6 +77,13 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
     DocumentSnapshot<Map<String, dynamic>> atMoment =
         await firestore.collection('atMoment').doc('now').get();
     if (atMoment.data() != null) {
+      setState(() {
+        hknow = atMoment.data()!['term'];
+        final temp = NamHoc(
+            start: atMoment.data()!['yearStart'],
+            end: atMoment.data()!['yearEnd']);
+        nhnow = temp;
+      });
       QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
           await firestore
               .collection('settingTrainees')
@@ -145,1252 +154,1258 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return setting.settingId != null
-        ? ValueListenableBuilder(
-            valueListenable: isViewed,
-            builder: (context, value, child) {
-              return Column(
-                children: [
-                  if (setting.isClockPoint != null &&
-                      DateTime.now()
-                          .isBeforeTimestamp(setting.isClockPoint)) ...[
-                    if (setting.pointCVEnd != null &&
-                        DateTime.now().isBeforeTimestamp(setting.pointCVEnd))
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
+    return ValueListenableBuilder(
+        valueListenable: isViewed,
+        builder: (context, value, child) {
+          return Obx(() => currentUser.loadIn.isTrue
+              ? Column(
+                  children: [
+                    if (setting.isClockPoint != null &&
+                        DateTime.now()
+                            .isBeforeTimestamp(setting.isClockPoint)) ...[
+                      if (setting.pointCVEnd != null &&
+                          DateTime.now().isBeforeTimestamp(setting.pointCVEnd))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Thời gian đánh giá từ ${GV.readTimestamp(setting.pointCBEnd!)} đến ${GV.readTimestamp(setting.pointCVEnd!)}',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        )
+                      else if (setting.pointCVEnd != null &&
+                          DateTime.now().isBetweenEqual(
+                              from: setting.pointCVEnd,
+                              to: setting.isClockPoint)) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              StreamBuilder(
+                                  stream: firestore
+                                      .collection('requestEdits')
+                                      .where('cvId', isEqualTo: userId)
+                                      .where('term', isEqualTo: setting.term)
+                                      .where('yearStart',
+                                          isEqualTo: setting.yearStart)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.docs.isNotEmpty) {
+                                      final request = RequestEditModel.fromMap(
+                                          snapshot.data!.docs.first.data());
+                                      return request.delayAt != null
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10),
+                                              child: Text(
+                                                'Yêu cầu sửa điểm của bạn đã được duyệt, thời hạn đến ngày ${GV.readTimestamp(request.delayAt!)}',
+                                                style: const TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Đã quá thời gian đánh giá.',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            );
+                                    }
+                                    return const Text(
+                                      'Đã quá thời gian đánh giá.',
+                                      style: TextStyle(color: Colors.red),
+                                    );
+                                  })
+                            ],
+                          ),
+                        )
+                      ]
+                    ],
+                    if (setting.isClockPoint != null &&
+                        DateTime.now().isAfterTimestamp(setting.isClockPoint))
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Thời gian đánh giá từ ${GV.readTimestamp(setting.pointCBEnd!)} đến ${GV.readTimestamp(setting.pointCVEnd!)}',
-                              style: const TextStyle(color: Colors.red),
+                              'Đã khóa điểm học kỳ.',
+                              style: TextStyle(color: Colors.red),
                             ),
                           ],
                         ),
-                      )
-                    else if (setting.pointCVEnd != null &&
-                        DateTime.now().isBetweenEqual(
-                            from: setting.pointCVEnd,
-                            to: setting.isClockPoint)) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            StreamBuilder(
-                                stream: firestore
-                                    .collection('requestEdits')
-                                    .where('cvId', isEqualTo: userId)
-                                    .where('term', isEqualTo: setting.term)
-                                    .where('yearStart',
-                                        isEqualTo: setting.yearStart)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data!.docs.isNotEmpty) {
-                                    final request = RequestEditModel.fromMap(
-                                        snapshot.data!.docs.first.data());
-                                    return request.delayAt != null
-                                        ? Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
-                                            child: Text(
-                                              'Yêu cầu sửa điểm của bạn đã được duyệt, thời hạn đến ngày ${GV.readTimestamp(request.delayAt!)}',
-                                              style: const TextStyle(
-                                                  color: Colors.red),
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Đã quá thời gian đánh giá.',
-                                            style: TextStyle(color: Colors.red),
-                                          );
-                                  }
-                                  return const Text(
-                                    'Đã quá thời gian đánh giá.',
-                                    style: TextStyle(color: Colors.red),
-                                  );
-                                })
-                          ],
-                        ),
-                      )
-                    ]
-                  ],
-                  if (setting.isClockPoint != null &&
-                      DateTime.now().isAfterTimestamp(setting.isClockPoint))
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            'Đã khóa điểm học kỳ.',
-                            style: TextStyle(color: Colors.red),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: screenWidth * 0.04,
+                                child: const Text(
+                                  "Học kỳ",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton2<String>(
+                                  isExpanded: true,
+                                  hint: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '${hknow}',
+                                          style: DropdownStyle.hintStyle,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  items: dshkAll
+                                      .map((String hk) =>
+                                          DropdownMenuItem<String>(
+                                            value: hk,
+                                            child: Center(
+                                              child: Text(
+                                                hk,
+                                                style: DropdownStyle.itemStyle,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: selectedHK != HocKy.empty
+                                      ? selectedHK
+                                      : null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedHK = value!;
+                                    });
+                                    currentUser.isCompleted.value = false;
+                                  },
+                                  buttonStyleData:
+                                      DropdownStyle.buttonStyleShort,
+                                  iconStyleData: DropdownStyle.iconStyleData,
+                                  dropdownStyleData:
+                                      DropdownStyle.dropdownStyleShort,
+                                  menuItemStyleData:
+                                      DropdownStyle.menuItemStyleData,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: screenWidth * 0.04,
-                              child: const Text(
-                                "Học kỳ",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                isExpanded: true,
-                                hint: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${setting.term}',
-                                        style: DropdownStyle.hintStyle,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                          const SizedBox(width: 25),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: screenWidth * 0.05,
+                                child: const Text(
+                                  "Năm học",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                items: dshkAll
-                                    .map((String hk) =>
-                                        DropdownMenuItem<String>(
-                                          value: hk,
-                                          child: Center(
-                                            child: Text(
-                                              hk,
-                                              style: DropdownStyle.itemStyle,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: selectedHK != HocKy.empty
-                                    ? selectedHK
-                                    : null,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedHK = value!;
-                                  });
-                                  currentUser.isCompleted.value = false;
-                                },
-                                buttonStyleData: DropdownStyle.buttonStyleShort,
-                                iconStyleData: DropdownStyle.iconStyleData,
-                                dropdownStyleData:
-                                    DropdownStyle.dropdownStyleShort,
-                                menuItemStyleData:
-                                    DropdownStyle.menuItemStyleData,
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 25),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: screenWidth * 0.05,
-                              child: const Text(
-                                "Năm học",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            DropdownButtonHideUnderline(
-                              child: DropdownButton2<NamHoc>(
-                                isExpanded: true,
-                                hint: Center(
-                                  child: Text(
-                                    setting.yearStart == setting.yearEnd
-                                        ? "${setting.yearStart}"
-                                        : "${setting.yearStart} - ${setting.yearEnd}",
-                                    style: DropdownStyle.hintStyle,
-                                    overflow: TextOverflow.ellipsis,
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton2<NamHoc>(
+                                  isExpanded: true,
+                                  hint: Center(
+                                    child: Text(
+                                      nhnow.start == nhnow.end
+                                          ? "${nhnow.start}"
+                                          : "${nhnow.start} - ${nhnow.end}",
+                                      style: DropdownStyle.hintStyle,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                items: dsnhAll
-                                    .map((NamHoc nh) =>
-                                        DropdownMenuItem<NamHoc>(
-                                          value: nh,
-                                          child: Center(
-                                            child: Text(
-                                              nh.start == nh.end
-                                                  ? nh.start
-                                                  : "${nh.start} - ${nh.end}",
-                                              style: DropdownStyle.itemStyle,
-                                              overflow: TextOverflow.ellipsis,
+                                  items: dsnhAll
+                                      .map((NamHoc nh) =>
+                                          DropdownMenuItem<NamHoc>(
+                                            value: nh,
+                                            child: Center(
+                                              child: Text(
+                                                nh.start == nh.end
+                                                    ? nh.start
+                                                    : "${nh.start} - ${nh.end}",
+                                                style: DropdownStyle.itemStyle,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: selectedNH != NamHoc.empty
-                                    ? selectedNH
-                                    : null,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedNH = value!;
-                                  });
-                                  currentUser.isCompleted.value = false;
-                                },
-                                buttonStyleData:
-                                    DropdownStyle.buttonStyleMedium,
-                                iconStyleData: DropdownStyle.iconStyleData,
-                                dropdownStyleData:
-                                    DropdownStyle.dropdownStyleMedium,
-                                menuItemStyleData:
-                                    DropdownStyle.menuItemStyleData,
+                                          ))
+                                      .toList(),
+                                  value: selectedNH != NamHoc.empty
+                                      ? selectedNH
+                                      : null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedNH = value!;
+                                    });
+                                    currentUser.isCompleted.value = false;
+                                  },
+                                  buttonStyleData:
+                                      DropdownStyle.buttonStyleMedium,
+                                  iconStyleData: DropdownStyle.iconStyleData,
+                                  dropdownStyleData:
+                                      DropdownStyle.dropdownStyleMedium,
+                                  menuItemStyleData:
+                                      DropdownStyle.menuItemStyleData,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 45),
-                        CustomButton(
-                            text: 'Xem',
+                            ],
+                          ),
+                          const SizedBox(width: 45),
+                          CustomButton(
+                              text: 'Xem',
+                              width: 100,
+                              height: 40,
+                              onTap: () {
+                                if (selectedHK != HocKy.empty &&
+                                    selectedNH != NamHoc.empty) {
+                                  setState(() {
+                                    isViewed.value = true;
+                                  });
+                                  currentUser.isCompleted.value = true;
+                                }
+                              }),
+                          const SizedBox(width: 25),
+                          CustomButton(
+                            text: 'Chấm tất cả',
                             width: 100,
                             height: 40,
-                            onTap: () {
-                              if (selectedHK != HocKy.empty &&
-                                  selectedNH != NamHoc.empty) {
-                                setState(() {
-                                  isViewed.value = true;
-                                });
-                                currentUser.isCompleted.value = true;
-                              }
-                            }),
-                        const SizedBox(width: 25),
-                        CustomButton(
-                          text: 'Chấm tất cả',
-                          width: 100,
-                          height: 40,
-                          onTap: () async {
-                            final loadRequest = await firestore
-                                .collection('requestEdits')
-                                .where('cvId', isEqualTo: userId)
-                                .where('term', isEqualTo: setting.term)
-                                .where('yearStart',
-                                    isEqualTo: setting.yearStart)
-                                .get();
-                            final request = RequestEditModel.fromMap(
-                                loadRequest.docs.first.data());
-                            final load = await firestore
-                                .collection('trainees')
-                                .where('classId', isEqualTo: myClass)
-                                .where('term', isEqualTo: setting.term)
-                                .where('yearStart',
-                                    isEqualTo: setting.yearStart)
-                                .get();
-                            List<RegisterTraineeModel> traineeAtNow = [];
-                            if (load.docs.isNotEmpty) {
-                              load.docs.forEach((element) => traineeAtNow.add(
-                                  RegisterTraineeModel.fromMap(
-                                      element.data())));
-                            }
-                            appreciateAll(
-                                traineeAtNow: traineeAtNow,
-                                isClock: request.delayAt != null
-                                    ? DateTime.now()
-                                        .isAfterTimestamp(request.delayAt)
-                                    : DateTime.now()
-                                        .isAfterTimestamp(setting.pointCVEnd));
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15, bottom: 25),
-                    child: Container(
-                      decoration: const BoxDecoration(color: Colors.white),
-                      height: screenHeight * 0.45,
-                      width: screenWidth * 0.6,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            color: GV.fieldColor,
-                            height: screenHeight * 0.04,
-                            child: const Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'STT',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'MSSV',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    'Họ tên',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Nộp báo cáo',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Cán bộ đánh giá',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Điểm số/chữ',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Thao tác',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child:
-                                isViewed.value && currentUser.isCompleted.isTrue
-                                    ? SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: StreamBuilder(
-                                          stream: firestore
-                                              .collection('trainees')
-                                              .where('classId',
-                                                  isEqualTo: myClass)
-                                              .snapshots(),
-                                          builder: (context, snapshotTrainee) {
-                                            if (snapshotTrainee.hasData &&
-                                                snapshotTrainee.data != null) {
-                                              List<RegisterTraineeModel> load =
-                                                  [];
-                                              List<RegisterTraineeModel>
-                                                  traineeClass = [];
-                                              if (snapshotTrainee
-                                                  .data!.docs.isNotEmpty) {
-                                                snapshotTrainee.data!.docs
-                                                    .forEach((element) => load
-                                                        .add(
-                                                            RegisterTraineeModel
-                                                                .fromMap(element
-                                                                    .data())));
-                                              }
-                                              load.forEach((e) {
-                                                if (selectedHK == HocKy.tatca &&
-                                                    selectedNH ==
-                                                        NamHoc.tatca) {
-                                                  traineeClass.add(e);
-                                                } else if (selectedHK ==
-                                                    HocKy.tatca) {
-                                                  if (e.yearStart ==
-                                                      selectedNH.start) {
-                                                    traineeClass.add(e);
-                                                  }
-                                                } else if (selectedNH ==
-                                                    NamHoc.tatca) {
-                                                  if (e.term == selectedHK) {
-                                                    traineeClass.add(e);
-                                                  }
-                                                } else if (e.term ==
-                                                        selectedHK &&
-                                                    e.yearStart ==
-                                                        selectedNH.start) {
-                                                  traineeClass.add(e);
-                                                }
-                                              });
-                                              return traineeClass.isNotEmpty
-                                                  ? ListView.builder(
-                                                      itemCount:
-                                                          traineeClass.length,
-                                                      shrinkWrap: true,
-                                                      itemBuilder: (context,
-                                                          indexTrain) {
-                                                        UserRegisterModel
-                                                            userRegister =
-                                                            UserRegisterModel();
-                                                        traineeClass[indexTrain]
-                                                            .listRegis!
-                                                            .forEach((e1) {
-                                                          if (e1.isConfirmed ==
-                                                              true) {
-                                                            userRegister = e1;
-                                                          }
-                                                        });
-                                                        UserModel user =
-                                                            UserModel();
-                                                        users.forEach((e) {
-                                                          if (e.userId ==
-                                                              traineeClass[
-                                                                      indexTrain]
-                                                                  .userId) {
-                                                            user = e;
-                                                          }
-                                                        });
-                                                        bool isApCB = false;
-                                                        AppreciateModel
-                                                            appreciate =
-                                                            AppreciateModel();
-                                                        appreciateCB
-                                                            .forEach((element) {
-                                                          if (element.userId ==
-                                                              traineeClass[
-                                                                      indexTrain]
-                                                                  .userId) {
-                                                            isApCB = true;
-                                                            appreciate =
-                                                                element;
-                                                          }
-                                                        });
-                                                        bool isSubmit = false;
-                                                        submits
-                                                            .forEach((element) {
-                                                          if (element.userId ==
-                                                              traineeClass[
-                                                                      indexTrain]
-                                                                  .userId) {
-                                                            isSubmit = true;
-                                                          }
-                                                        });
-                                                        return Container(
-                                                          height: screenHeight *
-                                                              0.05,
-                                                          color:
-                                                              indexTrain % 2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child: Text(
-                                                                    '${indexTrain + 1}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: Text(
-                                                                    '${traineeClass[indexTrain].userId}'
-                                                                        .toUpperCase(),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 3,
-                                                                child: Text(
-                                                                    '${traineeClass[indexTrain].studentName}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: isSubmit
-                                                                    ? const Icon(
-                                                                        Icons
-                                                                            .check_circle,
-                                                                        color: Colors
-                                                                            .green,
-                                                                      )
-                                                                    : const Icon(
-                                                                        Icons
-                                                                            .not_interested),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: isApCB
-                                                                    ? const Icon(
-                                                                        Icons
-                                                                            .check_circle,
-                                                                        color: Colors
-                                                                            .green,
-                                                                      )
-                                                                    : const Icon(
-                                                                        Icons
-                                                                            .not_interested),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child:
-                                                                    StreamBuilder(
-                                                                        stream: firestore
-                                                                            .collection(
-                                                                                'appreciatesCV')
-                                                                            .doc(traineeClass[indexTrain]
-                                                                                .userId)
-                                                                            .snapshots(),
-                                                                        builder:
-                                                                            (context,
-                                                                                snapshot) {
-                                                                          if (snapshot.hasData &&
-                                                                              snapshot.data != null &&
-                                                                              snapshot.data!.data() != null) {
-                                                                            final appre =
-                                                                                AppreciateCVModel.fromMap(snapshot.data!.data()!);
-                                                                            return Padding(
-                                                                              padding: const EdgeInsets.only(right: 10),
-                                                                              child: Text(
-                                                                                '${appre.finalTotal}/${appre.pointChar}',
-                                                                                textAlign: TextAlign.right,
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                          return const Padding(
-                                                                            padding:
-                                                                                EdgeInsets.only(right: 10),
-                                                                            child:
-                                                                                Text(
-                                                                              '-',
-                                                                              textAlign: TextAlign.right,
-                                                                            ),
-                                                                          );
-                                                                        }),
-                                                              ),
-                                                              userRegister.firmId !=
-                                                                      null
-                                                                  ? Expanded(
-                                                                      flex: 2,
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          IconButton(
-                                                                              tooltip: 'Thông tin sinh viên và bảng phân công công việc',
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {
-                                                                                showInfo(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
-                                                                              },
-                                                                              icon: const Icon(
-                                                                                Icons.info,
-                                                                                size: 22,
-                                                                                color: Colors.grey,
-                                                                              )),
-                                                                          IconButton(
-                                                                              tooltip: 'Kết quả của cán bộ hướng dẫn',
-                                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                                              onPressed: () {
-                                                                                if (appreciate.userId != null) {
-                                                                                  showAppreciateCB(context: context, user: user, appreciate: appreciate);
-                                                                                } else {
-                                                                                  GV.error(context: context, message: 'Chưa có đánh giá từ cán bộ');
-                                                                                }
-                                                                              },
-                                                                              icon: Icon(
-                                                                                Icons.my_library_books,
-                                                                                size: 22,
-                                                                                color: Colors.blue.shade800,
-                                                                              )),
-                                                                          StreamBuilder(
-                                                                              stream: firestore.collection('appreciatesCV').snapshots(),
-                                                                              builder: (context, snapshot) {
-                                                                                if (snapshot.hasData) {
-                                                                                  appCV = snapshot.data!.docs.map((e) => AppreciateCVModel.fromMap(e.data())).toList();
-                                                                                }
-                                                                                return IconButton(
-                                                                                    tooltip: 'Đánh giá',
-                                                                                    padding: const EdgeInsets.only(bottom: 1),
-                                                                                    onPressed: () async {
-                                                                                      final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
-                                                                                      final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
-                                                                                      points = [];
-                                                                                      double pointCB = 0;
-                                                                                      appreciateCB.forEach((element) {
-                                                                                        if (element.userId == traineeClass[indexTrain].userId) {
-                                                                                          double totalPoint = 0;
-                                                                                          bool isOnl = false;
-                                                                                          for (var i = 0; i < element.listContent!.length; i++) {
-                                                                                            if (i < 3 && element.listContent![i].point == 0) {
-                                                                                              isOnl = true;
-                                                                                            }
-                                                                                          }
-                                                                                          if (isOnl) {
-                                                                                            for (var i = 3; i < element.listContent!.length; i++) {
-                                                                                              totalPoint += element.listContent![i].point!;
-                                                                                            }
-                                                                                          } else {
-                                                                                            for (var i = 0; i < element.listContent!.length; i++) {
-                                                                                              totalPoint += element.listContent![i].point!;
-                                                                                            }
-                                                                                          }
-                                                                                          if (isOnl) {
-                                                                                            pointCB = (totalPoint / 70) * 5;
-                                                                                          } else {
-                                                                                            pointCB = (totalPoint / 100) * 5;
-                                                                                          }
-                                                                                        }
-                                                                                      });
-                                                                                      bool isAppCV = false;
-                                                                                      appCV.forEach((element) {
-                                                                                        if (element.userId == user.userId) {
-                                                                                          isAppCV = true;
-                                                                                        }
-                                                                                      });
-                                                                                      if (isAppCV) {
-                                                                                        appCV.forEach((element) {
-                                                                                          if (element.userId == user.userId) {
-                                                                                            for (int i = 0; i < 10; i++) {
-                                                                                              points.add(TextEditingController(text: element.listPoint![i].toString()));
-                                                                                            }
-                                                                                            points.add(TextEditingController(text: element.subPoint.toString()));
-                                                                                            setState(() {
-                                                                                              total.value = element.total!;
-                                                                                              finalTotal.value = element.finalTotal!;
-                                                                                            });
-                                                                                          }
-                                                                                        });
-                                                                                      } else {
-                                                                                        for (int i = 0; i < 11; i++) {
-                                                                                          if (i == 3) {
-                                                                                            points.add(TextEditingController(text: pointCB.toStringAsFixed(1)));
-                                                                                          } else {
-                                                                                            points.add(TextEditingController(text: initPoint[i].toString()));
-                                                                                          }
-                                                                                        }
-                                                                                        double temp = 0;
-                                                                                        for (var i = 0; i < 10; i++) {
-                                                                                          temp += double.parse(points[i].text);
-                                                                                        }
-                                                                                        setState(() {
-                                                                                          total.value = double.parse(temp.toStringAsFixed(1));
-                                                                                          finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(1));
-                                                                                        });
-                                                                                      }
-
-                                                                                      showAppreciate(
-                                                                                        context: context,
-                                                                                        user: user,
-                                                                                        trainee: traineeClass[indexTrain],
-                                                                                        userRegister: userRegister,
-                                                                                        isUpdate: isAppCV,
-                                                                                        isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd),
-                                                                                      );
-                                                                                    },
-                                                                                    icon: const Icon(
-                                                                                      CupertinoIcons.pencil_ellipsis_rectangle,
-                                                                                      size: 22,
-                                                                                      color: Colors.red,
-                                                                                    ));
-                                                                              })
-                                                                        ],
-                                                                      ))
-                                                                  : const Expanded(
-                                                                      flex: 2,
-                                                                      child:
-                                                                          Text(
-                                                                        'Chưa có công ty',
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                    ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : SizedBox(
-                                                      height:
-                                                          screenHeight * 0.45,
-                                                      width: screenWidth * 0.6,
-                                                      child: const Center(
-                                                        child: Text(
-                                                            'Chưa có sinh viên thực tập.'),
-                                                      ),
-                                                    );
-                                            } else {
-                                              return SizedBox(
-                                                height: screenHeight * 0.45,
-                                                width: screenWidth * 0.6,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Loading(),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      )
-                                    : selectedHK == HocKy.empty &&
-                                            selectedNH == NamHoc.empty
-                                        ? SingleChildScrollView(
-                                            scrollDirection: Axis.vertical,
-                                            child: StreamBuilder(
-                                              stream: firestore
-                                                  .collection('trainees')
-                                                  .where('classId',
-                                                      isEqualTo: myClass)
-                                                  .snapshots(),
-                                              builder:
-                                                  (context, snapshotTrainee) {
-                                                if (snapshotTrainee.hasData &&
-                                                    snapshotTrainee.data !=
-                                                        null &&
-                                                    myClass.isNotEmpty) {
-                                                  List<RegisterTraineeModel>
-                                                      load = [];
-                                                  List<RegisterTraineeModel>
-                                                      traineeClass = [];
-                                                  if (snapshotTrainee
-                                                      .data!.docs.isNotEmpty) {
-                                                    snapshotTrainee.data!.docs.forEach(
-                                                        (element) => load.add(
-                                                            RegisterTraineeModel
-                                                                .fromMap(element
-                                                                    .data())));
-                                                  }
-                                                  load.forEach((e) {
-                                                    if (e.term ==
-                                                            setting.term &&
-                                                        e.yearStart ==
-                                                            setting.yearStart) {
-                                                      traineeClass.add(e);
-                                                    }
-                                                  });
-                                                  return traineeClass.isNotEmpty
-                                                      ? ListView.builder(
-                                                          itemCount:
-                                                              traineeClass
-                                                                  .length,
-                                                          shrinkWrap: true,
-                                                          itemBuilder: (context,
-                                                              indexTrain) {
-                                                            UserRegisterModel
-                                                                userRegister =
-                                                                UserRegisterModel();
-                                                            traineeClass[
-                                                                    indexTrain]
-                                                                .listRegis!
-                                                                .forEach((e1) {
-                                                              if (e1.isConfirmed ==
-                                                                  true) {
-                                                                userRegister =
-                                                                    e1;
-                                                              }
-                                                            });
-                                                            UserModel user =
-                                                                UserModel();
-                                                            users.forEach((e) {
-                                                              if (e.userId ==
-                                                                  traineeClass[
-                                                                          indexTrain]
-                                                                      .userId) {
-                                                                user = e;
-                                                              }
-                                                            });
-                                                            bool isApCB = false;
-                                                            AppreciateModel
-                                                                appreciate =
-                                                                AppreciateModel();
-                                                            appreciateCB
-                                                                .forEach(
-                                                                    (element) {
-                                                              if (element
-                                                                      .userId ==
-                                                                  traineeClass[
-                                                                          indexTrain]
-                                                                      .userId) {
-                                                                isApCB = true;
-                                                                appreciate =
-                                                                    element;
-                                                              }
-                                                            });
-                                                            bool isSubmit =
-                                                                false;
-                                                            submits.forEach(
-                                                                (element) {
-                                                              if (element
-                                                                      .userId ==
-                                                                  traineeClass[
-                                                                          indexTrain]
-                                                                      .userId) {
-                                                                isSubmit = true;
-                                                              }
-                                                            });
-                                                            return Container(
-                                                              height:
-                                                                  screenHeight *
-                                                                      0.05,
-                                                              color: indexTrain %
-                                                                          2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                              child: Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                        '${indexTrain + 1}',
-                                                                        textAlign:
-                                                                            TextAlign.center),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: Text(
-                                                                        '${traineeClass[indexTrain].userId}'
-                                                                            .toUpperCase(),
-                                                                        textAlign:
-                                                                            TextAlign.justify),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 3,
-                                                                    child: Text(
-                                                                        '${traineeClass[indexTrain].studentName}',
-                                                                        textAlign:
-                                                                            TextAlign.justify),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: isSubmit
-                                                                        ? const Icon(
-                                                                            Icons.check_circle,
-                                                                            color:
-                                                                                Colors.green,
-                                                                          )
-                                                                        : const Icon(Icons.not_interested),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: isApCB
-                                                                        ? const Icon(
-                                                                            Icons.check_circle,
-                                                                            color:
-                                                                                Colors.green,
-                                                                          )
-                                                                        : const Icon(Icons.not_interested),
-                                                                  ),
-                                                                  Expanded(
-                                                                    flex: 2,
-                                                                    child: StreamBuilder(
-                                                                        stream: firestore.collection('appreciatesCV').doc(traineeClass[indexTrain].userId).snapshots(),
-                                                                        builder: (context, snapshot) {
-                                                                          if (snapshot.hasData &&
-                                                                              snapshot.data != null &&
-                                                                              snapshot.data!.data() != null) {
-                                                                            final appre =
-                                                                                AppreciateCVModel.fromMap(snapshot.data!.data()!);
-                                                                            return Padding(
-                                                                              padding: const EdgeInsets.only(right: 10),
-                                                                              child: Text(
-                                                                                '${appre.finalTotal}/${appre.pointChar}',
-                                                                                textAlign: TextAlign.right,
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                          return const Padding(
-                                                                            padding:
-                                                                                EdgeInsets.only(right: 10),
-                                                                            child:
-                                                                                Text(
-                                                                              '-',
-                                                                              textAlign: TextAlign.right,
-                                                                            ),
-                                                                          );
-                                                                        }),
-                                                                  ),
-                                                                  userRegister.firmId !=
-                                                                          null
-                                                                      ? Expanded(
-                                                                          flex:
-                                                                              2,
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
-                                                                              IconButton(
-                                                                                  tooltip: 'Thông tin sinh viên và bảng phân công công việc',
-                                                                                  padding: const EdgeInsets.only(bottom: 1),
-                                                                                  onPressed: () {
-                                                                                    showInfo(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
-                                                                                  },
-                                                                                  icon: const Icon(
-                                                                                    Icons.info,
-                                                                                    size: 22,
-                                                                                    color: Colors.grey,
-                                                                                  )),
-                                                                              IconButton(
-                                                                                  tooltip: 'Kết quả của cán bộ hướng dẫn',
-                                                                                  padding: const EdgeInsets.only(bottom: 1),
-                                                                                  onPressed: () {
-                                                                                    if (appreciate.userId != null) {
-                                                                                      showAppreciateCB(context: context, user: user, appreciate: appreciate);
-                                                                                    } else {
-                                                                                      GV.error(context: context, message: 'Chưa có đánh giá từ cán bộ');
-                                                                                    }
-                                                                                  },
-                                                                                  icon: Icon(
-                                                                                    Icons.my_library_books,
-                                                                                    size: 22,
-                                                                                    color: Colors.blue.shade800,
-                                                                                  )),
-                                                                              StreamBuilder(
-                                                                                  stream: firestore.collection('appreciatesCV').snapshots(),
-                                                                                  builder: (context, snapshot) {
-                                                                                    if (snapshot.hasData) {
-                                                                                      appCV = snapshot.data!.docs.map((e) => AppreciateCVModel.fromMap(e.data())).toList();
-                                                                                    }
-                                                                                    return IconButton(
-                                                                                        tooltip: 'Đánh giá',
-                                                                                        padding: const EdgeInsets.only(bottom: 1),
-                                                                                        onPressed: () async {
-                                                                                          final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
-                                                                                          final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
-                                                                                          points = [];
-                                                                                          double pointCB = 0;
-                                                                                          appreciateCB.forEach((element) {
-                                                                                            if (element.userId == traineeClass[indexTrain].userId) {
-                                                                                              double totalPoint = 0;
-                                                                                              bool isOnl = false;
-                                                                                              for (var i = 0; i < element.listContent!.length; i++) {
-                                                                                                if (i < 3 && element.listContent![i].point == 0) {
-                                                                                                  isOnl = true;
-                                                                                                }
-                                                                                              }
-                                                                                              if (isOnl) {
-                                                                                                for (var i = 3; i < element.listContent!.length; i++) {
-                                                                                                  totalPoint += element.listContent![i].point!;
-                                                                                                }
-                                                                                              } else {
-                                                                                                for (var i = 0; i < element.listContent!.length; i++) {
-                                                                                                  totalPoint += element.listContent![i].point!;
-                                                                                                }
-                                                                                              }
-                                                                                              if (isOnl) {
-                                                                                                pointCB = (totalPoint / 70) * 5;
-                                                                                              } else {
-                                                                                                pointCB = (totalPoint / 100) * 5;
-                                                                                              }
-                                                                                            }
-                                                                                          });
-                                                                                          bool isAppCV = false;
-                                                                                          appCV.forEach((element) {
-                                                                                            if (element.userId == user.userId) {
-                                                                                              isAppCV = true;
-                                                                                            }
-                                                                                          });
-                                                                                          if (isAppCV) {
-                                                                                            appCV.forEach((element) {
-                                                                                              if (element.userId == user.userId) {
-                                                                                                for (int i = 0; i < 10; i++) {
-                                                                                                  points.add(TextEditingController(text: element.listPoint![i].toString()));
-                                                                                                }
-                                                                                                points.add(TextEditingController(text: element.subPoint.toString()));
-                                                                                                setState(() {
-                                                                                                  total.value = element.total!;
-                                                                                                  finalTotal.value = element.finalTotal!;
-                                                                                                });
-                                                                                              }
-                                                                                            });
-                                                                                          } else {
-                                                                                            for (int i = 0; i < 11; i++) {
-                                                                                              if (i == 3) {
-                                                                                                points.add(TextEditingController(text: pointCB.toStringAsFixed(1)));
-                                                                                              } else {
-                                                                                                points.add(TextEditingController(text: initPoint[i].toString()));
-                                                                                              }
-                                                                                            }
-                                                                                            double temp = 0;
-                                                                                            for (var i = 0; i < 10; i++) {
-                                                                                              temp += double.parse(points[i].text);
-                                                                                            }
-                                                                                            setState(() {
-                                                                                              total.value = double.parse(temp.toStringAsFixed(1));
-                                                                                              finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(1));
-                                                                                            });
-                                                                                          }
-
-                                                                                          showAppreciate(
-                                                                                            context: context,
-                                                                                            user: user,
-                                                                                            trainee: traineeClass[indexTrain],
-                                                                                            userRegister: userRegister,
-                                                                                            isUpdate: isAppCV,
-                                                                                            isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd!),
-                                                                                          );
-                                                                                        },
-                                                                                        icon: const Icon(
-                                                                                          CupertinoIcons.pencil_ellipsis_rectangle,
-                                                                                          size: 22,
-                                                                                          color: Colors.red,
-                                                                                        ));
-                                                                                  })
-                                                                            ],
-                                                                          ))
-                                                                      : const Expanded(
-                                                                          flex:
-                                                                              2,
-                                                                          child:
-                                                                              Text(
-                                                                            'Chưa có công ty',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                          ),
-                                                                        ),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      : SizedBox(
-                                                          height: screenHeight *
-                                                              0.45,
-                                                          width:
-                                                              screenWidth * 0.6,
-                                                          child: const Center(
-                                                            child: Text(
-                                                                'Chưa có sinh viên thực tập.'),
-                                                          ),
-                                                        );
-                                                } else {
-                                                  return SizedBox(
-                                                    height: screenHeight * 0.45,
-                                                    width: screenWidth * 0.6,
-                                                    child: const Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Loading(),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                            ),
-                                          )
-                                        : const Center(
-                                            child: Text(
-                                                'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
-                                          ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 35),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomButton(
-                          text: 'Xuất danh sách',
-                          width: 100,
-                          height: 40,
-                          onTap: () async {
-                            if (selectedHK != HocKy.empty &&
-                                selectedNH != NamHoc.empty) {
-                              List<RegisterTraineeModel> list = [];
-                              final loadTrainee = await firestore
-                                  .collection('trainees')
-                                  .where('classId', isEqualTo: myClass)
-                                  .where('term', isEqualTo: selectedHK)
+                            onTap: () async {
+                              final loadRequest = await firestore
+                                  .collection('requestEdits')
+                                  .where('cvId', isEqualTo: userId)
+                                  .where('term', isEqualTo: setting.term)
                                   .where('yearStart',
-                                      isEqualTo: selectedNH.start)
+                                      isEqualTo: setting.yearStart)
                                   .get();
-                              loadTrainee.docs.forEach((element) {
-                                list.add(RegisterTraineeModel.fromMap(
-                                    element.data()));
-                              });
-                              await xuatDSSVTT(
-                                  classId: myClass,
-                                  term: selectedHK,
-                                  year: selectedNH,
-                                  trainees: list);
-                            } else {
-                              List<RegisterTraineeModel> list = [];
-                              final loadTrainee = await firestore
+                              final request = RequestEditModel.fromMap(
+                                  loadRequest.docs.first.data());
+                              final load = await firestore
                                   .collection('trainees')
                                   .where('classId', isEqualTo: myClass)
                                   .where('term', isEqualTo: setting.term)
                                   .where('yearStart',
                                       isEqualTo: setting.yearStart)
                                   .get();
-                              loadTrainee.docs.forEach((element) {
-                                list.add(RegisterTraineeModel.fromMap(
-                                    element.data()));
-                              });
-                              await xuatDSSVTT(
-                                  classId: myClass,
-                                  term: setting.term!,
-                                  year: NamHoc(
-                                      start: setting.yearStart!,
-                                      end: setting.yearEnd!),
-                                  trainees: list);
-                            }
-                          },
+                              List<RegisterTraineeModel> traineeAtNow = [];
+                              if (load.docs.isNotEmpty) {
+                                load.docs.forEach((element) => traineeAtNow.add(
+                                    RegisterTraineeModel.fromMap(
+                                        element.data())));
+                              }
+                              appreciateAll(
+                                  traineeAtNow: traineeAtNow,
+                                  isClock: request.delayAt != null
+                                      ? DateTime.now()
+                                          .isAfterTimestamp(request.delayAt)
+                                      : DateTime.now().isAfterTimestamp(
+                                          setting.pointCVEnd));
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15, bottom: 25),
+                      child: Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        height: screenHeight * 0.45,
+                        width: screenWidth * 0.6,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              color: GV.fieldColor,
+                              height: screenHeight * 0.04,
+                              child: const Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'STT',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'MSSV',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      'Họ tên',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Nộp báo cáo',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Cán bộ đánh giá',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Điểm số/chữ',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Thao tác',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child:
+                                  isViewed.value &&
+                                          currentUser.isCompleted.isTrue
+                                      ? SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: StreamBuilder(
+                                            stream: firestore
+                                                .collection('trainees')
+                                                .where('classId',
+                                                    isEqualTo: myClass)
+                                                .snapshots(),
+                                            builder:
+                                                (context, snapshotTrainee) {
+                                              if (snapshotTrainee.hasData &&
+                                                  snapshotTrainee.data !=
+                                                      null) {
+                                                List<RegisterTraineeModel>
+                                                    load = [];
+                                                List<RegisterTraineeModel>
+                                                    traineeClass = [];
+                                                if (snapshotTrainee
+                                                    .data!.docs.isNotEmpty) {
+                                                  snapshotTrainee.data!.docs
+                                                      .forEach((element) => load
+                                                          .add(RegisterTraineeModel
+                                                              .fromMap(element
+                                                                  .data())));
+                                                }
+                                                load.forEach((e) {
+                                                  if (selectedHK ==
+                                                          HocKy.tatca &&
+                                                      selectedNH ==
+                                                          NamHoc.tatca) {
+                                                    traineeClass.add(e);
+                                                  } else if (selectedHK ==
+                                                      HocKy.tatca) {
+                                                    if (e.yearStart ==
+                                                        selectedNH.start) {
+                                                      traineeClass.add(e);
+                                                    }
+                                                  } else if (selectedNH ==
+                                                      NamHoc.tatca) {
+                                                    if (e.term == selectedHK) {
+                                                      traineeClass.add(e);
+                                                    }
+                                                  } else if (e.term ==
+                                                          selectedHK &&
+                                                      e.yearStart ==
+                                                          selectedNH.start) {
+                                                    traineeClass.add(e);
+                                                  }
+                                                });
+                                                return traineeClass.isNotEmpty
+                                                    ? ListView.builder(
+                                                        itemCount:
+                                                            traineeClass.length,
+                                                        shrinkWrap: true,
+                                                        itemBuilder: (context,
+                                                            indexTrain) {
+                                                          UserRegisterModel
+                                                              userRegister =
+                                                              UserRegisterModel();
+                                                          traineeClass[
+                                                                  indexTrain]
+                                                              .listRegis!
+                                                              .forEach((e1) {
+                                                            if (e1.isConfirmed ==
+                                                                true) {
+                                                              userRegister = e1;
+                                                            }
+                                                          });
+                                                          UserModel user =
+                                                              UserModel();
+                                                          users.forEach((e) {
+                                                            if (e.userId ==
+                                                                traineeClass[
+                                                                        indexTrain]
+                                                                    .userId) {
+                                                              user = e;
+                                                            }
+                                                          });
+                                                          bool isApCB = false;
+                                                          AppreciateModel
+                                                              appreciate =
+                                                              AppreciateModel();
+                                                          appreciateCB.forEach(
+                                                              (element) {
+                                                            if (element
+                                                                    .userId ==
+                                                                traineeClass[
+                                                                        indexTrain]
+                                                                    .userId) {
+                                                              isApCB = true;
+                                                              appreciate =
+                                                                  element;
+                                                            }
+                                                          });
+                                                          bool isSubmit = false;
+                                                          submits.forEach(
+                                                              (element) {
+                                                            if (element
+                                                                    .userId ==
+                                                                traineeClass[
+                                                                        indexTrain]
+                                                                    .userId) {
+                                                              isSubmit = true;
+                                                            }
+                                                          });
+                                                          return Container(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.05,
+                                                            color: indexTrain %
+                                                                        2 ==
+                                                                    0
+                                                                ? Colors.blue
+                                                                    .shade50
+                                                                : null,
+                                                            child: Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  child: Text(
+                                                                      '${indexTrain + 1}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: Text(
+                                                                      '${traineeClass[indexTrain].userId}'
+                                                                          .toUpperCase(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                      '${traineeClass[indexTrain].studentName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: isSubmit
+                                                                      ? const Icon(
+                                                                          Icons
+                                                                              .check_circle,
+                                                                          color:
+                                                                              Colors.green,
+                                                                        )
+                                                                      : const Icon(Icons.not_interested),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: isApCB
+                                                                      ? const Icon(
+                                                                          Icons
+                                                                              .check_circle,
+                                                                          color:
+                                                                              Colors.green,
+                                                                        )
+                                                                      : const Icon(
+                                                                          Icons
+                                                                              .not_interested),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child:
+                                                                      StreamBuilder(
+                                                                          stream: firestore
+                                                                              .collection('appreciatesCV')
+                                                                              .doc(traineeClass[indexTrain].userId)
+                                                                              .snapshots(),
+                                                                          builder: (context, snapshot) {
+                                                                            if (snapshot.hasData &&
+                                                                                snapshot.data != null &&
+                                                                                snapshot.data!.data() != null) {
+                                                                              final appre = AppreciateCVModel.fromMap(snapshot.data!.data()!);
+                                                                              return Padding(
+                                                                                padding: const EdgeInsets.only(right: 10),
+                                                                                child: Text(
+                                                                                  '${appre.finalTotal}/${appre.pointChar}',
+                                                                                  textAlign: TextAlign.right,
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                            return const Padding(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              child: Text(
+                                                                                '-',
+                                                                                textAlign: TextAlign.right,
+                                                                              ),
+                                                                            );
+                                                                          }),
+                                                                ),
+                                                                userRegister.firmId !=
+                                                                        null
+                                                                    ? Expanded(
+                                                                        flex: 2,
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            IconButton(
+                                                                                tooltip: 'Thông tin sinh viên và bảng phân công công việc',
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () {
+                                                                                  showInfo(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
+                                                                                },
+                                                                                icon: const Icon(
+                                                                                  Icons.info,
+                                                                                  size: 22,
+                                                                                  color: Colors.grey,
+                                                                                )),
+                                                                            IconButton(
+                                                                                tooltip: 'Kết quả của cán bộ hướng dẫn',
+                                                                                padding: const EdgeInsets.only(bottom: 1),
+                                                                                onPressed: () {
+                                                                                  if (appreciate.userId != null) {
+                                                                                    showAppreciateCB(context: context, user: user, appreciate: appreciate);
+                                                                                  } else {
+                                                                                    GV.error(context: context, message: 'Chưa có đánh giá từ cán bộ');
+                                                                                  }
+                                                                                },
+                                                                                icon: Icon(
+                                                                                  Icons.my_library_books,
+                                                                                  size: 22,
+                                                                                  color: Colors.blue.shade800,
+                                                                                )),
+                                                                            StreamBuilder(
+                                                                                stream: firestore.collection('appreciatesCV').snapshots(),
+                                                                                builder: (context, snapshot) {
+                                                                                  if (snapshot.hasData) {
+                                                                                    appCV = snapshot.data!.docs.map((e) => AppreciateCVModel.fromMap(e.data())).toList();
+                                                                                  }
+                                                                                  return IconButton(
+                                                                                      tooltip: 'Đánh giá',
+                                                                                      padding: const EdgeInsets.only(bottom: 1),
+                                                                                      onPressed: () async {
+                                                                                        final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
+                                                                                        final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                        points = [];
+                                                                                        double pointCB = 0;
+                                                                                        appreciateCB.forEach((element) {
+                                                                                          if (element.userId == traineeClass[indexTrain].userId) {
+                                                                                            double totalPoint = 0;
+                                                                                            bool isOnl = false;
+                                                                                            for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                              if (i < 3 && element.listContent![i].point == 0) {
+                                                                                                isOnl = true;
+                                                                                              }
+                                                                                            }
+                                                                                            if (isOnl) {
+                                                                                              for (var i = 3; i < element.listContent!.length; i++) {
+                                                                                                totalPoint += element.listContent![i].point!;
+                                                                                              }
+                                                                                            } else {
+                                                                                              for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                                totalPoint += element.listContent![i].point!;
+                                                                                              }
+                                                                                            }
+                                                                                            if (isOnl) {
+                                                                                              pointCB = (totalPoint / 70) * 5;
+                                                                                            } else {
+                                                                                              pointCB = (totalPoint / 100) * 5;
+                                                                                            }
+                                                                                          }
+                                                                                        });
+                                                                                        bool isAppCV = false;
+                                                                                        appCV.forEach((element) {
+                                                                                          if (element.userId == user.userId) {
+                                                                                            isAppCV = true;
+                                                                                          }
+                                                                                        });
+                                                                                        if (isAppCV) {
+                                                                                          appCV.forEach((element) {
+                                                                                            if (element.userId == user.userId) {
+                                                                                              for (int i = 0; i < 10; i++) {
+                                                                                                points.add(TextEditingController(text: element.listPoint![i].toString()));
+                                                                                              }
+                                                                                              points.add(TextEditingController(text: element.subPoint.toString()));
+                                                                                              setState(() {
+                                                                                                total.value = element.total!;
+                                                                                                finalTotal.value = element.finalTotal!;
+                                                                                              });
+                                                                                            }
+                                                                                          });
+                                                                                        } else {
+                                                                                          for (int i = 0; i < 11; i++) {
+                                                                                            if (i == 3) {
+                                                                                              points.add(TextEditingController(text: pointCB.toStringAsFixed(1)));
+                                                                                            } else {
+                                                                                              points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                                            }
+                                                                                          }
+                                                                                          double temp = 0;
+                                                                                          for (var i = 0; i < 10; i++) {
+                                                                                            temp += double.parse(points[i].text);
+                                                                                          }
+                                                                                          setState(() {
+                                                                                            total.value = double.parse(temp.toStringAsFixed(1));
+                                                                                            finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(1));
+                                                                                          });
+                                                                                        }
+
+                                                                                        showAppreciate(
+                                                                                          context: context,
+                                                                                          user: user,
+                                                                                          trainee: traineeClass[indexTrain],
+                                                                                          userRegister: userRegister,
+                                                                                          isUpdate: isAppCV,
+                                                                                          isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd),
+                                                                                        );
+                                                                                      },
+                                                                                      icon: const Icon(
+                                                                                        CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                                        size: 22,
+                                                                                        color: Colors.red,
+                                                                                      ));
+                                                                                })
+                                                                          ],
+                                                                        ))
+                                                                    : const Expanded(
+                                                                        flex: 2,
+                                                                        child:
+                                                                            Text(
+                                                                          'Chưa có công ty',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                      ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : SizedBox(
+                                                        height:
+                                                            screenHeight * 0.45,
+                                                        width:
+                                                            screenWidth * 0.6,
+                                                        child: const Center(
+                                                          child: Text(
+                                                              'Chưa có sinh viên thực tập.'),
+                                                        ),
+                                                      );
+                                              } else {
+                                                return SizedBox(
+                                                  height: screenHeight * 0.45,
+                                                  width: screenWidth * 0.6,
+                                                  child: const Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Loading(),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        )
+                                      : selectedHK == HocKy.empty &&
+                                              selectedNH == NamHoc.empty
+                                          ? SingleChildScrollView(
+                                              scrollDirection: Axis.vertical,
+                                              child: StreamBuilder(
+                                                stream: firestore
+                                                    .collection('trainees')
+                                                    .where('classId',
+                                                        isEqualTo: myClass)
+                                                    .snapshots(),
+                                                builder:
+                                                    (context, snapshotTrainee) {
+                                                  if (snapshotTrainee.hasData &&
+                                                      snapshotTrainee.data !=
+                                                          null &&
+                                                      myClass.isNotEmpty) {
+                                                    List<RegisterTraineeModel>
+                                                        load = [];
+                                                    List<RegisterTraineeModel>
+                                                        traineeClass = [];
+                                                    if (snapshotTrainee.data!
+                                                        .docs.isNotEmpty) {
+                                                      snapshotTrainee.data!.docs.forEach(
+                                                          (element) => load.add(
+                                                              RegisterTraineeModel
+                                                                  .fromMap(element
+                                                                      .data())));
+                                                    }
+                                                    load.forEach((e) {
+                                                      if (e.term == hknow &&
+                                                          e.yearStart ==
+                                                              nhnow.start) {
+                                                        traineeClass.add(e);
+                                                      }
+                                                    });
+                                                    return traineeClass
+                                                            .isNotEmpty
+                                                        ? ListView.builder(
+                                                            itemCount:
+                                                                traineeClass
+                                                                    .length,
+                                                            shrinkWrap: true,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    indexTrain) {
+                                                              UserRegisterModel
+                                                                  userRegister =
+                                                                  UserRegisterModel();
+                                                              traineeClass[
+                                                                      indexTrain]
+                                                                  .listRegis!
+                                                                  .forEach(
+                                                                      (e1) {
+                                                                if (e1.isConfirmed ==
+                                                                    true) {
+                                                                  userRegister =
+                                                                      e1;
+                                                                }
+                                                              });
+                                                              UserModel user =
+                                                                  UserModel();
+                                                              users
+                                                                  .forEach((e) {
+                                                                if (e.userId ==
+                                                                    traineeClass[
+                                                                            indexTrain]
+                                                                        .userId) {
+                                                                  user = e;
+                                                                }
+                                                              });
+                                                              bool isApCB =
+                                                                  false;
+                                                              AppreciateModel
+                                                                  appreciate =
+                                                                  AppreciateModel();
+                                                              appreciateCB
+                                                                  .forEach(
+                                                                      (element) {
+                                                                if (element
+                                                                        .userId ==
+                                                                    traineeClass[
+                                                                            indexTrain]
+                                                                        .userId) {
+                                                                  isApCB = true;
+                                                                  appreciate =
+                                                                      element;
+                                                                }
+                                                              });
+                                                              bool isSubmit =
+                                                                  false;
+                                                              submits.forEach(
+                                                                  (element) {
+                                                                if (element
+                                                                        .userId ==
+                                                                    traineeClass[
+                                                                            indexTrain]
+                                                                        .userId) {
+                                                                  isSubmit =
+                                                                      true;
+                                                                }
+                                                              });
+                                                              return Container(
+                                                                height:
+                                                                    screenHeight *
+                                                                        0.05,
+                                                                color: indexTrain %
+                                                                            2 ==
+                                                                        0
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade50
+                                                                    : null,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: Text(
+                                                                          '${indexTrain + 1}',
+                                                                          textAlign:
+                                                                              TextAlign.center),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: Text(
+                                                                          '${traineeClass[indexTrain].userId}'
+                                                                              .toUpperCase(),
+                                                                          textAlign:
+                                                                              TextAlign.justify),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 3,
+                                                                      child: Text(
+                                                                          '${traineeClass[indexTrain].studentName}',
+                                                                          textAlign:
+                                                                              TextAlign.justify),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: isSubmit
+                                                                          ? const Icon(
+                                                                              Icons.check_circle,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : const Icon(Icons.not_interested),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: isApCB
+                                                                          ? const Icon(
+                                                                              Icons.check_circle,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : const Icon(Icons.not_interested),
+                                                                    ),
+                                                                    Expanded(
+                                                                      flex: 2,
+                                                                      child: StreamBuilder(
+                                                                          stream: firestore.collection('appreciatesCV').doc(traineeClass[indexTrain].userId).snapshots(),
+                                                                          builder: (context, snapshot) {
+                                                                            if (snapshot.hasData &&
+                                                                                snapshot.data != null &&
+                                                                                snapshot.data!.data() != null) {
+                                                                              final appre = AppreciateCVModel.fromMap(snapshot.data!.data()!);
+                                                                              return Padding(
+                                                                                padding: const EdgeInsets.only(right: 10),
+                                                                                child: Text(
+                                                                                  '${appre.finalTotal}/${appre.pointChar}',
+                                                                                  textAlign: TextAlign.right,
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                            return const Padding(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              child: Text(
+                                                                                '-',
+                                                                                textAlign: TextAlign.right,
+                                                                              ),
+                                                                            );
+                                                                          }),
+                                                                    ),
+                                                                    userRegister.firmId !=
+                                                                            null
+                                                                        ? Expanded(
+                                                                            flex:
+                                                                                2,
+                                                                            child:
+                                                                                Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                IconButton(
+                                                                                    tooltip: 'Thông tin sinh viên và bảng phân công công việc',
+                                                                                    padding: const EdgeInsets.only(bottom: 1),
+                                                                                    onPressed: () {
+                                                                                      showInfo(context: context, user: user, trainee: traineeClass[indexTrain], userRegister: userRegister);
+                                                                                    },
+                                                                                    icon: const Icon(
+                                                                                      Icons.info,
+                                                                                      size: 22,
+                                                                                      color: Colors.grey,
+                                                                                    )),
+                                                                                IconButton(
+                                                                                    tooltip: 'Kết quả của cán bộ hướng dẫn',
+                                                                                    padding: const EdgeInsets.only(bottom: 1),
+                                                                                    onPressed: () {
+                                                                                      if (appreciate.userId != null) {
+                                                                                        showAppreciateCB(context: context, user: user, appreciate: appreciate);
+                                                                                      } else {
+                                                                                        GV.error(context: context, message: 'Chưa có đánh giá từ cán bộ');
+                                                                                      }
+                                                                                    },
+                                                                                    icon: Icon(
+                                                                                      Icons.my_library_books,
+                                                                                      size: 22,
+                                                                                      color: Colors.blue.shade800,
+                                                                                    )),
+                                                                                StreamBuilder(
+                                                                                    stream: firestore.collection('appreciatesCV').snapshots(),
+                                                                                    builder: (context, snapshot) {
+                                                                                      if (snapshot.hasData) {
+                                                                                        appCV = snapshot.data!.docs.map((e) => AppreciateCVModel.fromMap(e.data())).toList();
+                                                                                      }
+                                                                                      return IconButton(
+                                                                                          tooltip: 'Đánh giá',
+                                                                                          padding: const EdgeInsets.only(bottom: 1),
+                                                                                          onPressed: () async {
+                                                                                            final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
+                                                                                            final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                            points = [];
+                                                                                            double pointCB = 0;
+                                                                                            appreciateCB.forEach((element) {
+                                                                                              if (element.userId == traineeClass[indexTrain].userId) {
+                                                                                                double totalPoint = 0;
+                                                                                                bool isOnl = false;
+                                                                                                for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                                  if (i < 3 && element.listContent![i].point == 0) {
+                                                                                                    isOnl = true;
+                                                                                                  }
+                                                                                                }
+                                                                                                if (isOnl) {
+                                                                                                  for (var i = 3; i < element.listContent!.length; i++) {
+                                                                                                    totalPoint += element.listContent![i].point!;
+                                                                                                  }
+                                                                                                } else {
+                                                                                                  for (var i = 0; i < element.listContent!.length; i++) {
+                                                                                                    totalPoint += element.listContent![i].point!;
+                                                                                                  }
+                                                                                                }
+                                                                                                if (isOnl) {
+                                                                                                  pointCB = (totalPoint / 70) * 5;
+                                                                                                } else {
+                                                                                                  pointCB = (totalPoint / 100) * 5;
+                                                                                                }
+                                                                                              }
+                                                                                            });
+                                                                                            bool isAppCV = false;
+                                                                                            appCV.forEach((element) {
+                                                                                              if (element.userId == user.userId) {
+                                                                                                isAppCV = true;
+                                                                                              }
+                                                                                            });
+                                                                                            if (isAppCV) {
+                                                                                              appCV.forEach((element) {
+                                                                                                if (element.userId == user.userId) {
+                                                                                                  for (int i = 0; i < 10; i++) {
+                                                                                                    points.add(TextEditingController(text: element.listPoint![i].toString()));
+                                                                                                  }
+                                                                                                  points.add(TextEditingController(text: element.subPoint.toString()));
+                                                                                                  setState(() {
+                                                                                                    total.value = element.total!;
+                                                                                                    finalTotal.value = element.finalTotal!;
+                                                                                                  });
+                                                                                                }
+                                                                                              });
+                                                                                            } else {
+                                                                                              for (int i = 0; i < 11; i++) {
+                                                                                                if (i == 3) {
+                                                                                                  points.add(TextEditingController(text: pointCB.toStringAsFixed(1)));
+                                                                                                } else {
+                                                                                                  points.add(TextEditingController(text: initPoint[i].toString()));
+                                                                                                }
+                                                                                              }
+                                                                                              double temp = 0;
+                                                                                              for (var i = 0; i < 10; i++) {
+                                                                                                temp += double.parse(points[i].text);
+                                                                                              }
+                                                                                              setState(() {
+                                                                                                total.value = double.parse(temp.toStringAsFixed(1));
+                                                                                                finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(1));
+                                                                                              });
+                                                                                            }
+
+                                                                                            showAppreciate(
+                                                                                              context: context,
+                                                                                              user: user,
+                                                                                              trainee: traineeClass[indexTrain],
+                                                                                              userRegister: userRegister,
+                                                                                              isUpdate: isAppCV,
+                                                                                              isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd!),
+                                                                                            );
+                                                                                          },
+                                                                                          icon: const Icon(
+                                                                                            CupertinoIcons.pencil_ellipsis_rectangle,
+                                                                                            size: 22,
+                                                                                            color: Colors.red,
+                                                                                          ));
+                                                                                    })
+                                                                              ],
+                                                                            ))
+                                                                        : const Expanded(
+                                                                            flex:
+                                                                                2,
+                                                                            child:
+                                                                                Text(
+                                                                              'Chưa có công ty',
+                                                                              textAlign: TextAlign.center,
+                                                                            ),
+                                                                          ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : SizedBox(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.45,
+                                                            width: screenWidth *
+                                                                0.6,
+                                                            child: const Center(
+                                                              child: Text(
+                                                                  'Chưa có sinh viên thực tập.'),
+                                                            ),
+                                                          );
+                                                  } else {
+                                                    return SizedBox(
+                                                      height:
+                                                          screenHeight * 0.45,
+                                                      width: screenWidth * 0.6,
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Loading(),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            )
+                                          : const Center(
+                                              child: Text(
+                                                  'Vui lòng chọn học kỳ và năm học sau đó nhấn vào nút xem để tiếp tục.'),
+                                            ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 15),
-                        CustomButton(
-                          text: 'Xuất điểm',
-                          width: 100,
-                          height: 40,
-                          onTap: () async {
-                            if (selectedHK != HocKy.empty &&
-                                selectedNH != NamHoc.empty) {
-                              List<AppreciateCVModel> list = [];
-                              appCV.forEach((element) {
-                                if (selectedHK == HocKy.tatca &&
-                                    selectedNH == NamHoc.tatca) {
-                                  list.add(element);
-                                } else if (selectedHK == HocKy.tatca) {
-                                  if (element.yearStart == selectedNH.start) {
-                                    list.add(element);
-                                  }
-                                } else if (selectedNH == NamHoc.tatca) {
-                                  if (element.term == selectedHK) {
-                                    list.add(element);
-                                  }
-                                } else if (element.term == selectedHK &&
-                                    element.yearStart == selectedNH.start) {
-                                  list.add(element);
-                                }
-                              });
-                              await xuatKQTT(
-                                  classId: myClass,
-                                  term: selectedHK,
-                                  year: selectedNH,
-                                  appreciates: list);
-                            } else {
-                              List<AppreciateCVModel> list = [];
-                              appCV.forEach((element) {
-                                if (element.term == setting.term &&
-                                    element.yearStart == setting.yearStart) {
-                                  list.add(element);
-                                }
-                              });
-                              await xuatKQTT(
-                                  classId: myClass,
-                                  term: setting.term!,
-                                  year: NamHoc(
-                                      start: setting.yearStart!,
-                                      end: setting.yearEnd!),
-                                  appreciates: list);
-                            }
-                          },
-                        ),
-                        if (setting.isClockPoint != null &&
-                            DateTime.now()
-                                .isBeforeTimestamp(setting.isClockPoint)) ...[
-                          if (DateTime.now()
-                              .isAfterTimestamp(setting.pointCVEnd)) ...[
-                            StreamBuilder(
-                                stream: firestore
-                                    .collection('requestEdits')
-                                    .where('cvId', isEqualTo: userId)
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 35),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomButton(
+                            text: 'Xuất danh sách',
+                            width: 100,
+                            height: 40,
+                            onTap: () async {
+                              if (selectedHK != HocKy.empty &&
+                                  selectedNH != NamHoc.empty) {
+                                List<RegisterTraineeModel> list = [];
+                                final loadTrainee = await firestore
+                                    .collection('trainees')
+                                    .where('classId', isEqualTo: myClass)
+                                    .where('term', isEqualTo: selectedHK)
+                                    .where('yearStart',
+                                        isEqualTo: selectedNH.start)
+                                    .get();
+                                loadTrainee.docs.forEach((element) {
+                                  list.add(RegisterTraineeModel.fromMap(
+                                      element.data()));
+                                });
+                                await xuatDSSVTT(
+                                    classId: myClass,
+                                    term: selectedHK,
+                                    year: selectedNH,
+                                    trainees: list);
+                              } else {
+                                List<RegisterTraineeModel> list = [];
+                                final loadTrainee = await firestore
+                                    .collection('trainees')
+                                    .where('classId', isEqualTo: myClass)
                                     .where('term', isEqualTo: setting.term)
                                     .where('yearStart',
                                         isEqualTo: setting.yearStart)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data!.docs.isNotEmpty) {
-                                    final request = RequestEditModel.fromMap(
-                                        snapshot.data!.docs.first.data());
-                                    return request.delayAt != null
-                                        ? Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: CustomButton(
-                                              text: 'Đã duyệt yêu cầu sửa điểm',
-                                              width: 100,
-                                              height: 40,
-                                              onTap: () {},
-                                            ),
-                                          )
-                                        : Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: CustomButton(
-                                              text: 'Đã yêu cầu sửa điểm',
-                                              width: 100,
-                                              height: 40,
-                                              onTap: () {},
-                                            ),
-                                          );
-                                  } else if (snapshot.hasData &&
-                                      snapshot.data!.docs.isEmpty) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: CustomButton(
-                                        text: 'Yêu cầu sửa điểm',
-                                        width: 100,
-                                        height: 40,
-                                        onTap: () async {
-                                          requireEdit();
-                                        },
-                                      ),
-                                    );
+                                    .get();
+                                loadTrainee.docs.forEach((element) {
+                                  list.add(RegisterTraineeModel.fromMap(
+                                      element.data()));
+                                });
+                                await xuatDSSVTT(
+                                    classId: myClass,
+                                    term: setting.term!,
+                                    year: NamHoc(
+                                        start: setting.yearStart!,
+                                        end: setting.yearEnd!),
+                                    trainees: list);
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 15),
+                          CustomButton(
+                            text: 'Xuất điểm',
+                            width: 100,
+                            height: 40,
+                            onTap: () async {
+                              if (selectedHK != HocKy.empty &&
+                                  selectedNH != NamHoc.empty) {
+                                List<AppreciateCVModel> list = [];
+                                appCV.forEach((element) {
+                                  if (selectedHK == HocKy.tatca &&
+                                      selectedNH == NamHoc.tatca) {
+                                    list.add(element);
+                                  } else if (selectedHK == HocKy.tatca) {
+                                    if (element.yearStart == selectedNH.start) {
+                                      list.add(element);
+                                    }
+                                  } else if (selectedNH == NamHoc.tatca) {
+                                    if (element.term == selectedHK) {
+                                      list.add(element);
+                                    }
+                                  } else if (element.term == selectedHK &&
+                                      element.yearStart == selectedNH.start) {
+                                    list.add(element);
                                   }
-                                  return const SizedBox.shrink();
-                                })
+                                });
+                                await xuatKQTT(
+                                    classId: myClass,
+                                    term: selectedHK,
+                                    year: selectedNH,
+                                    appreciates: list);
+                              } else {
+                                List<AppreciateCVModel> list = [];
+                                appCV.forEach((element) {
+                                  if (element.term == setting.term &&
+                                      element.yearStart == setting.yearStart) {
+                                    list.add(element);
+                                  }
+                                });
+                                await xuatKQTT(
+                                    classId: myClass,
+                                    term: setting.term!,
+                                    year: NamHoc(
+                                        start: setting.yearStart!,
+                                        end: setting.yearEnd!),
+                                    appreciates: list);
+                              }
+                            },
+                          ),
+                          if (setting.isClockPoint != null &&
+                              DateTime.now()
+                                  .isBeforeTimestamp(setting.isClockPoint)) ...[
+                            if (DateTime.now()
+                                .isAfterTimestamp(setting.pointCVEnd)) ...[
+                              StreamBuilder(
+                                  stream: firestore
+                                      .collection('requestEdits')
+                                      .where('cvId', isEqualTo: userId)
+                                      .where('term', isEqualTo: setting.term)
+                                      .where('yearStart',
+                                          isEqualTo: setting.yearStart)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.docs.isNotEmpty) {
+                                      final request = RequestEditModel.fromMap(
+                                          snapshot.data!.docs.first.data());
+                                      return request.delayAt != null
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15),
+                                              child: CustomButton(
+                                                text:
+                                                    'Đã duyệt yêu cầu sửa điểm',
+                                                width: 100,
+                                                height: 40,
+                                                onTap: () {},
+                                              ),
+                                            )
+                                          : Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15),
+                                              child: CustomButton(
+                                                text: 'Đã yêu cầu sửa điểm',
+                                                width: 100,
+                                                height: 40,
+                                                onTap: () {},
+                                              ),
+                                            );
+                                    } else if (snapshot.hasData &&
+                                        snapshot.data!.docs.isEmpty) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 15),
+                                        child: CustomButton(
+                                          text: 'Yêu cầu sửa điểm',
+                                          width: 100,
+                                          height: 40,
+                                          onTap: () async {
+                                            requireEdit();
+                                          },
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  })
+                            ]
                           ]
-                        ]
-                      ],
-                    ),
-                  )
-                ],
-              );
-            })
-        : SizedBox(
-            height: screenHeight * 0.45,
-            width: screenWidth * 0.67,
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Loading(),
-              ],
-            ),
-          );
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              : SizedBox(
+                  height: screenHeight * 0.45,
+                  width: screenWidth * 0.67,
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Loading(),
+                    ],
+                  ),
+                ));
+        });
   }
 
   appreciateAll({
@@ -2238,12 +2253,16 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                               MainAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                              plan.listWork![i]
-                                                                  .content!,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .start,
+                                                            Expanded(
+                                                              child: Text(
+                                                                plan
+                                                                    .listWork![
+                                                                        i]
+                                                                    .content!,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                              ),
                                                             ),
                                                           ],
                                                         ),

@@ -100,180 +100,174 @@ class _InfoCVState extends State<InfoCV> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         backgroundColor: Colors.cyan.shade50,
-        body: Column(
-          children: [
-            const Header(),
-            Padding(
-              padding: EdgeInsets.only(
-                top: screenHeight * 0.02,
-                bottom: screenHeight * 0.02,
-                left: screenWidth * 0.08,
-                right: screenWidth * 0.08,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MenuLeft(),
-                  SizedBox(width: screenWidth * 0.03),
-                  Expanded(
-                    child: Container(
-                      constraints:
-                          BoxConstraints(minHeight: screenHeight * 0.67),
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            width: 0.1,
-                          ),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: screenHeight * 0.06,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade600,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(5.0),
-                                topRight: Radius.circular(5.0),
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              const Header(),
+              Padding(
+                padding: EdgeInsets.only(
+                  top: screenHeight * 0.02,
+                  bottom: screenHeight * 0.02,
+                  left: screenWidth * 0.08,
+                  right: screenWidth * 0.08,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MenuLeft(),
+                    SizedBox(width: screenWidth * 0.03),
+                    Expanded(
+                      child: Container(
+                        constraints:
+                            BoxConstraints(minHeight: screenHeight * 0.67),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            border: Border.all(
+                              style: BorderStyle.solid,
+                              width: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: screenHeight * 0.06,
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade600,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(5.0),
+                                  topRight: Radius.circular(5.0),
+                                ),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Quản lý thông tin",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Quản lý thông tin",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          StreamBuilder<Object>(
-                              stream: null,
-                              builder: (context, snapshot) {
-                                return Container(
-                                  padding: const EdgeInsets.only(
-                                    left: 100,
-                                    top: 20,
-                                    right: 100,
-                                  ),
-                                  width: screenWidth * 0.7,
-                                  constraints: BoxConstraints(
-                                      minHeight: screenHeight * 0.15),
-                                  child: Column(
+                            Container(
+                              padding: const EdgeInsets.only(
+                                left: 100,
+                                top: 20,
+                                right: 100,
+                              ),
+                              width: screenWidth * 0.7,
+                              constraints: BoxConstraints(
+                                  minHeight: screenHeight * 0.15),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          LineDetail(
-                                            field: "Mã cố vấn",
-                                            display: currentUser.userId.value
-                                                .toUpperCase(),
-                                          ),
-                                          LineDetail(
-                                            field: "Họ tên",
-                                            ctrl: nameCVCtrl,
-                                          ),
-                                        ],
+                                      LineDetail(
+                                        field: "Mã cố vấn",
+                                        display: currentUser.userId.value
+                                            .toUpperCase(),
                                       ),
-                                      const SizedBox(height: 25),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          LineDetail(
-                                            field: "Điện thoại",
-                                            ctrl: phoneCVCtrl,
-                                            textFormat: <TextInputFormatter>[
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly
-                                            ],
-                                          ),
-                                          LineDetail(
-                                            field: "Email",
-                                            display: email,
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 25),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          LineDetail(
-                                            field: "Mã lớp cố vấn",
-                                            display: classId,
-                                          ),
-                                          LineDetail(
-                                            field: "Tên lớp cố vấn",
-                                            display: className,
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 25),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 50),
-                                        child: CustomButton(
-                                          text: "Lưu",
-                                          width: screenWidth * 0.1,
-                                          height: screenHeight * 0.07,
-                                          onTap: () async {
-                                            if (nameCVCtrl.text !=
-                                                    currentUser
-                                                        .userName.value ||
-                                                phoneCVCtrl.text !=
-                                                    currentUser.phone.value) {
-                                              GV.usersCol
-                                                  .doc(currentUser.userId.value)
-                                                  .update({
-                                                'name': nameCVCtrl.text,
-                                                'phone': phoneCVCtrl.text,
-                                              });
-                                              currentUser.setCurrentUser(
-                                                setUserName: nameCVCtrl.text,
-                                                setPhone: phoneCVCtrl.text,
-                                              );
-                                              GV.success(
-                                                  context: context,
-                                                  message:
-                                                      'Thay đổi thành công!');
-                                            } else if (nameCVCtrl.text ==
-                                                    currentUser
-                                                        .userName.value &&
-                                                phoneCVCtrl.text ==
-                                                    currentUser.phone.value) {
-                                              GV.error(
-                                                  context: context,
-                                                  message:
-                                                      'Không có gì thay đổi!');
-                                            }
-                                          },
-                                        ),
+                                      LineDetail(
+                                        field: "Họ tên",
+                                        ctrl: nameCVCtrl,
                                       ),
                                     ],
                                   ),
-                                );
-                              }),
-                        ],
+                                  const SizedBox(height: 25),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      LineDetail(
+                                        field: "Điện thoại",
+                                        ctrl: phoneCVCtrl,
+                                        textFormat: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                      ),
+                                      LineDetail(
+                                        field: "Email",
+                                        display: email,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 25),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      LineDetail(
+                                        field: "Mã lớp cố vấn",
+                                        display: classId,
+                                      ),
+                                      LineDetail(
+                                        field: "Tên lớp cố vấn",
+                                        display: className,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 25),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 50),
+                                    child: CustomButton(
+                                      text: "Lưu",
+                                      width: screenWidth * 0.1,
+                                      height: screenHeight * 0.07,
+                                      onTap: () async {
+                                        if (nameCVCtrl.text !=
+                                                currentUser.userName.value ||
+                                            phoneCVCtrl.text !=
+                                                currentUser.phone.value) {
+                                          GV.usersCol
+                                              .doc(currentUser.userId.value)
+                                              .update({
+                                            'name': nameCVCtrl.text,
+                                            'phone': phoneCVCtrl.text,
+                                          });
+                                          currentUser.setCurrentUser(
+                                            setUserName: nameCVCtrl.text,
+                                            setPhone: phoneCVCtrl.text,
+                                          );
+                                          GV.success(
+                                              context: context,
+                                              message: 'Thay đổi thành công!');
+                                        } else if (nameCVCtrl.text ==
+                                                currentUser.userName.value &&
+                                            phoneCVCtrl.text ==
+                                                currentUser.phone.value) {
+                                          GV.error(
+                                              context: context,
+                                              message: 'Không có gì thay đổi!');
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Footer(),
-          ],
+              const Footer(),
+            ],
+          ),
         ));
   }
 }

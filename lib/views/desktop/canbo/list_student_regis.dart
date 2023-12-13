@@ -15,6 +15,7 @@ import 'package:tttt_project/models/setting_trainee_model.dart';
 import 'package:tttt_project/models/user_model.dart';
 import 'package:tttt_project/widgets/custom_button.dart';
 import 'package:tttt_project/widgets/dropdown_style.dart';
+import 'package:tttt_project/widgets/field_detail.dart';
 import 'package:tttt_project/widgets/loading.dart';
 import 'package:tttt_project/common/user_controller.dart';
 
@@ -51,12 +52,12 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
           'userId',
         )
         .toString();
+    currentUser.loadIn.value = false;
     var loadData = await GV.usersCol.get();
     if (loadData.docs.isNotEmpty) {
       loadUsers =
           loadData.docs.map((e) => UserModel.fromMap(e.data())).toList();
     }
-
     bool? isLoggedIn = sharedPref.getBool("isLoggedIn");
     if (isLoggedIn == true) {
       currentUser.setCurrentUser(
@@ -106,6 +107,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
           setCVClass: loadUser.cvClass,
         );
       }
+      currentUser.loadIn.value = true;
     }
   }
 
@@ -113,508 +115,309 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    return setting.settingId != null
-        ? ValueListenableBuilder(
-            valueListenable: isViewed,
-            builder: (context, value, child) {
-              return Column(
-                children: [
-                  if (setting.traineeStart != null &&
-                      DateTime.now().isBeforeTimestamp(setting.traineeStart))
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Text(
-                        'Bạn cần phê duyệt trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})',
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  if (setting.traineeStart != null &&
-                      DateTime.now().isAfterOrEqual(setting.traineeStart))
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Text(
-                        'Đã quá thời gian phê duyệt (${GV.readTimestamp(setting.traineeStart!)})',
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: screenWidth * 0.06,
-                              child: const Text(
-                                "Trạng thái",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            DropdownButtonHideUnderline(
-                              child: DropdownButton2<String>(
-                                isExpanded: true,
-                                hint: Center(
-                                  child: Text(
-                                    "Chọn",
-                                    style: DropdownStyle.hintStyle,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                items: dsttAll
-                                    .map((String tt) =>
-                                        DropdownMenuItem<String>(
-                                          value: tt,
-                                          child: Center(
-                                            child: Text(
-                                              tt,
-                                              style: DropdownStyle.itemStyle,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ))
-                                    .toList(),
-                                value: selectedTT != TrangThai.empty
-                                    ? selectedTT
-                                    : null,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedTT = value!;
-                                  });
-                                  currentUser.isCompleted.value = false;
-                                },
-                                buttonStyleData:
-                                    DropdownStyle.buttonStyleMedium,
-                                iconStyleData: DropdownStyle.iconStyleData,
-                                dropdownStyleData:
-                                    DropdownStyle.dropdownStyleMedium,
-                                menuItemStyleData:
-                                    DropdownStyle.menuItemStyleData,
-                              ),
-                            ),
-                          ],
+    return Obx(
+      () => currentUser.loadIn.isTrue
+          ? ValueListenableBuilder(
+              valueListenable: isViewed,
+              builder: (context, value, child) {
+                return Column(
+                  children: [
+                    if (setting.traineeStart != null &&
+                        DateTime.now().isBeforeTimestamp(setting.traineeStart))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Text(
+                          'Bạn cần phê duyệt trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})',
+                          style: const TextStyle(color: Colors.red),
                         ),
-                        const SizedBox(width: 75),
-                        CustomButton(
-                            text: 'Xem',
-                            width: 100,
-                            height: 45,
-                            onTap: () {
-                              if (selectedTT != TrangThai.empty) {
-                                setState(() {
-                                  isViewed.value = true;
-                                });
-                                currentUser.isCompleted.value = true;
-                              }
-                            })
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 35),
-                    child: Container(
-                      decoration: const BoxDecoration(color: Colors.white),
-                      height: screenHeight * 0.45,
-                      width: screenWidth * 0.55,
-                      child: Column(
+                      ),
+                    if (setting.traineeStart != null &&
+                        DateTime.now().isAfterOrEqual(setting.traineeStart))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Text(
+                          'Đã quá thời gian phê duyệt (${GV.readTimestamp(setting.traineeStart!)})',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Container(
-                            color: GV.fieldColor,
-                            height: screenHeight * 0.04,
-                            child: const Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'STT',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: screenWidth * 0.06,
+                                child: const Text(
+                                  "Trạng thái",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    'MSSV',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton2<String>(
+                                  isExpanded: true,
+                                  hint: Center(
+                                    child: Text(
+                                      "Chọn",
+                                      style: DropdownStyle.hintStyle,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
+                                  items: dsttAll
+                                      .map((String tt) =>
+                                          DropdownMenuItem<String>(
+                                            value: tt,
+                                            child: Center(
+                                              child: Text(
+                                                tt,
+                                                style: DropdownStyle.itemStyle,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: selectedTT != TrangThai.empty
+                                      ? selectedTT
+                                      : null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedTT = value!;
+                                    });
+                                    currentUser.isCompleted.value = false;
+                                  },
+                                  buttonStyleData:
+                                      DropdownStyle.buttonStyleMedium,
+                                  iconStyleData: DropdownStyle.iconStyleData,
+                                  dropdownStyleData:
+                                      DropdownStyle.dropdownStyleMedium,
+                                  menuItemStyleData:
+                                      DropdownStyle.menuItemStyleData,
                                 ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    'Họ tên',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Text(
-                                    'Vị trí ứng tuyển',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    'Trạng thái',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    'Thao tác',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          isViewed.value && currentUser.isCompleted.isTrue
-                              ? Expanded(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: StreamBuilder(
-                                      stream: firestore
-                                          .collection('firms')
-                                          .where('firmId', isEqualTo: userId)
-                                          .snapshots(),
-                                      builder: (context, snapshotFirm) {
-                                        List<FirmModel> loadFirms = [];
-                                        if (snapshotFirm.hasData &&
-                                            snapshotFirm.data != null) {
-                                          snapshotFirm.data?.docs
-                                              .forEach((element) {
-                                            loadFirms.add(FirmModel.fromMap(
-                                                element.data()));
-                                          });
-                                          listRegis = [];
-                                          FirmModel firm = FirmModel();
-                                          for (var element in loadFirms) {
-                                            if (element.firmId == userId) {
-                                              firm = element;
-                                              for (var e
-                                                  in element.listRegis!) {
-                                                if (selectedTT ==
-                                                    TrangThai.tatca) {
-                                                  listRegis.add(e);
-                                                } else {
-                                                  if (e.status == selectedTT) {
+                          const SizedBox(width: 75),
+                          CustomButton(
+                              text: 'Xem',
+                              width: 100,
+                              height: 45,
+                              onTap: () {
+                                if (selectedTT != TrangThai.empty) {
+                                  setState(() {
+                                    isViewed.value = true;
+                                  });
+                                  currentUser.isCompleted.value = true;
+                                }
+                              })
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 35),
+                      child: Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        height: screenHeight * 0.45,
+                        width: screenWidth * 0.55,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              color: GV.fieldColor,
+                              height: screenHeight * 0.04,
+                              child: const Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'STT',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      'MSSV',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Text(
+                                      'Họ tên',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Text(
+                                      'Vị trí ứng tuyển',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      'Trạng thái',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      'Thao tác',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            isViewed.value && currentUser.isCompleted.isTrue
+                                ? Expanded(
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: StreamBuilder(
+                                        stream: firestore
+                                            .collection('firms')
+                                            .where('firmId', isEqualTo: userId)
+                                            .snapshots(),
+                                        builder: (context, snapshotFirm) {
+                                          List<FirmModel> loadFirms = [];
+                                          if (snapshotFirm.hasData &&
+                                              snapshotFirm.data != null) {
+                                            snapshotFirm.data?.docs
+                                                .forEach((element) {
+                                              loadFirms.add(FirmModel.fromMap(
+                                                  element.data()));
+                                            });
+                                            listRegis = [];
+                                            FirmModel firm = FirmModel();
+                                            for (var element in loadFirms) {
+                                              if (element.firmId == userId) {
+                                                firm = element;
+                                                for (var e
+                                                    in element.listRegis!) {
+                                                  if (selectedTT ==
+                                                      TrangThai.tatca) {
                                                     listRegis.add(e);
+                                                  } else {
+                                                    if (e.status ==
+                                                        selectedTT) {
+                                                      listRegis.add(e);
+                                                    }
                                                   }
                                                 }
                                               }
                                             }
-                                          }
-                                          listRegis.sort(
-                                            (a, b) =>
-                                                b.status!.compareTo(a.status!),
-                                          );
-                                          return listRegis.isNotEmpty
-                                              ? ListView.builder(
-                                                  itemCount: listRegis.length,
-                                                  shrinkWrap: true,
-                                                  itemBuilder:
-                                                      (context, indexRegis) {
-                                                    return Container(
-                                                      height:
-                                                          screenHeight * 0.05,
-                                                      color: indexRegis % 2 == 0
-                                                          ? Colors.blue.shade50
-                                                          : null,
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child: Text(
-                                                                '${indexRegis + 1}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 3,
-                                                            child: Text(
-                                                                '${listRegis[indexRegis].userId}'
-                                                                    .toUpperCase(),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .justify,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 4,
-                                                            child: Text(
-                                                                '${listRegis[indexRegis].userName}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .justify,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 5,
-                                                            child: Text(
-                                                                '${listRegis[indexRegis].jobName}',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .justify,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 3,
-                                                            child: Text(
-                                                                listRegis[indexRegis]
-                                                                        .isConfirmed!
-                                                                    ? 'Thực tập'
-                                                                    : listRegis[indexRegis].status! ==
-                                                                            TrangThai
-                                                                                .accept
-                                                                        ? 'Chờ xác nhận'
-                                                                        : listRegis[indexRegis]
-                                                                            .status!,
-                                                                style: const TextStyle(
-                                                                    color: Colors
-                                                                        .red),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .justify,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis),
-                                                          ),
-                                                          Expanded(
-                                                            flex: 2,
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                IconButton(
-                                                                    tooltip:
-                                                                        'Thông tin và xét duyệt',
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        bottom:
-                                                                            1),
-                                                                    onPressed:
-                                                                        () async {
-                                                                      final loadCV = await firestore
-                                                                          .collection(
-                                                                              'cvs')
-                                                                          .doc(listRegis[indexRegis]
-                                                                              .userId)
-                                                                          .get();
-                                                                      CVModel?
-                                                                          cv;
-                                                                      if (loadCV
-                                                                              .data() !=
-                                                                          null) {
-                                                                        cv = CVModel.fromMap(
-                                                                            loadCV.data()!);
-                                                                      }
-                                                                      loadUsers
-                                                                          .forEach(
-                                                                              (element) {
-                                                                        if (element.userId ==
-                                                                            listRegis[indexRegis].userId) {
-                                                                          user =
-                                                                              element;
-                                                                        }
-                                                                      });
-                                                                      showInfoAndReply(
-                                                                          context:
-                                                                              context,
-                                                                          jobRegister: listRegis[
-                                                                              indexRegis],
-                                                                          firm:
-                                                                              firm,
-                                                                          cv: cv);
-                                                                    },
-                                                                    icon: Icon(
-                                                                        CupertinoIcons
-                                                                            .pencil_outline,
-                                                                        size:
-                                                                            22,
-                                                                        color: Colors
-                                                                            .blue
-                                                                            .shade900))
-                                                              ],
+                                            listRegis.sort(
+                                              (a, b) => b.status!
+                                                  .compareTo(a.status!),
+                                            );
+                                            return listRegis.isNotEmpty
+                                                ? ListView.builder(
+                                                    itemCount: listRegis.length,
+                                                    shrinkWrap: true,
+                                                    itemBuilder:
+                                                        (context, indexRegis) {
+                                                      return Container(
+                                                        height:
+                                                            screenHeight * 0.05,
+                                                        color:
+                                                            indexRegis % 2 == 0
+                                                                ? Colors.blue
+                                                                    .shade50
+                                                                : null,
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                  '${indexRegis + 1}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                )
-                                              : SizedBox(
-                                                  height: screenHeight * 0.45,
-                                                  width: screenWidth * 0.55,
-                                                  child: const Center(
-                                                      child: Text(
-                                                          'Chưa có sinh viên đăng ký.')),
-                                                );
-                                        } else {
-                                          return SizedBox(
-                                            height: screenHeight * 0.45,
-                                            width: screenWidth * 0.55,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Loading(),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                )
-                              : selectedTT == TrangThai.empty
-                                  ? Expanded(
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.vertical,
-                                        child: StreamBuilder(
-                                          stream: firestore
-                                              .collection('firms')
-                                              .where('firmId',
-                                                  isEqualTo: userId)
-                                              .snapshots(),
-                                          builder: (context, snapshotFirm) {
-                                            List<FirmModel> loadFirms = [];
-                                            if (snapshotFirm.hasData &&
-                                                snapshotFirm.data != null) {
-                                              snapshotFirm.data?.docs
-                                                  .forEach((element) {
-                                                loadFirms.add(FirmModel.fromMap(
-                                                    element.data()));
-                                              });
-                                              listRegis = [];
-                                              FirmModel firm = FirmModel();
-                                              for (var element in loadFirms) {
-                                                if (element.firmId == userId) {
-                                                  firm = element;
-                                                  for (var e
-                                                      in element.listRegis!) {
-                                                    listRegis.add(e);
-                                                  }
-                                                }
-                                              }
-                                              listRegis.sort(
-                                                (a, b) => b.status!
-                                                    .compareTo(a.status!),
-                                              );
-                                              return listRegis.isNotEmpty
-                                                  ? ListView.builder(
-                                                      itemCount:
-                                                          listRegis.length,
-                                                      shrinkWrap: true,
-                                                      itemBuilder: (context,
-                                                          indexRegis) {
-                                                        return Container(
-                                                          height: screenHeight *
-                                                              0.05,
-                                                          color:
-                                                              indexRegis % 2 ==
-                                                                      0
-                                                                  ? Colors.blue
-                                                                      .shade50
-                                                                  : null,
-                                                          child: Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child: Text(
-                                                                    '${indexRegis + 1}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 3,
-                                                                child: Text(
-                                                                    '${listRegis[indexRegis].userId}'
-                                                                        .toUpperCase(),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 4,
-                                                                child: Text(
-                                                                    '${listRegis[indexRegis].userName}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 5,
-                                                                child: Text(
-                                                                    '${listRegis[indexRegis].jobName}',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 3,
-                                                                child: Text(
-                                                                    listRegis[indexRegis]
-                                                                            .isConfirmed!
-                                                                        ? 'Thực tập'
-                                                                        : listRegis[indexRegis].status! ==
-                                                                                TrangThai
-                                                                                    .accept
-                                                                            ? 'Chờ xác nhận'
-                                                                            : listRegis[indexRegis]
-                                                                                .status!,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .red),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .justify,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis),
-                                                              ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    IconButton(
+                                                            Expanded(
+                                                              flex: 3,
+                                                              child: Text(
+                                                                  '${listRegis[indexRegis].userId}'
+                                                                      .toUpperCase(),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 4,
+                                                              child: Text(
+                                                                  '${listRegis[indexRegis].userName}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 5,
+                                                              child: Text(
+                                                                  '${listRegis[indexRegis].jobName}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 3,
+                                                              child: Text(
+                                                                  listRegis[indexRegis]
+                                                                          .isConfirmed!
+                                                                      ? 'Thực tập'
+                                                                      : listRegis[indexRegis].status! ==
+                                                                              TrangThai
+                                                                                  .accept
+                                                                          ? 'Chờ xác nhận'
+                                                                          : listRegis[indexRegis]
+                                                                              .status!,
+                                                                  style: const TextStyle(
+                                                                      color: Colors
+                                                                          .red),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 2,
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  IconButton(
                                                                       tooltip:
                                                                           'Thông tin và xét duyệt',
                                                                       padding: const EdgeInsets
@@ -624,7 +427,7 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                       onPressed:
                                                                           () async {
                                                                         final loadCV = await firestore
-                                                                            .collection('cvs')
+                                                                            .collection('profiles')
                                                                             .doc(listRegis[indexRegis].userId)
                                                                             .get();
                                                                         CVModel?
@@ -657,64 +460,264 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                                                                               22,
                                                                           color: Colors
                                                                               .blue
-                                                                              .shade900),
-                                                                    )
-                                                                  ],
-                                                                ),
+                                                                              .shade900))
+                                                                ],
                                                               ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : SizedBox(
-                                                      height:
-                                                          screenHeight * 0.45,
-                                                      width: screenWidth * 0.55,
-                                                      child: const Center(
-                                                          child: Text(
-                                                              'Chưa có sinh viên đăng ký.')),
-                                                    );
-                                            } else {
-                                              return SizedBox(
-                                                height: screenHeight * 0.45,
-                                                width: screenWidth * 0.55,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Loading(),
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    )
-                                  : const Expanded(
-                                      child: Center(
-                                        child: Text(
-                                            'Vui lòng nhấn vào nút xem để tiếp tục.'),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  )
+                                                : SizedBox(
+                                                    height: screenHeight * 0.45,
+                                                    width: screenWidth * 0.55,
+                                                    child: const Center(
+                                                        child: Text(
+                                                            'Chưa có sinh viên đăng ký.')),
+                                                  );
+                                          } else {
+                                            return SizedBox(
+                                              height: screenHeight * 0.45,
+                                              width: screenWidth * 0.55,
+                                              child: const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Loading(),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        },
                                       ),
                                     ),
-                        ],
+                                  )
+                                : selectedTT == TrangThai.empty
+                                    ? Expanded(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.vertical,
+                                          child: StreamBuilder(
+                                            stream: firestore
+                                                .collection('firms')
+                                                .where('firmId',
+                                                    isEqualTo: userId)
+                                                .snapshots(),
+                                            builder: (context, snapshotFirm) {
+                                              List<FirmModel> loadFirms = [];
+                                              if (snapshotFirm.hasData &&
+                                                  snapshotFirm.data != null) {
+                                                snapshotFirm.data?.docs
+                                                    .forEach((element) {
+                                                  loadFirms.add(
+                                                      FirmModel.fromMap(
+                                                          element.data()));
+                                                });
+                                                listRegis = [];
+                                                FirmModel firm = FirmModel();
+                                                for (var element in loadFirms) {
+                                                  if (element.firmId ==
+                                                      userId) {
+                                                    firm = element;
+                                                    for (var e
+                                                        in element.listRegis!) {
+                                                      listRegis.add(e);
+                                                    }
+                                                  }
+                                                }
+                                                listRegis.sort(
+                                                  (a, b) => b.status!
+                                                      .compareTo(a.status!),
+                                                );
+                                                return listRegis.isNotEmpty
+                                                    ? ListView.builder(
+                                                        itemCount:
+                                                            listRegis.length,
+                                                        shrinkWrap: true,
+                                                        itemBuilder: (context,
+                                                            indexRegis) {
+                                                          return Container(
+                                                            height:
+                                                                screenHeight *
+                                                                    0.05,
+                                                            color: indexRegis %
+                                                                        2 ==
+                                                                    0
+                                                                ? Colors.blue
+                                                                    .shade50
+                                                                : null,
+                                                            child: Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  child: Text(
+                                                                      '${indexRegis + 1}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                      '${listRegis[indexRegis].userId}'
+                                                                          .toUpperCase(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 4,
+                                                                  child: Text(
+                                                                      '${listRegis[indexRegis].userName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 5,
+                                                                  child: Text(
+                                                                      '${listRegis[indexRegis].jobName}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                      listRegis[indexRegis]
+                                                                              .isConfirmed!
+                                                                          ? 'Thực tập'
+                                                                          : listRegis[indexRegis].status! ==
+                                                                                  TrangThai
+                                                                                      .accept
+                                                                              ? 'Chờ xác nhận'
+                                                                              : listRegis[indexRegis]
+                                                                                  .status!,
+                                                                      style: const TextStyle(
+                                                                          color: Colors
+                                                                              .red),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 2,
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      IconButton(
+                                                                        tooltip:
+                                                                            'Thông tin và xét duyệt',
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            bottom:
+                                                                                1),
+                                                                        onPressed:
+                                                                            () async {
+                                                                          final loadCV = await firestore
+                                                                              .collection('profiles')
+                                                                              .doc(listRegis[indexRegis].userId)
+                                                                              .get();
+                                                                          CVModel?
+                                                                              cv;
+                                                                          if (loadCV.data() !=
+                                                                              null) {
+                                                                            cv =
+                                                                                CVModel.fromMap(loadCV.data()!);
+                                                                          }
+                                                                          loadUsers
+                                                                              .forEach((element) {
+                                                                            if (element.userId ==
+                                                                                listRegis[indexRegis].userId) {
+                                                                              user = element;
+                                                                            }
+                                                                          });
+                                                                          showInfoAndReply(
+                                                                              context: context,
+                                                                              jobRegister: listRegis[indexRegis],
+                                                                              firm: firm,
+                                                                              cv: cv);
+                                                                        },
+                                                                        icon: Icon(
+                                                                            CupertinoIcons
+                                                                                .pencil_outline,
+                                                                            size:
+                                                                                22,
+                                                                            color:
+                                                                                Colors.blue.shade900),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : SizedBox(
+                                                        height:
+                                                            screenHeight * 0.45,
+                                                        width:
+                                                            screenWidth * 0.55,
+                                                        child: const Center(
+                                                            child: Text(
+                                                                'Chưa có sinh viên đăng ký.')),
+                                                      );
+                                              } else {
+                                                return SizedBox(
+                                                  height: screenHeight * 0.45,
+                                                  width: screenWidth * 0.55,
+                                                  child: const Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Loading(),
+                                                    ],
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    : const Expanded(
+                                        child: Center(
+                                          child: Text(
+                                              'Vui lòng nhấn vào nút xem để tiếp tục.'),
+                                        ),
+                                      ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                );
+              })
+          : SizedBox(
+              height: screenHeight * 0.45,
+              width: screenWidth * 0.67,
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Loading(),
                 ],
-              );
-            })
-        : SizedBox(
-            height: screenHeight * 0.45,
-            width: screenWidth * 0.67,
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Loading(),
-              ],
+              ),
             ),
-          );
+    );
   }
 
   showInfoAndReply(
@@ -789,40 +792,122 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text(
-                                  'Mã sinh viên: ${user.userId!.toUpperCase()}'),
-                              Text(
-                                'Họ tên: ${user.userName!}',
-                              ),
-                              Text(
-                                'Ngành: ${user.major!}',
-                              ),
-                              Text(
-                                'Email: ${user.email!}',
-                              ),
-                              Text(
-                                'Số điện thoại: ${user.phone!}',
-                              ),
-                              if (cv != null) ...[
-                                Text(
-                                  'Kỹ năng: ${cv.skill}',
+                              FieldDetail(
+                                  field: 'Mã sinh viên',
+                                  content: '${user.userId!.toUpperCase()}'),
+                              FieldDetail(
+                                  field: 'Họ tên',
+                                  content: '${user.userName!}'),
+                              FieldDetail(
+                                  field: 'Ngành', content: '${user.major!}'),
+                              FieldDetail(
+                                  field: 'Email', content: '${user.email!}'),
+                              FieldDetail(
+                                  field: 'Số điện thoại',
+                                  content: '${user.phone!}'),
+                              if (cv != null)
+                                FieldDetail(
+                                    field: 'Mô tả bản thân',
+                                    content: '${cv.description}'),
+                              if (cv != null)
+                                const Text(
+                                  'Kỹ năng (mức độ thông thạo kỹ năng, được đánh giá trên thang điểm từ 1 đến 5)',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                Text(
-                                  'Nguyện vọng: ${cv.wish}',
+                              if (cv != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 15),
+                                  child: Table(
+                                    columnWidths: Map.from({
+                                      0: const FlexColumnWidth(2),
+                                      1: const FlexColumnWidth(2),
+                                      2: const FlexColumnWidth(3),
+                                    }),
+                                    children: [
+                                      TableRow(children: [
+                                        Row(
+                                          children: [
+                                            const Text('Ngoại ngữ: '),
+                                            Text(
+                                              '${cv.language}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text('Kỹ năng lập trình: '),
+                                            Text(
+                                              '${cv.programming}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text(
+                                                'Kỹ năng làm việc nhóm: '),
+                                            Text(
+                                              '${cv.skillGroup}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                      ]),
+                                      TableRow(children: [
+                                        Row(
+                                          children: [
+                                            const Text('Máy học, AI: '),
+                                            Text(
+                                              '${cv.machineAI}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text('Website: '),
+                                            Text(
+                                              '${cv.website}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text('Ứng dụng di động: '),
+                                            Text(
+                                              '${cv.mobile}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                      ]),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                              Text(
-                                'Vị tri ứng tuyển: ${jobRegister.jobName}',
-                              ),
-                              Text(
-                                'Ngày ứng tuyển: ${GV.readTimestamp(jobRegister.createdAt!)}',
-                              ),
-                              Text(
-                                  'Thực tập: Từ ngày: ${GV.readTimestamp(loadTrainee.traineeStart!)} - Đến ngày: ${GV.readTimestamp(loadTrainee.traineeEnd!)}'),
+                              FieldDetail(
+                                  field: 'Vị tri ứng tuyển',
+                                  content: '${jobRegister.jobName}'),
+                              FieldDetail(
+                                  field: 'Ngày ứng tuyển',
+                                  content:
+                                      '${GV.readTimestamp(jobRegister.createdAt!)}'),
+                              FieldDetail(
+                                  field: 'Thực tập',
+                                  content:
+                                      'Từ ngày ${GV.readTimestamp(loadTrainee.traineeStart!)} - Đến ngày ${GV.readTimestamp(loadTrainee.traineeEnd!)}'),
                               if (jobRegister.status == TrangThai.accept)
-                                Text(
-                                  'Ngày duyệt: ${GV.readTimestamp(jobRegister.repliedAt!)}',
-                                ),
+                                FieldDetail(
+                                    field: 'Ngày duyệt',
+                                    content:
+                                        '${GV.readTimestamp(jobRegister.repliedAt!)}'),
                               if (DateTime.now()
                                   .isAfterOrEqual(setting.traineeStart))
                                 const Padding(

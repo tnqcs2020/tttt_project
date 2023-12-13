@@ -6,6 +6,7 @@ class FirmModel {
   String? firmId, firmName, email, phone, owner, describe, address;
   List<JobPositionModel>? listJob;
   List<JobRegisterModel>? listRegis;
+  List<int>? tieuChi;
 
   FirmModel({
     this.firmId,
@@ -17,6 +18,7 @@ class FirmModel {
     this.address,
     this.listJob,
     this.listRegis,
+    this.tieuChi,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,6 +32,7 @@ class FirmModel {
       'address': address,
       'listJob': listJob!.map((i) => i.toMap()).toList(),
       'listRegis': listRegis!.map((i) => i.toMap()).toList(),
+      'tieuChi': tieuChi,
     };
   }
 
@@ -48,6 +51,7 @@ class FirmModel {
       listRegis: data['listRegis']
           .map<JobRegisterModel>((i) => JobRegisterModel.fromMap(i))
           .toList(),
+      tieuChi: (data['tieuChi'] as List).map((item) => item as int).toList(),
     );
   }
 

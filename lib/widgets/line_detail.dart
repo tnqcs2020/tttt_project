@@ -48,6 +48,7 @@ class LineDetail extends StatelessWidget {
             minLines: minLines,
             maxLines: 100,
             style: const TextStyle(color: Colors.black),
+            textAlign: TextAlign.justify,
             decoration: InputDecoration(
               hintText: display != null && ctrl == null ? display : null,
               hintStyle: const TextStyle(color: Colors.black87),

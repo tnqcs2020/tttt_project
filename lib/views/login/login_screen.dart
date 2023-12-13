@@ -23,32 +23,40 @@ class LogInScreen extends StatelessWidget {
           children: [
             Container(
               color: Colors.blue.shade600,
-              height: screenHeight * 0.12,
+              height: screenHeight * 0.15,
               padding: EdgeInsets.only(
-                left: screenWidth * 0.08,
-                right: screenWidth * 0.08,
+                left: screenWidth * 0.1,
+                right: screenWidth * 0.1,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        "Hệ thống quản lý thực tập thực tế",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-                      Text(
-                        "Trường Công nghệ Thông tin và Truyền thông",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white),
+                      Image(
+                          image: AssetImage('assets/images/LOGO CICT-06.png')),
+                      SizedBox(width: 5),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hệ thống quản lý thực tập thực tế",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            "Trường Công nghệ Thông tin và Truyền thông",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -46,7 +46,8 @@ flutter:
 
   assets:
     - assets/
-    - assets/logo.png
+    - assets/images/
+    - assets/images/LOGO CICT-06.png
 
   fonts:
     - family: OpenSans

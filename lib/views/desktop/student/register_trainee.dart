@@ -52,6 +52,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   SettingTraineeModel setting = SettingTraineeModel();
   List<CreditModel> credits = [];
   AppreciateCVModel appreciate = AppreciateCVModel();
+  SettingTraineeModel settingTraineeUser = SettingTraineeModel();
 
   @override
   void initState() {
@@ -129,7 +130,6 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
         if (isExitTrainee.data() != null) {
           RegisterTraineeModel loadTrainee =
               RegisterTraineeModel.fromMap(isExitTrainee.data()!);
-
           if (loadTrainee.traineeStart == null &&
               loadTrainee.traineeEnd == null) {
             QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
@@ -142,12 +142,30 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             if (isExistSettingTrainee.docs.isNotEmpty) {
               final settingTrainee = SettingTraineeModel.fromMap(
                   isExistSettingTrainee.docs.first.data());
+              setState(() {
+                settingTraineeUser = settingTrainee;
+              });
               firestore.collection('trainees').doc(userId).update({
                 'traineeStart': settingTrainee.traineeStart,
                 'traineeEnd': settingTrainee.traineeEnd,
               });
               loadTrainee.traineeStart = settingTrainee.traineeStart;
               loadTrainee.traineeEnd = settingTrainee.traineeEnd;
+            }
+          } else {
+            QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
+                await firestore
+                    .collection('settingTrainees')
+                    .where('term', isEqualTo: loadTrainee.term)
+                    .where('yearStart', isEqualTo: loadTrainee.yearStart)
+                    .where('yearEnd', isEqualTo: loadTrainee.yearEnd)
+                    .get();
+            if (isExistSettingTrainee.docs.isNotEmpty) {
+              final settingTrainee = SettingTraineeModel.fromMap(
+                  isExistSettingTrainee.docs.first.data());
+              setState(() {
+                settingTraineeUser = settingTrainee;
+              });
             }
           }
           var isHasFirm = false;
@@ -329,22 +347,53 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             EasyStep(
                                               icon:
                                                   const Icon(Icons.edit_square),
-                                              customTitle: Text(
-                                                'Đăng ký',
-                                                style: TextStyle(
-                                                    color: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            0
-                                                        ? Colors.black
-                                                        : Colors.blue.shade900,
-                                                    fontWeight: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            0
-                                                        ? FontWeight.bold
-                                                        : null),
-                                                textAlign: TextAlign.center,
+                                              customTitle: Column(
+                                                children: [
+                                                  Text(
+                                                    'Đăng ký',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                0
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                0
+                                                            ? FontWeight.bold
+                                                            : null),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    settingTraineeUser
+                                                                .regisStart !=
+                                                            null
+                                                        ? '${GV.readTimestamp(settingTraineeUser.regisStart!)} - ${GV.readTimestamp(settingTraineeUser.regisEnd!)}'
+                                                        : setting.regisStart !=
+                                                                null
+                                                            ? '${GV.readTimestamp(setting.regisStart!)} - ${GV.readTimestamp(setting.regisEnd!)}'
+                                                            : '',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                0
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                0
+                                                            ? FontWeight.bold
+                                                            : null,
+                                                        fontSize: 11),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
                                               enabled: _allowTabStepping(
                                                   0, StepEnabling.sequential),
@@ -352,22 +401,53 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             EasyStep(
                                               icon: const Icon(
                                                   CupertinoIcons.house_fill),
-                                              customTitle: Text(
-                                                'Công ty',
-                                                style: TextStyle(
-                                                    color: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            1
-                                                        ? Colors.black
-                                                        : Colors.blue.shade900,
-                                                    fontWeight: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            1
-                                                        ? FontWeight.bold
-                                                        : null),
-                                                textAlign: TextAlign.center,
+                                              customTitle: Column(
+                                                children: [
+                                                  Text(
+                                                    'Công ty',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                1
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                1
+                                                            ? FontWeight.bold
+                                                            : null),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    settingTraineeUser
+                                                                .regisEnd !=
+                                                            null
+                                                        ? '${GV.readTimestampAfter(settingTraineeUser.regisEnd!)} - ${GV.readTimestampBefore(settingTraineeUser.traineeStart!)}'
+                                                        : setting.regisEnd !=
+                                                                null
+                                                            ? '${GV.readTimestampAfter(setting.regisEnd!)} - ${GV.readTimestampBefore(setting.traineeStart!)}'
+                                                            : '',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                1
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                1
+                                                            ? FontWeight.bold
+                                                            : null,
+                                                        fontSize: 11),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
                                               enabled: _allowTabStepping(
                                                   1, StepEnabling.sequential),
@@ -375,22 +455,53 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             EasyStep(
                                               icon: const Icon(CupertinoIcons
                                                   .desktopcomputer),
-                                              customTitle: Text(
-                                                'Thực tập',
-                                                style: TextStyle(
-                                                    color: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            2
-                                                        ? Colors.black
-                                                        : Colors.blue.shade900,
-                                                    fontWeight: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            2
-                                                        ? FontWeight.bold
-                                                        : null),
-                                                textAlign: TextAlign.center,
+                                              customTitle: Column(
+                                                children: [
+                                                  Text(
+                                                    'Thực tập',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                2
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                2
+                                                            ? FontWeight.bold
+                                                            : null),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    settingTraineeUser
+                                                                .traineeStart !=
+                                                            null
+                                                        ? '${GV.readTimestamp(settingTraineeUser.traineeStart!)} - ${GV.readTimestamp(settingTraineeUser.traineeEnd!)}'
+                                                        : setting.traineeStart !=
+                                                                null
+                                                            ? '${GV.readTimestamp(setting.traineeStart!)} - ${GV.readTimestamp(setting.traineeEnd!)}'
+                                                            : '',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                2
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                2
+                                                            ? FontWeight.bold
+                                                            : null,
+                                                        fontSize: 11),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
                                               enabled: _allowTabStepping(
                                                   2, StepEnabling.sequential),
@@ -398,22 +509,53 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             EasyStep(
                                               icon: const Icon(
                                                   CupertinoIcons.doc_fill),
-                                              customTitle: Text(
-                                                'Nộp tài liệu',
-                                                style: TextStyle(
-                                                    color: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            3
-                                                        ? Colors.black
-                                                        : Colors.blue.shade900,
-                                                    fontWeight: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            3
-                                                        ? FontWeight.bold
-                                                        : null),
-                                                textAlign: TextAlign.center,
+                                              customTitle: Column(
+                                                children: [
+                                                  Text(
+                                                    'Nộp tài liệu',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                3
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                3
+                                                            ? FontWeight.bold
+                                                            : null),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    settingTraineeUser
+                                                                .traineeEnd !=
+                                                            null
+                                                        ? '${GV.readTimestampAfter(settingTraineeUser.traineeEnd!)} - ${GV.readTimestamp(settingTraineeUser.submitEnd!)}'
+                                                        : setting.traineeEnd !=
+                                                                null
+                                                            ? '${GV.readTimestampAfter(setting.traineeEnd!)} - ${GV.readTimestamp(setting.submitEnd!)}'
+                                                            : '',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                3
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                3
+                                                            ? FontWeight.bold
+                                                            : null,
+                                                        fontSize: 11),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
                                               enabled: _allowTabStepping(
                                                   3, StepEnabling.sequential),
@@ -424,22 +566,57 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                                     .checkmark_seal_fill,
                                                 grade: 5,
                                               ),
-                                              customTitle: Text(
-                                                'Kết quả',
-                                                style: TextStyle(
-                                                    color: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            4
-                                                        ? Colors.black
-                                                        : Colors.blue.shade900,
-                                                    fontWeight: currentUser
-                                                                .selectedStep
-                                                                .value ==
-                                                            4
-                                                        ? FontWeight.bold
-                                                        : null),
-                                                textAlign: TextAlign.center,
+                                              customTitle: Column(
+                                                children: [
+                                                  Text(
+                                                    'Kết quả',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                4
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                4
+                                                            ? FontWeight.bold
+                                                            : null),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(
+                                                    settingTraineeUser
+                                                                .pointCVEnd !=
+                                                            null
+                                                        ? GV.readTimestampAfter(
+                                                            settingTraineeUser
+                                                                .pointCVEnd!)
+                                                        : setting.pointCVEnd !=
+                                                                null
+                                                            ? GV.readTimestampAfter(
+                                                                setting
+                                                                    .pointCVEnd!)
+                                                            : '',
+                                                    style: TextStyle(
+                                                        color: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                4
+                                                            ? Colors.black
+                                                            : Colors
+                                                                .blue.shade900,
+                                                        fontWeight: currentUser
+                                                                    .selectedStep
+                                                                    .value ==
+                                                                4
+                                                            ? FontWeight.bold
+                                                            : null,
+                                                        fontSize: 11),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
                                               enabled: _allowTabStepping(
                                                   4, StepEnabling.sequential),
@@ -463,10 +640,13 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             }
                                           },
                                         ),
-                                        const Divider(
-                                          thickness: 0.1,
-                                          height: 0,
-                                          color: Colors.black,
+                                        const Padding(
+                                          padding: EdgeInsets.only(top: 10),
+                                          child: Divider(
+                                            thickness: 0.1,
+                                            height: 0,
+                                            color: Colors.black,
+                                          ),
                                         ),
                                         switch (
                                             currentUser.selectedStep.value) {
@@ -509,7 +689,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                 minHeight: screenHeight * 0.5, maxWidth: screenWidth * 0.5),
             child: Column(
               children: [
-                if (setting.regisStart != null && setting.regisEnd != null)
+                if (settingTraineeUser.regisStart != null &&
+                    setting.regisEnd != null)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -951,8 +1132,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         child: Loading(),
                       );
                     })
-                : setting.traineeStart != null &&
-                        DateTime.now().isBeforeTimestamp(setting.traineeStart)
+                : settingTraineeUser.traineeStart != null &&
+                        DateTime.now()
+                            .isBeforeTimestamp(settingTraineeUser.traineeStart)
                     ? loadTrainee.listRegis != null &&
                             loadTrainee.listRegis!.isNotEmpty
                         ? listAccepted.isNotEmpty
@@ -969,7 +1151,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                     ),
                                     if (setting.traineeStart != null)
                                       Text(
-                                          'Bạn cần xác nhận trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                          'Bạn cần xác nhận trước ngày thực tập (${GV.readTimestamp(settingTraineeUser.traineeStart!)})'),
                                     const SizedBox(height: 15),
                                     SizedBox(
                                       width: screenWidth * 0.5,
@@ -1250,9 +1432,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    if (setting.traineeStart != null)
+                                    if (settingTraineeUser.traineeStart != null)
                                       Text(
-                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})'),
+                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(settingTraineeUser.traineeStart!)})'),
                                     const SizedBox(height: 35),
                                     CustomButton(
                                       text: "Ứng tuyển thêm",
@@ -1285,9 +1467,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    if (setting.traineeStart != null)
+                                    if (settingTraineeUser.traineeStart != null)
                                       Text(
-                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(setting.traineeStart!)})')
+                                          'Bạn cần có công ty thực tập trước ngày thực tập (${GV.readTimestamp(settingTraineeUser.traineeStart!)})')
                                   ],
                                 ),
                                 const SizedBox(height: 35),
@@ -1321,9 +1503,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                     fontSize: 16,
                                   ),
                                 ),
-                                if (setting.traineeStart != null)
+                                if (settingTraineeUser.traineeStart != null)
                                   Text(
-                                      'Đã bắt đầu thời gian thực tập (${GV.readTimestamp(setting.traineeStart!)}) vui lòng liên hệ giảng viên cố vấn để được giải quyết.')
+                                      'Đã bắt đầu thời gian thực tập (${GV.readTimestamp(settingTraineeUser.traineeStart!)}) vui lòng liên hệ giảng viên cố vấn để được giải quyết.')
                               ],
                             ),
                           ],
@@ -1337,7 +1519,6 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
   }
 
   Widget _trainee() {
-    // double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return StreamBuilder(
         stream: firestore
@@ -1457,9 +1638,11 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                plan.listWork![i].content!,
-                                                textAlign: TextAlign.start,
+                                              Expanded(
+                                                child: Text(
+                                                  plan.listWork![i].content!,
+                                                  textAlign: TextAlign.start,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -1543,9 +1726,9 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    if (setting.submitEnd != null)
+                    if (settingTraineeUser.submitEnd != null)
                       Text(
-                          "Đến hết ngày ${GV.readTimestamp(setting.submitEnd!)}"),
+                          "Đến hết ngày ${GV.readTimestamp(settingTraineeUser.submitEnd!)}"),
                   ],
                 ),
                 const SizedBox(height: 5),
@@ -1581,97 +1764,114 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                                       ),
                                     ),
                                     const SizedBox(width: 15),
-                                    InkWell(
-                                      onTap: () async {
-                                        showDialog(
-                                            context: context,
-                                            barrierColor: Colors.black12,
-                                            builder: (context) {
-                                              return Padding(
-                                                padding: EdgeInsets.only(
-                                                  top: screenHeight * 0.06,
-                                                  bottom: screenHeight * 0.02,
-                                                  left: screenWidth * 0.27,
-                                                  right: screenWidth * 0.08,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    AlertDialog(
-                                                      title: Container(
-                                                        color: Colors
-                                                            .blue.shade600,
-                                                        height:
+                                    DateTime.now().isBeforeOrEqual(
+                                            settingTraineeUser.submitEnd)
+                                        ? InkWell(
+                                            onTap: () async {
+                                              showDialog(
+                                                  context: context,
+                                                  barrierColor: Colors.black12,
+                                                  builder: (context) {
+                                                    return Padding(
+                                                      padding: EdgeInsets.only(
+                                                        top:
                                                             screenHeight * 0.06,
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 10),
-                                                        child: const Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Text(
-                                                              'Xóa tài liệu',
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 20),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                        bottom:
+                                                            screenHeight * 0.02,
+                                                        left:
+                                                            screenWidth * 0.27,
+                                                        right:
+                                                            screenWidth * 0.08,
                                                       ),
-                                                      titlePadding:
-                                                          EdgeInsets.zero,
-                                                      shape: Border.all(
-                                                          width: 0.5),
-                                                      content: const Text(
-                                                          "Bạn có chắc chắn muốn xóa tài liệu này?"),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: const Text(
-                                                            "Hủy",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          AlertDialog(
+                                                            title: Container(
+                                                              color: Colors.blue
+                                                                  .shade600,
+                                                              height:
+                                                                  screenHeight *
+                                                                      0.06,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10),
+                                                              child: const Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Text(
+                                                                    'Xóa tài liệu',
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            20),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
+                                                            titlePadding:
+                                                                EdgeInsets.zero,
+                                                            shape: Border.all(
+                                                                width: 0.5),
+                                                            content: const Text(
+                                                                "Bạn có chắc chắn muốn xóa tài liệu này?"),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  "Hủy",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  await deleteFile(
+                                                                      deleteAt:
+                                                                          index);
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  "Đồng ý",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () async {
-                                                            await deleteFile(
-                                                                deleteAt:
-                                                                    index);
-                                                          },
-                                                          child: const Text(
-                                                            "Đồng ý",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            });
-                                      },
-                                      child: const Icon(
-                                        Icons.delete_outlined,
-                                        color: Colors.red,
-                                        size: 20,
-                                      ),
-                                    ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  });
+                                            },
+                                            child: const Icon(
+                                              Icons.delete_outlined,
+                                              color: Colors.red,
+                                              size: 20,
+                                            ),
+                                          )
+                                        : const SizedBox.shrink()
                                   ],
                                 );
                               },
@@ -1681,7 +1881,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   ],
                 ),
                 const SizedBox(height: 75),
-                DateTime.now().isBeforeOrEqual(setting.submitEnd)
+                DateTime.now().isBeforeOrEqual(settingTraineeUser.submitEnd)
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1933,7 +2133,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Kết quả thực tập',
+                'Kết quả học phần',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -1950,7 +2150,8 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    DateTime.now().isAfterTimestamp(setting.pointCVEnd)
+                    DateTime.now()
+                            .isAfterTimestamp(settingTraineeUser.pointCVEnd)
                         ? appreciate.pointChar != 'F'
                             ? const Column(
                                 children: [
@@ -1983,7 +2184,7 @@ class _RegisterTraineeState extends State<RegisterTrainee> {
                   field: 'Học phần',
                   display: trainee.creditName,
                 ),
-                DateTime.now().isAfterTimestamp(setting.pointCVEnd)
+                DateTime.now().isAfterTimestamp(settingTraineeUser.pointCVEnd)
                     ? LineDetail(
                         field: 'Điểm/Điểm chữ',
                         display:

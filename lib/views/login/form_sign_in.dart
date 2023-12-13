@@ -72,7 +72,7 @@ class FormSignIn extends StatelessWidget {
                         await SharedPreferences.getInstance();
                     prefs.setString(
                       'userId',
-                      _userIdCtrl.text,
+                      _userIdCtrl.text.toLowerCase(),
                     );
                     prefs.setInt('menuSelected', 0);
                     prefs.setBool("isLoggedIn", true);
@@ -148,7 +148,7 @@ class FormSignIn extends StatelessWidget {
                         await SharedPreferences.getInstance();
                     prefs.setString(
                       'userId',
-                      _userIdCtrl.text,
+                      _userIdCtrl.text.toLowerCase(),
                     );
                     prefs.setInt('menuSelected', 0);
                     prefs.setBool("isLoggedIn", true);
@@ -199,7 +199,8 @@ class FormSignIn extends StatelessWidget {
                     String str = "";
                     if (isExistUser.data()!['group'] == NguoiDung.quantri ||
                         isExistUser.data()!['group'] == NguoiDung.giaovu ||
-                        isExistUser.data()!['group'] == NguoiDung.covan ) {
+                        isExistUser.data()!['group'] == NguoiDung.covan ||
+                        isExistUser.data()!['group'] == NguoiDung.cbhd) {
                       str = "${_userIdCtrl.text.toLowerCase()}@ctu.edu.vn";
                       await GV.auth.signInWithEmailAndPassword(
                         email: str,
@@ -222,7 +223,7 @@ class FormSignIn extends StatelessWidget {
                         await SharedPreferences.getInstance();
                     prefs.setString(
                       'userId',
-                      _userIdCtrl.text,
+                      _userIdCtrl.text.toLowerCase(),
                     );
                     prefs.setInt('menuSelected', 0);
                     prefs.setBool("isLoggedIn", true);
@@ -255,10 +256,6 @@ class FormSignIn extends StatelessWidget {
                   GV.error(
                       context: context, message: 'Tài khoản không tồn tại!');
                 }
-              } else {
-                GV.error(
-                    context: context,
-                    message: 'Vui lòng điền thông tin đăng nhập!');
               }
             },
           ),

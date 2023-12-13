@@ -39,6 +39,7 @@ class UserController extends GetxController {
   RxDouble finalTotal = 0.0.obs;
   RxString selectedCourse = ''.obs;
   RxString selectedMajor = ''.obs;
+  RxList<FirmSuggestModel> suggest = RxList();
 
   setCurrentUser({
     String? setUid,
