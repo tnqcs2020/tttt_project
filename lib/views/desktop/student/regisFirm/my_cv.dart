@@ -724,76 +724,77 @@ class _MyCVState extends State<MyCV> {
                                                                                 'Yêu cầu kỹ năng (mức độ thông thạo kỹ năng, được đánh giá trên thang điểm từ 1 đến 5)',
                                                                                 style: TextStyle(fontWeight: FontWeight.bold),
                                                                               ),
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 15),
-                                                                                child: Table(
-                                                                                  columnWidths: Map.from({
-                                                                                    0: const FlexColumnWidth(2),
-                                                                                    1: const FlexColumnWidth(2),
-                                                                                    2: const FlexColumnWidth(3),
-                                                                                  }),
-                                                                                  children: [
-                                                                                    TableRow(children: [
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Ngoại ngữ: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![0]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Kỹ năng lập trình: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![1]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Kỹ năng làm việc nhóm: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![2]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                    ]),
-                                                                                    TableRow(children: [
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Máy học, AI: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![3]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Website: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![4]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          const Text('Ứng dụng di động: '),
-                                                                                          Text(
-                                                                                            '${firm.tieuChi![5]}',
-                                                                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                    ]),
-                                                                                  ],
+                                                                              if (firm.tieuChi != null)
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 15),
+                                                                                  child: Table(
+                                                                                    columnWidths: Map.from({
+                                                                                      0: const FlexColumnWidth(2),
+                                                                                      1: const FlexColumnWidth(2),
+                                                                                      2: const FlexColumnWidth(3),
+                                                                                    }),
+                                                                                    children: [
+                                                                                      TableRow(children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Ngoại ngữ: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![0]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Kỹ năng lập trình: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![1]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Kỹ năng làm việc nhóm: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![2]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                      ]),
+                                                                                      TableRow(children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Máy học, AI: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![3]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Website: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![4]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            const Text('Ứng dụng di động: '),
+                                                                                            Text(
+                                                                                              '${firm.tieuChi![5]}',
+                                                                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                      ]),
+                                                                                    ],
+                                                                                  ),
                                                                                 ),
-                                                                              ),
                                                                               if (setting.settingId != null && DateTime.now().isBeforeTimestamp(setting.traineeStart!)) ...[
                                                                                 if (isRegistered == false) ...[
                                                                                   const Text(

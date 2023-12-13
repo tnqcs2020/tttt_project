@@ -56,6 +56,8 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
   final _formKey = GlobalKey<FormState>();
   SettingTraineeModel setting = SettingTraineeModel();
   ValueNotifier finalTotal = ValueNotifier(0);
+  String hknow = HocKy.empty;
+  NamHoc nhnow = NamHoc.empty;
   @override
   void initState() {
     getData();
@@ -79,6 +81,13 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
     DocumentSnapshot<Map<String, dynamic>> atMoment =
         await firestore.collection('atMoment').doc('now').get();
     if (atMoment.data() != null) {
+      setState(() {
+        hknow = atMoment.data()!['term'];
+        final temp = NamHoc(
+            start: atMoment.data()!['yearStart'],
+            end: atMoment.data()!['yearEnd']);
+        nhnow = temp;
+      });
       QuerySnapshot<Map<String, dynamic>> isExistSettingTrainee =
           await firestore
               .collection('settingTrainees')
@@ -207,7 +216,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          '${setting.term}',
+                                          hknow,
                                           style: DropdownStyle.hintStyle,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -267,9 +276,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                   isExpanded: true,
                                   hint: Center(
                                     child: Text(
-                                      setting.yearStart == setting.yearEnd
-                                          ? "${setting.yearStart}"
-                                          : "${setting.yearStart} - ${setting.yearEnd}",
+                                      nhnow.start == nhnow.end
+                                          ? "${nhnow.start}"
+                                          : "${nhnow.start} - ${nhnow.end}",
                                       style: DropdownStyle.hintStyle,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -823,11 +832,9 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                                                     trainees.forEach((e2) {
                                                       if (e1.userId ==
                                                               e2.userId &&
-                                                          e2.term ==
-                                                              setting.term &&
+                                                          e2.term == hknow &&
                                                           e2.yearStart ==
-                                                              setting
-                                                                  .yearStart) {
+                                                              nhnow.start) {
                                                         listRegis.add(e1);
                                                       }
                                                     });
@@ -1238,13 +1245,12 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                       children: <Widget>[
                         FieldDetail(
                             field: 'Mã sinh viên',
-                            content: '${user.userId!.toUpperCase()}'),
+                            content: user.userId!.toUpperCase()),
+                        FieldDetail(field: 'Họ tên', content: user.userName!),
+                        FieldDetail(field: 'Ngành', content: user.major!),
+                        FieldDetail(field: 'Email', content: user.email!),
                         FieldDetail(
-                            field: 'Họ tên', content: '${user.userName!}'),
-                        FieldDetail(field: 'Ngành', content: '${user.major!}'),
-                        FieldDetail(field: 'Email', content: '${user.email!}'),
-                        FieldDetail(
-                            field: 'Số điện thoại', content: '${user.phone!}'),
+                            field: 'Số điện thoại', content: user.phone!),
                         if (cv != null)
                           FieldDetail(
                               field: 'Mô tả bản thân',
@@ -1336,8 +1342,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                             content: '${jobRegister.jobName}'),
                         FieldDetail(
                             field: 'Ngày ứng tuyển',
-                            content:
-                                '${GV.readTimestamp(jobRegister.createdAt!)}'),
+                            content: GV.readTimestamp(jobRegister.createdAt!)),
                         FieldDetail(
                             field: 'Thực tập',
                             content:
@@ -1346,7 +1351,7 @@ class _ListStudentTraineeState extends State<ListStudentTrainee> {
                           FieldDetail(
                               field: 'Ngày duyệt',
                               content:
-                                  '${GV.readTimestamp(jobRegister.repliedAt!)}'),
+                                  GV.readTimestamp(jobRegister.repliedAt!)),
                       ],
                     ),
                   ),
