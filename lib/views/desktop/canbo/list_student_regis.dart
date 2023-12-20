@@ -928,7 +928,9 @@ class _ListStudentRegisState extends State<ListStudentRegis> {
                         actions: DateTime.now()
                                 .isAfterOrEqual(setting.traineeStart)
                             ? null
-                            : jobRegister.status == TrangThai.wait
+                            : jobRegister.status == TrangThai.wait &&
+                                    loadTrainee.term == setting.term &&
+                                    loadTrainee.yearStart == setting.yearStart
                                 ? [
                                     ElevatedButton(
                                       child: const Text(

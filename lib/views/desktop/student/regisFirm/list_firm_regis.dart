@@ -720,7 +720,6 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                                   'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
                                                                                                 });
                                                                                                 Navigator.pop(context);
-                                                                                                Navigator.pop(context);
                                                                                                 GV.success(context: context, message: 'Đã cập nhật vị trí ứng tuyển.');
                                                                                               }
                                                                                             }
@@ -808,8 +807,8 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                                                     }
                                                                                                                   }
                                                                                                                 }
-                                                                                                                firestore.collection('plans').doc(userId).set(plan.toMap());
-                                                                                                                firestore.collection('firms').doc(firm.firmId).update({
+                                                                                                                await firestore.collection('plans').doc(userId).set(plan.toMap());
+                                                                                                                await firestore.collection('firms').doc(firm.firmId).update({
                                                                                                                   'listRegis': listRegis.map((i) => i.toMap()).toList()
                                                                                                                 });
                                                                                                                 var loadListRegis = await GV.traineesCol.doc(userId).get();
@@ -821,8 +820,9 @@ class _ListFirmRegisState extends State<ListFirmRegis> {
                                                                                                                     }
                                                                                                                   }
                                                                                                                 }
-                                                                                                                firestore.collection('trainees').doc(userId).update({
+                                                                                                                await firestore.collection('trainees').doc(userId).update({
                                                                                                                   'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                                                  'reachedStep':2,
                                                                                                                 });
                                                                                                                 Navigator.pop(context);
                                                                                                                 Navigator.pop(context);

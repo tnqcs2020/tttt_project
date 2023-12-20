@@ -1399,6 +1399,7 @@ class _MyCVState extends State<MyCV> {
                                                                                                                       }
                                                                                                                       await firestore.collection('trainees').doc(userId).update({
                                                                                                                         'listRegis': listUserRegis.map((i) => i.toMap()).toList(),
+                                                                                                                        'reachedStep': 2,
                                                                                                                       });
                                                                                                                       if (method.value) {
                                                                                                                         await suggestTFIDF();

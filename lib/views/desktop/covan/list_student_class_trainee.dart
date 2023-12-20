@@ -397,8 +397,11 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                   .where('yearStart',
                                       isEqualTo: setting.yearStart)
                                   .get();
-                              final request = RequestEditModel.fromMap(
-                                  loadRequest.docs.first.data());
+                              RequestEditModel? request;
+                              if (loadRequest.docs.isNotEmpty) {
+                                request = RequestEditModel.fromMap(
+                                    loadRequest.docs.first.data());
+                              }
                               final load = await firestore
                                   .collection('trainees')
                                   .where('classId', isEqualTo: myClass)
@@ -414,11 +417,12 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                               }
                               appreciateAll(
                                   traineeAtNow: traineeAtNow,
-                                  isClock: request.delayAt != null
-                                      ? DateTime.now()
-                                          .isAfterTimestamp(request.delayAt)
-                                      : DateTime.now().isAfterTimestamp(
-                                          setting.pointCVEnd));
+                                  isClock:
+                                      request != null && request.delayAt != null
+                                          ? DateTime.now()
+                                              .isAfterTimestamp(request.delayAt)
+                                          : DateTime.now().isAfterTimestamp(
+                                              setting.pointCVEnd));
                             },
                           ),
                         ],
@@ -748,7 +752,10 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                       padding: const EdgeInsets.only(bottom: 1),
                                                                                       onPressed: () async {
                                                                                         final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
-                                                                                        final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                        RequestEditModel? request;
+                                                                                        if (loadRequest.docs.isNotEmpty) {
+                                                                                          request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                        }
                                                                                         points = [];
                                                                                         double pointCB = 0;
                                                                                         appreciateCB.forEach((element) {
@@ -819,7 +826,7 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                           trainee: traineeClass[indexTrain],
                                                                                           userRegister: userRegister,
                                                                                           isUpdate: isAppCV,
-                                                                                          isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd),
+                                                                                          isClock: request != null && request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd),
                                                                                         );
                                                                                       },
                                                                                       icon: const Icon(
@@ -1095,8 +1102,11 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                           tooltip: 'Đánh giá',
                                                                                           padding: const EdgeInsets.only(bottom: 1),
                                                                                           onPressed: () async {
-                                                                                            final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: setting.term).where('yearStart', isEqualTo: setting.yearStart).get();
-                                                                                            final request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                            final loadRequest = await firestore.collection('requestEdits').where('cvId', isEqualTo: userId).where('term', isEqualTo: hknow).where('yearStart', isEqualTo: nhnow.start).get();
+                                                                                            RequestEditModel? request;
+                                                                                            if (loadRequest.docs.isNotEmpty) {
+                                                                                              request = RequestEditModel.fromMap(loadRequest.docs.first.data());
+                                                                                            }
                                                                                             points = [];
                                                                                             double pointCB = 0;
                                                                                             appreciateCB.forEach((element) {
@@ -1160,14 +1170,13 @@ class _ListStudentClassState extends State<ListStudentClassTrainee> {
                                                                                                 finalTotal.value = double.parse((temp - double.parse(points[10].text)).toStringAsFixed(1));
                                                                                               });
                                                                                             }
-
                                                                                             showAppreciate(
                                                                                               context: context,
                                                                                               user: user,
                                                                                               trainee: traineeClass[indexTrain],
                                                                                               userRegister: userRegister,
                                                                                               isUpdate: isAppCV,
-                                                                                              isClock: request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd!),
+                                                                                              isClock: request != null && request.delayAt != null ? DateTime.now().isAfterTimestamp(request.delayAt) : DateTime.now().isAfterTimestamp(setting.pointCVEnd),
                                                                                             );
                                                                                           },
                                                                                           icon: const Icon(

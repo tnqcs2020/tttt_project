@@ -1932,6 +1932,7 @@ class _ListFirmState extends State<ListFirm> {
                                                                       .map((i) =>
                                                                           i.toMap())
                                                                       .toList(),
+                                                                      'reachedStep':2,
                                                                 });
                                                                 Navigator.pop(
                                                                     context);
